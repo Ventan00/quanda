@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Quanda.Server.Data;
 using Quanda.Server.Repositories.Interfaces;
 using Quanda.Shared.DTOs.Requests;
+using Quanda.Shared.Enums;
 using Quanda.Shared.Models;
 
 namespace Quanda.Server.Repositories.Implementations
@@ -21,7 +22,88 @@ namespace Quanda.Server.Repositories.Implementations
 
         public async Task<List<Question>> GetQuestions(GetQuestionsDTO getQuestionsDto)
         {
-            throw new NotImplementedException();
+            if (getQuestionsDto.Categories.Count() == 0)
+            {
+                switch (getQuestionsDto.SortingOption)
+                {
+                    case SORT_OPTION_ENUM.Date:
+                        return await _context.Questions
+                            .OrderBy(question => question.PublishDate)
+                            .Skip(getQuestionsDto.Skip)
+                            .ToListAsync();
+                    case SORT_OPTION_ENUM.Tags:
+                        return null;
+                    case SORT_OPTION_ENUM.Views:
+                        return await _context.Questions
+                            .OrderBy(question => question.Views)
+                            .Skip(getQuestionsDto.Skip)
+                            .ToListAsync();
+                    case SORT_OPTION_ENUM.Answers:
+                        return await _context.Questions
+                            .Include(question => question.Answers)
+                            .OrderBy(question => question.Views)
+                            .Skip(getQuestionsDto.Skip)
+                            .ToListAsync();
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+            else
+            {
+                switch (getQuestionsDto.SortingOption)
+                {
+                    case SORT_OPTION_ENUM.Date:
+                        return await _context.Questions
+                            .Include(question => question.QuestionCategories)
+                            .Where(
+                                question => _context.QuestionCategories
+                                    .Include(qc => qc.IdCategoryNavigation)
+                                    .Where(qc => qc.IdQuestion==question.IdQuestion)
+                                    .Any(qc => getQuestionsDto.Categories.Any(cat => qc.IdCategoryNavigation==cat))
+                                                )
+                            .OrderBy(question => question.PublishDate)
+                            .Skip(getQuestionsDto.Skip)
+                            .ToListAsync();
+                    case SORT_OPTION_ENUM.Tags:
+                        return await _context.Questions
+                            .Include(question => question.QuestionCategories)
+                            .Where(
+                                question => _context.QuestionCategories
+                                    .Include(qc => qc.IdCategoryNavigation)
+                                    .Where(qc => qc.IdQuestion == question.IdQuestion)
+                                    .Any(qc => getQuestionsDto.Categories.Any(cat => qc.IdCategoryNavigation == cat))
+                                                )
+                            .Skip(getQuestionsDto.Skip)
+                            .ToListAsync();
+                    case SORT_OPTION_ENUM.Views:
+                        return await _context.Questions
+                            .Include(question => question.QuestionCategories)
+                            .Where(
+                                question => _context.QuestionCategories
+                                    .Include(qc => qc.IdCategoryNavigation)
+                                    .Where(qc => qc.IdQuestion == question.IdQuestion)
+                                    .Any(qc => getQuestionsDto.Categories.Any(cat => qc.IdCategoryNavigation == cat))
+                            )
+                            .OrderBy(question => question.Views)
+                            .Skip(getQuestionsDto.Skip)
+                            .ToListAsync();
+                    case SORT_OPTION_ENUM.Answers:
+                        return await _context.Questions
+                            .Include(question => question.QuestionCategories)
+                            .Include(question => question.Answers)
+                            .Where(
+                                question => _context.QuestionCategories
+                                    .Include(qc => qc.IdCategoryNavigation)
+                                    .Where(qc => qc.IdQuestion == question.IdQuestion)
+                                    .Any(qc => getQuestionsDto.Categories.Any(cat => qc.IdCategoryNavigation == cat))
+                            )
+                            .OrderBy(question => question.Answers.Count)
+                            .Skip(getQuestionsDto.Skip)
+                            .ToListAsync();
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
         }
 
         public async Task<Question> GetQuestion(int questionId)
@@ -74,10 +156,13 @@ namespace Quanda.Server.Repositories.Implementations
 
         }
 
-
         public async Task<int> SetFinished(int questionId)
         {
-            throw new NotImplementedException();
+            var Question = await _context.Questions.Where(question => question.IdQuestion == questionId).SingleAsync();
+            if (Question == null) return 1;
+            Question.IsFinished = true;
+            await _context.SaveChangesAsync();
+            return 0;
         }
     }
 }
