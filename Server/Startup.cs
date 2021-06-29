@@ -9,6 +9,8 @@ using Microsoft.Extensions.Hosting;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Quanda.Server.Data;
+using Quanda.Server.Repositories.Implementations;
+using Quanda.Server.Repositories.Interfaces;
 
 namespace Quanda.Server
 {
@@ -32,6 +34,9 @@ namespace Quanda.Server
 
             services.AddControllersWithViews();
             services.AddRazorPages();
+
+            //repositories
+            services.AddScoped<IQuestionRepository, QuestionRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
