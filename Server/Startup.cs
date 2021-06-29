@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -6,6 +7,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
+using Quanda.Server.Data;
 
 namespace Quanda.Server
 {
@@ -22,6 +25,10 @@ namespace Quanda.Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<AppDbContext>(options =>
+            {
+                options.UseMySql(Configuration.GetConnectionString("MySqlDbConnString"), new MySqlServerVersion(new Version(8, 0, 25)));
+            });
 
             services.AddControllersWithViews();
             services.AddRazorPages();
