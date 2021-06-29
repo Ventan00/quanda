@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Quanda.Server.EfConfigurations;
 using Quanda.Shared.Models;
 
 namespace Quanda.Server.Data
@@ -24,7 +25,15 @@ namespace Quanda.Server.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
+            modelBuilder.ApplyConfiguration(new AnswerEfConfiguration());
+            modelBuilder.ApplyConfiguration(new CategoryEfConfiguration());
+            modelBuilder.ApplyConfiguration(new NotificationEfConfiguration());
+            modelBuilder.ApplyConfiguration(new QuestionEfConfiguration());
+            modelBuilder.ApplyConfiguration(new QuestionCategoryEfConfiguration());
+            modelBuilder.ApplyConfiguration(new RoleEfConfiguration());
+            modelBuilder.ApplyConfiguration(new ServiceEfConfiguration());
+            modelBuilder.ApplyConfiguration(new UserEfConfiguration());
+            modelBuilder.ApplyConfiguration(new UserRoleEfConfiguration());
         }
     }
 }
