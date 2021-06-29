@@ -1,7 +1,14 @@
-﻿namespace Quanda.Shared.Models
+﻿using System.Collections.Generic;
+
+namespace Quanda.Shared.Models
 {
     public class Answer
     {
+        public Answer()
+        {
+            InverseIdRootAnswersNavigation = new HashSet<Answer>();
+        }
+
         public int IdAnswer { get; set; }
         public string Text { get; set; }
         public int Rating { get; set; }
@@ -13,5 +20,6 @@
         public virtual User IdUserNavigation { get; set; }
         public virtual Question IdQuestionNavigation { get; set; }
         public virtual Answer IdRootAnswerNavigation { get; set; }
+        public virtual ICollection<Answer> InverseIdRootAnswersNavigation { get; set; }
     }
 }
