@@ -11,6 +11,8 @@ using Microsoft.EntityFrameworkCore;
 using Quanda.Server.Data;
 using Quanda.Server.Repositories.Implementations;
 using Quanda.Server.Repositories.Interfaces;
+using Quanda.Server.Services.Implementations;
+using Quanda.Server.Services.Interfaces;
 
 namespace Quanda.Server
 {
@@ -37,6 +39,11 @@ namespace Quanda.Server
 
             //repositories
             services.AddScoped<IQuestionRepository, QuestionRepository>();
+            services.AddScoped<IUsersRepository, UsersRepository>();
+
+            //custom services
+            services.AddScoped<IUserAuthService, UserAuthService>();
+            services.AddScoped<IJwtService, JwtService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
