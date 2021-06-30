@@ -18,9 +18,9 @@ namespace Quanda.Server.EfConfigurations
 
             builder.Property(u => u.Nickname).HasMaxLength(30).IsRequired();
 
-            builder.Property(u => u.FirstName).HasMaxLength(30).IsRequired();
+            builder.Property(u => u.FirstName).HasMaxLength(30).IsRequired(false);
 
-            builder.Property(u => u.LastName).HasMaxLength(30).IsRequired();
+            builder.Property(u => u.LastName).HasMaxLength(30).IsRequired(false);
 
             builder.Property(u => u.Email).IsRequired();
 
