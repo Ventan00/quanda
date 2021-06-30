@@ -3,11 +3,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Quanda.Server.Data;
-using Quanda.Server.Enums;
+using Quanda.Server.Utils;
 using Quanda.Server.Repositories.Interfaces;
 using Quanda.Shared.DTOs.Requests;
 using Quanda.Shared.Models;
-using static Quanda.Server.Enums.UserStatus;
+using static Quanda.Server.Utils.UserStatus;
 
 namespace Quanda.Server.Repositories.Implementations
 {

@@ -1,4 +1,4 @@
-﻿namespace Quanda.Server.Enums
+﻿namespace Quanda.Server.Utils
 {
     public enum UserStatus
     {

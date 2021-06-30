@@ -2,7 +2,7 @@
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using static Quanda.Server.Enums.UserStatus;
+using static Quanda.Server.Utils.UserStatus;
 using Quanda.Server.Repositories.Interfaces;
 using Quanda.Server.Services.Interfaces;
 using Quanda.Shared.DTOs.Requests;

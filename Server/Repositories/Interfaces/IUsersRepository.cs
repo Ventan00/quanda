@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Quanda.Server.Enums;
+using Quanda.Server.Utils;
 using Quanda.Shared.DTOs.Requests;
 using Quanda.Shared.Models;
 
