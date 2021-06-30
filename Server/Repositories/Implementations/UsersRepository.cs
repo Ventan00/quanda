@@ -31,8 +31,6 @@ namespace Quanda.Server.Repositories.Implementations
 
             var user = new User
             {
-                FirstName = registerDto.FirstName,
-                LastName = registerDto.LastName,
                 Nickname = registerDto.Nickname,
                 Email = registerDto.Email
             };
