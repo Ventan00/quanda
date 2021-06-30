@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Quanda.Server.Data;
 using Quanda.Server.Repositories.Interfaces;
+using Quanda.Server.Utils;
 using Quanda.Shared.DTOs.Requests;
 using Quanda.Shared.Enums;
 using Quanda.Shared.Models;
@@ -30,6 +31,7 @@ namespace Quanda.Server.Repositories.Implementations
                         return await _context.Questions
                             .OrderBy(question => question.PublishDate)
                             .Skip(getQuestionsDto.Skip)
+                            .Take(10)
                             .ToListAsync();
                     case SORT_OPTION_ENUM.Tags:
                         return null;
@@ -37,12 +39,14 @@ namespace Quanda.Server.Repositories.Implementations
                         return await _context.Questions
                             .OrderBy(question => question.Views)
                             .Skip(getQuestionsDto.Skip)
+                            .Take(10)
                             .ToListAsync();
                     case SORT_OPTION_ENUM.Answers:
                         return await _context.Questions
                             .Include(question => question.Answers)
                             .OrderBy(question => question.Views)
                             .Skip(getQuestionsDto.Skip)
+                            .Take(10)
                             .ToListAsync();
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -63,6 +67,7 @@ namespace Quanda.Server.Repositories.Implementations
                                                 )
                             .OrderBy(question => question.PublishDate)
                             .Skip(getQuestionsDto.Skip)
+                            .Take(10)
                             .ToListAsync();
                     case SORT_OPTION_ENUM.Tags:
                         return await _context.Questions
@@ -74,6 +79,7 @@ namespace Quanda.Server.Repositories.Implementations
                                     .Any(qc => getQuestionsDto.Categories.Any(cat => qc.IdCategoryNavigation == cat))
                                                 )
                             .Skip(getQuestionsDto.Skip)
+                            .Take(10)
                             .ToListAsync();
                     case SORT_OPTION_ENUM.Views:
                         return await _context.Questions
@@ -86,6 +92,7 @@ namespace Quanda.Server.Repositories.Implementations
                             )
                             .OrderBy(question => question.Views)
                             .Skip(getQuestionsDto.Skip)
+                            .Take(10)
                             .ToListAsync();
                     case SORT_OPTION_ENUM.Answers:
                         return await _context.Questions
@@ -99,6 +106,7 @@ namespace Quanda.Server.Repositories.Implementations
                             )
                             .OrderBy(question => question.Answers.Count)
                             .Skip(getQuestionsDto.Skip)
+                            .Take(10)
                             .ToListAsync();
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -111,7 +119,7 @@ namespace Quanda.Server.Repositories.Implementations
             return await _context.Questions.Where(question => question.IdQuestion == questionId).SingleAsync();
         }
 
-        public async Task<int> AddQuestion(AddQuestionDTO question)
+        public async Task<QuestionResult> AddQuestion(AddQuestionDTO question)
         {
             var Question = new Question()
             {
@@ -125,44 +133,43 @@ namespace Quanda.Server.Repositories.Implementations
                 IdUser = question.IdUser
             };
             await _context.AddAsync(Question);
-            return await _context.SaveChangesAsync() == 1? 0 : 1;
+            return await _context.SaveChangesAsync() == 1? QuestionResult.QUESTION_ADDED : QuestionResult.QUESTION_DATABASE_ERROR;
         }
 
-        public async Task<int> UpdateQuestion(int questionId, UpdateQuestionDTO question)
+        public async Task<QuestionResult> UpdateQuestion(int questionId, UpdateQuestionDTO question)
         {
             var Question = await _context.Questions.Where(question => question.IdQuestion == questionId).SingleAsync();
-            if (Question == null) return 1;
+            if (Question == null) return QuestionResult.QUESTION_NOT_FOUND;
             Question.Description = question.Description;
             Question.IsModified = true;
-            return await _context.SaveChangesAsync() == 1 ? 0: 2;
+            return await _context.SaveChangesAsync() == 1 ? QuestionResult.QUESTION_UPDATED: QuestionResult.QUESTION_DATABASE_ERROR;
         }
 
-        public async Task<int> RemoveQuestion(int questionId)
+        public async Task<QuestionResult> RemoveQuestion(int questionId)
         {
             var Question = await _context.Questions.Where(question => question.IdQuestion == questionId).SingleAsync();
-            if(Question == null) return 1;
+            if(Question == null) return QuestionResult.QUESTION_NOT_FOUND;
             _context.Remove(Question);
-            await _context.SaveChangesAsync();
-            return  0;
+            
+            return await _context.SaveChangesAsync() ==1 ? QuestionResult.QUESTION_DELETED: QuestionResult.QUESTION_DATABASE_ERROR;
         }
 
-        public async Task<int> SetToCheck(int questionId, bool value)
+        public async Task<QuestionResult> SetToCheck(int questionId, bool value)
         {
             var Question = await _context.Questions.Where(question => question.IdQuestion == questionId).SingleAsync();
-            if (Question == null) return 1;
+            if (Question == null) return QuestionResult.QUESTION_NOT_FOUND;
             Question.ToCheck = value;
-            await _context.SaveChangesAsync();
-            return 0;
+            ;
+            return await _context.SaveChangesAsync() ==1 ? QuestionResult.QUESTION_CHANGED_TOCHECK_STATUS : QuestionResult.QUESTION_DATABASE_ERROR;
 
         }
 
-        public async Task<int> SetFinished(int questionId)
+        public async Task<QuestionResult> SetFinished(int questionId)
         {
             var Question = await _context.Questions.Where(question => question.IdQuestion == questionId).SingleAsync();
-            if (Question == null) return 1;
+            if (Question == null) return QuestionResult.QUESTION_NOT_FOUND;
             Question.IsFinished = true;
-            await _context.SaveChangesAsync();
-            return 0;
+            return await _context.SaveChangesAsync() == 1 ? QuestionResult.QUESTION_SET_TO_FINISHED : QuestionResult.QUESTION_DATABASE_ERROR;
         }
     }
 }

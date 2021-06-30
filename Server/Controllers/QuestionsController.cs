@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Quanda.Server.Repositories.Interfaces;
+using Quanda.Server.Utils;
 using Quanda.Shared.Models;
 using Quanda.Shared.DTOs.Requests;
 
@@ -36,33 +37,39 @@ namespace Quanda.Server.Controllers
         [HttpPost]
         public async Task<IActionResult> AddQuestion([FromBody] AddQuestionDTO question)
         {
-            return await _repository.AddQuestion(question) == 0 ? Ok() : BadRequest();
+            return await _repository.AddQuestion(question) == QuestionResult.QUESTION_ADDED ? Ok() : BadRequest();
         }
         [HttpPut("{QuestionID}")]
         public async Task<IActionResult> UpdateQuestion([FromRoute] int QuestionID, [FromBody] UpdateQuestionDTO question)
         {
-            var statusCode = await _repository.UpdateQuestion(QuestionID,question);
-            if (statusCode == 0)
-                return Ok();
-            else if (statusCode == 1)
-                return NotFound();
-            else
-                return BadRequest();
+            var statusCode = await _repository.UpdateQuestion(QuestionID, question);
+            if (statusCode == QuestionResult.QUESTION_UPDATED) return Ok();
+            else if (statusCode == QuestionResult.QUESTION_NOT_FOUND) return NotFound();
+            else return BadRequest();
         }
         [HttpPut("{QuestionID:int}/{CheckValue:bool}")]
         public async Task<IActionResult> SetToCheck([FromRoute] int QuestionID, [FromRoute]bool CheckValue)
         {
-            return await _repository.SetToCheck(QuestionID, CheckValue) == 0 ? Ok() : NotFound();
+            var statusCode = await _repository.SetToCheck(QuestionID, CheckValue);
+            if (statusCode == QuestionResult.QUESTION_CHANGED_TOCHECK_STATUS) return Ok();
+            else if (statusCode == QuestionResult.QUESTION_NOT_FOUND) return NotFound();
+            else return BadRequest();
         }
         [HttpPut("{QuestionID:int}")]
         public async Task<IActionResult> SetFinished([FromRoute] int QuestionID)
         {
-           return await _repository.SetFinished(QuestionID) == 0 ? Ok() : NotFound();
+            var statusCode = await _repository.SetFinished(QuestionID);
+            if (statusCode == QuestionResult.QUESTION_SET_TO_FINISHED) return Ok();
+            else if (statusCode == QuestionResult.QUESTION_NOT_FOUND) return NotFound();
+            else return BadRequest();
         }
         [HttpDelete("{QuestionID:int}")]
         public async Task<IActionResult> DeleteQuestion([FromRoute] int QuestionID)
         {
-            return await _repository.RemoveQuestion(QuestionID) == 0 ? Ok(): NotFound() ;
+            var statusCode = await _repository.RemoveQuestion(QuestionID);
+            if (statusCode == QuestionResult.QUESTION_DELETED) return Ok();
+            else if (statusCode == QuestionResult.QUESTION_NOT_FOUND) return NotFound();
+            else return BadRequest();
         }
 
     }
