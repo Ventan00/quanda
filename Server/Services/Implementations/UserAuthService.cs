@@ -8,7 +8,7 @@ namespace Quanda.Server.Services.Implementations
     {
         public bool VerifyUserPassword(string rawPassword, User user)
         {
-            var verificationRs = new PasswordHasher<User>().VerifyHashedPassword(null, user.HashedPassword, rawPassword);
+            var verificationRs = new PasswordHasher<User>().VerifyHashedPassword(user, user.HashedPassword, rawPassword);
             return @verificationRs switch
             {
                 PasswordVerificationResult.Success => true,

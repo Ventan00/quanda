@@ -29,14 +29,17 @@ namespace Quanda.Server.Repositories.Implementations
             if (isNicknameTaken)
                 return USER_NICKNAME_IS_TAKEN;
 
-            await _context.Users.AddAsync(new User
+            var user = new User
             {
                 FirstName = registerDto.FirstName,
                 LastName = registerDto.LastName,
                 Nickname = registerDto.Nickname,
-                Email = registerDto.Email,
-                HashedPassword = new PasswordHasher<User>().HashPassword(null, registerDto.RawPassword)
-            });
+                Email = registerDto.Email
+            };
+
+            user.HashedPassword = new PasswordHasher<User>().HashPassword(user, registerDto.RawPassword);
+
+            await _context.Users.AddAsync(user);
 
             var isRegistered = await _context.SaveChangesAsync() > 0;
             return !isRegistered ? USER_DB_ERROR : USER_REGISTERED;
