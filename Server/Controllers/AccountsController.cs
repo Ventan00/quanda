@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Net;
+using System.Net.Mail;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using static Quanda.Server.Utils.UserStatus;
+using static Quanda.Server.Utils.TempUserResult;
 using Quanda.Server.Repositories.Interfaces;
 using Quanda.Server.Services.Interfaces;
 using Quanda.Shared.DTOs.Requests;
@@ -13,21 +15,37 @@ namespace Quanda.Server.Controllers
     [Route("api/[controller]")]
     public class AccountsController : ControllerBase
     {
-        private readonly IUsersRepository _repository;
+        private readonly IUsersRepository _usersRepository;
+        private readonly ITempUsersRepository _tempUsersRepository;
         private readonly IJwtService _jwtService;
         private readonly IUserAuthService _userAuthService;
+        private readonly ISmtpService _smtpService;
 
-        public AccountsController(IUsersRepository repository, IJwtService jwtService, IUserAuthService userAuthService)
+        public AccountsController(
+            IUsersRepository usersRepository,
+            ITempUsersRepository tempUsersRepository,
+            IJwtService jwtService,
+            IUserAuthService userAuthService,
+            ISmtpService smtpService)
         {
-            _repository = repository;
+            _usersRepository = usersRepository;
+            _tempUsersRepository = tempUsersRepository;
             _jwtService = jwtService;
             _userAuthService = userAuthService;
+            _smtpService = smtpService;
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDTO registerDto)
         {
-            var registerStatus = await _repository.AddNewUserAsync(registerDto);
+            var confirmationCode = Guid.NewGuid().ToString();
+
+            var registerStatus = await _usersRepository.AddNewUserAsync(registerDto, confirmationCode);
+
+            if (registerStatus == USER_REGISTERED)
+            {
+                await _smtpService.SendRegisterConfirmationEmailAsync(registerDto.Email, confirmationCode);
+            }
 
             return @registerStatus switch
             {
@@ -42,8 +60,11 @@ namespace Quanda.Server.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDTO loginDto)
         {
-            var user = await _repository.GetUserByEmailAsync(loginDto.Email);
+            var user = await _usersRepository.GetUserByEmailAsync(loginDto.Email);
             if (user is null)
+                return Unauthorized();
+
+            if (user.IdTempUserNavigation is not null)
                 return Unauthorized();
 
             var isPasswordCorrect = _userAuthService.VerifyUserPassword(loginDto.RawPassword, user);
@@ -51,7 +72,7 @@ namespace Quanda.Server.Controllers
                 return Unauthorized();
 
             var (refreshToken, refreshTokenExpirationDate) = _jwtService.GenerateRefreshToken();
-            var updateStatus = await _repository.UpdateRefreshTokenForUserAsync(user, refreshToken, refreshTokenExpirationDate);
+            var updateStatus = await _usersRepository.UpdateRefreshTokenForUserAsync(user, refreshToken, refreshTokenExpirationDate);
             if (updateStatus == USER_DB_ERROR)
                 return StatusCode((int)HttpStatusCode.InternalServerError);
 
@@ -60,6 +81,21 @@ namespace Quanda.Server.Controllers
             _jwtService.AddTokensToCookies(refreshToken, refreshTokenExpirationDate, accessToken, Response.Cookies);
 
             return NoContent();
+        }
+
+
+        [HttpGet("confirm-email/{code}")]
+        public async Task<IActionResult> ConfirmEmail(string code)
+        {
+            var deleteResult = await _tempUsersRepository.DeleteTempUserByCodeAsync(code);
+
+            return @deleteResult switch
+            {
+                TEMP_USER_NOT_FOUND => NotFound("Wrong confirmation code"),
+                TEMP_USER_DELETED => Redirect($"https://{HttpContext.Request.Host}/login"),
+                TEMP_USER_DB_ERROR => StatusCode((int)HttpStatusCode.InternalServerError),
+                _ => throw new ArgumentOutOfRangeException()
+            };
         }
     }
 }

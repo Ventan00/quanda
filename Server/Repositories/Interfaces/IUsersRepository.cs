@@ -8,7 +8,7 @@ namespace Quanda.Server.Repositories.Interfaces
 {
     public interface IUsersRepository
     {
-        public Task<UserStatus> AddNewUserAsync(RegisterDTO registerDto);
+        public Task<UserStatus> AddNewUserAsync(RegisterDTO registerDto, string confirmationCode);
         public Task<User> GetUserByEmailAsync(string email);
         public Task<UserStatus> UpdateRefreshTokenForUserAsync(User user, string refreshToken, DateTime refreshTokenExpirationDate);
     }
