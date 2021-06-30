@@ -79,12 +79,6 @@ namespace Quanda.Server.Repositories.Implementations
             var answer = await _context.Answers.SingleOrDefaultAsync(a => a.IdAnswer == idAnswer);
             if (answer == null)
                 return AnswerResult.ANSWER_DELETED;
-            var childAnswer = await _context.Answers.SingleOrDefaultAsync(a => a.IdRootAnswer == idAnswer);
-            if(answer.IdRootAnswer == null && childAnswer != null)
-                childAnswer.IdRootAnswer = null;
-            else if(answer.IdRootAnswer != null && childAnswer != null)
-                childAnswer.IdRootAnswer = answer.IdRootAnswer;
-
             _context.Answers.Remove(answer);
             if (!(await _context.SaveChangesAsync() > 0))
                 return AnswerResult.DELETE_DB_ERROR;

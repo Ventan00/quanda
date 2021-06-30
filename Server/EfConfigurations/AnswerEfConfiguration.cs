@@ -44,6 +44,7 @@ namespace Quanda.Server.EfConfigurations
             builder.HasOne(a => a.IdRootAnswerNavigation)
                 .WithMany(a => a.InverseIdRootAnswersNavigation)
                 .HasForeignKey(a => a.IdRootAnswer)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("Answer_Answer");
         }
     }

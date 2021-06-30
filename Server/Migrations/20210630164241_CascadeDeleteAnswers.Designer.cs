@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Quanda.Server.Data;
 
 namespace Quanda.Server.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210630164241_CascadeDeleteAnswers")]
+    partial class CascadeDeleteAnswers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -203,25 +205,6 @@ namespace Quanda.Server.Migrations
                     b.ToTable("Service");
                 });
 
-            modelBuilder.Entity("Quanda.Shared.Models.TempUser", b =>
-                {
-                    b.Property<int?>("IdUser")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(36)
-                        .HasColumnType("varchar(36)");
-
-                    b.Property<DateTime>("ExpirationDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.HasKey("IdUser")
-                        .HasName("TempUser_pk");
-
-                    b.ToTable("Temp_User");
-                });
-
             modelBuilder.Entity("Quanda.Shared.Models.User", b =>
                 {
                     b.Property<int>("IdUser")
@@ -240,6 +223,7 @@ namespace Quanda.Server.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<string>("FirstName")
+                        .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("varchar(30)");
 
@@ -252,6 +236,7 @@ namespace Quanda.Server.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("LastName")
+                        .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("varchar(30)");
 
@@ -392,18 +377,6 @@ namespace Quanda.Server.Migrations
                     b.Navigation("IdQuestionNavigation");
                 });
 
-            modelBuilder.Entity("Quanda.Shared.Models.TempUser", b =>
-                {
-                    b.HasOne("Quanda.Shared.Models.User", "IdUserNavigation")
-                        .WithOne("IdTempUserNavigation")
-                        .HasForeignKey("Quanda.Shared.Models.TempUser", "IdUser")
-                        .HasConstraintName("TempUser_User")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("IdUserNavigation");
-                });
-
             modelBuilder.Entity("Quanda.Shared.Models.User", b =>
                 {
                     b.HasOne("Quanda.Shared.Models.Service", "IdServiceNavigation")
@@ -467,8 +440,6 @@ namespace Quanda.Server.Migrations
             modelBuilder.Entity("Quanda.Shared.Models.User", b =>
                 {
                     b.Navigation("Answers");
-
-                    b.Navigation("IdTempUserNavigation");
 
                     b.Navigation("Notifications");
 
