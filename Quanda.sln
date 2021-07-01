@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31112.23
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Quanda.Server", "Server\Quanda.Server.csproj", "{B3A783FA-49D9-47C3-8BA0-4349FCC43A98}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Quanda.Server", "Server\Quanda.Server.csproj", "{B3A783FA-49D9-47C3-8BA0-4349FCC43A98}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Quanda.Client", "Client\Quanda.Client.csproj", "{53E8958F-F3A3-40EA-9563-9145FEE48D25}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Quanda.Client", "Client\Quanda.Client.csproj", "{53E8958F-F3A3-40EA-9563-9145FEE48D25}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Quanda.Shared", "Shared\Quanda.Shared.csproj", "{C9EDF5EB-8203-41E9-B109-E582CE026CF7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Quanda.Shared", "Shared\Quanda.Shared.csproj", "{C9EDF5EB-8203-41E9-B109-E582CE026CF7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
