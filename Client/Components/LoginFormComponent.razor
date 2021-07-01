@@ -1,0 +1,48 @@
+﻿@using Microsoft.AspNetCore.Components
+@using Quanda.Client.Repositories.Interfaces
+@using Quanda.Shared.DTOs.Requests
+@using Quanda.Shared.Enums
+@inject IUsersRepository _usersRepository
+@inject NavigationManager _navManager;
+
+<EditForm Model="@_loginDto" OnValidSubmit="@HandleValidSubmit" autocomplete="off">
+    <DataAnnotationsValidator />
+    <div class="form-group">
+        <label for="email-input" class="d-block">Email Address</label>
+        <InputText id="email-input" @bind-Value="_loginDto.Email" />
+        <ValidationMessage For="() => _loginDto.Email" />
+    </div>
+    <div class="form-group">
+        <label for="password-input" class="d-block">Password</label>
+        <InputText id="password-input" @bind-Value="_loginDto.RawPassword" />
+        <ValidationMessage For="() => _loginDto.RawPassword" />
+    </div>
+    @switch (_loginStatus)
+    {
+        case LoginStatusEnum.SERVER_ERROR:
+            <label class="text-danger">An unexpected error has occurred. PLease try again.</label>
+            break;
+        case LoginStatusEnum.INVALID_CREDENTIALS:
+            <label class="text-danger">Invalid credentials. Please try again.</label>
+            break;
+        case LoginStatusEnum.EMAIL_NOT_CONFIRMED:
+            <label class="text-danger d-block">Email address is not confirmed.</label>
+            <label>Don't see an email?</label><a class="btn btn-link pl-1" href="recover/email-confirmation">Click here</a>
+            break;
+    }
+    <button type="submit" class="btn btn-success d-block">Log In</button>
+</EditForm>
+
+@code {
+    private readonly LoginDTO _loginDto = new();
+    private LoginStatusEnum? _loginStatus;
+
+    private async Task HandleValidSubmit()
+    {
+        _loginStatus = await _usersRepository.LoginAsync(_loginDto);
+        if (_loginStatus == LoginStatusEnum.LOGIN_ACCEPTED)
+        {
+            _navManager.NavigateTo("");
+        }
+    }
+}
