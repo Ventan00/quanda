@@ -8,6 +8,8 @@ using static Quanda.Server.Utils.TempUserResult;
 using Quanda.Server.Repositories.Interfaces;
 using Quanda.Server.Services.Interfaces;
 using Quanda.Shared.DTOs.Requests;
+using Quanda.Shared.DTOs.Responses;
+using Quanda.Shared.Enums;
 
 namespace Quanda.Server.Controllers
 {
@@ -60,27 +62,38 @@ namespace Quanda.Server.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDTO loginDto)
         {
+            var loginResponseDto = new LoginResponseDTO
+            {
+                LoginStatus = LoginStatusEnum.INVALID_CREDENTIALS
+            };
+
             var user = await _usersRepository.GetUserByEmailAsync(loginDto.Email);
             if (user is null)
-                return Unauthorized();
-
-            if (user.IdTempUserNavigation is not null)
-                return Unauthorized();
+                return Unauthorized(loginResponseDto);
 
             var isPasswordCorrect = _userAuthService.VerifyUserPassword(loginDto.RawPassword, user);
             if (!isPasswordCorrect)
-                return Unauthorized();
+                return Unauthorized(loginResponseDto);
+
+            if (user.IdTempUserNavigation is not null)
+            {
+                loginResponseDto.LoginStatus = LoginStatusEnum.EMAIL_NOT_CONFIRMED;
+                return Unauthorized(loginResponseDto);
+            }
 
             var (refreshToken, refreshTokenExpirationDate) = _jwtService.GenerateRefreshToken();
             var updateStatus = await _usersRepository.UpdateRefreshTokenForUserAsync(user, refreshToken, refreshTokenExpirationDate);
             if (updateStatus == USER_DB_ERROR)
-                return StatusCode((int)HttpStatusCode.InternalServerError);
+            {
+                loginResponseDto.LoginStatus = LoginStatusEnum.SERVER_ERROR;
+                return StatusCode((int)HttpStatusCode.InternalServerError, loginResponseDto.LoginStatus == LoginStatusEnum.SERVER_ERROR);
+            }
 
             var accessToken = _jwtService.GenerateAccessToken(user);
-
             _jwtService.AddTokensToCookies(refreshToken, refreshTokenExpirationDate, accessToken, Response.Cookies);
 
-            return NoContent();
+            loginResponseDto.LoginStatus = LoginStatusEnum.LOGIN_ACCEPTED;
+            return Ok(loginResponseDto);
         }
 
 

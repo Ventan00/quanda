@@ -6,6 +6,7 @@ namespace Quanda.Shared.DTOs.Requests
     {
         [Required]
         [MaxLength(30)]
+        [MinLength(6)]
         public string Nickname { get; set; }
 
         [Required]
@@ -14,6 +15,7 @@ namespace Quanda.Shared.DTOs.Requests
 
         [Required]
         [MaxLength(30)]
+        [MinLength(6)]
         public string RawPassword { get; set; }
     }
 }
