@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Quanda.Client.Repositories.Implementations;
 using Quanda.Client.Repositories.Interfaces;
+using Quanda.Client.Helpers;
 
 namespace Quanda.Client
 {
@@ -25,6 +26,7 @@ namespace Quanda.Client
         public static void ConfigureServices(IServiceCollection services)
         {
             services.AddScoped<IUsersRepository, UsersRepository>();
+            services.AddScoped<IHttpService, HttpService>();
         }
     }
 }
