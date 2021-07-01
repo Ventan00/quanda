@@ -1,0 +1,59 @@
+﻿@using Quanda.Shared.Models
+<div class="question-container">
+    <a href="@questionURL">
+        <div class="question-header">
+            <div class="question-text">
+                @Question.Header
+            </div>
+            <div class="question-date">
+                @Question.PublishDate.ToString("dd-MM-yyyy")
+            </div>
+        </div>
+        <div class="question-categories">
+            <div class="question-category-label">
+                Categories:
+            </div>
+            @foreach (var category in Question.QuestionCategories)
+            {
+                <div class="question-category">
+                    @category.IdCategoryNavigation.Name
+                </div>
+            }
+        </div>
+        <div class="question-text">
+            @Question.Description
+        </div>
+        <div class="question-footer">
+            <div class="question-user-info">
+                <div class="question-user-image">
+                    <img src="@Question.IdUserNavigation.Avatar" href="@userURL" />
+                </div>
+                <div class="question-user-nick">
+                    @Question.IdUserNavigation.Nickname
+                </div>
+                <div class="question-user-views">
+                    <div class="question-user-views-text">Views </div>
+                    <div class="question-user-views-value">@Question.Views</div>
+                </div>
+                <div class="question-user-answers">
+                    <div class="question-user-answers-text">Answers </div>
+                    <div class="question-user-answers-value">@Question.Answers.Count</div>
+                </div>
+            </div>
+        </div>
+    </a>
+</div>
+
+@code {
+    [Parameter]
+    public Question Question { get; set; }
+
+    private string questionURL = string.Empty;
+    private string userURL = string.Empty;
+    protected override void OnInitialized()
+    {
+        //todo Dodać parsowanie tekstu tak by nie było zdjęć
+        questionURL = $"questions/{Question.IdQuestion}";
+        userURL = $"users/{Question.IdUser}";
+    }
+}

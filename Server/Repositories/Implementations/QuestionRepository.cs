@@ -116,7 +116,11 @@ namespace Quanda.Server.Repositories.Implementations
 
         public async Task<Question> GetQuestion(int questionId)
         {
-            return await _context.Questions.Where(question => question.IdQuestion == questionId).SingleAsync();
+            var Question =  await _context.Questions.Where(question => question.IdQuestion == questionId).SingleAsync();
+            if(Question != null)
+                Question.Views++;
+            await _context.SaveChangesAsync();
+            return Question;
         }
 
         public async Task<QuestionResult> AddQuestion(AddQuestionDTO question)
