@@ -1,0 +1,16 @@
+﻿@inject IAnswerRepository answerRepository
+<h3>AnswersToQuestionsComponent</h3>
+<div class="answers-container">
+
+</div>
+
+@code {
+    [Parameter]
+    public List<AnswerBoxResponseDto> Answers { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        Answers = await answerRepository.GetAnswersAsync(1);
+    }
+
+}
