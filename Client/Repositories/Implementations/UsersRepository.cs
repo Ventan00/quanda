@@ -27,5 +27,15 @@ namespace Quanda.Client.Repositories.Implementations
 
             return loginResponseDto?.LoginStatus ?? LoginStatusEnum.SERVER_ERROR;
         }
+
+        public async Task<RegisterStatusEnum> RegisterAsync(RegisterDTO registerDto)
+        {
+            var response = await _httpClient.PostAsJsonAsync($"{ApiUrl}/register", registerDto);
+
+            var registerResponseDto = JsonSerializer.Deserialize<RegisterResponseDTO>(await response.Content.ReadAsStringAsync(),
+                new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+            return registerResponseDto?.RegisterStatus ?? RegisterStatusEnum.SERVER_ERROR;
+        }
     }
 }

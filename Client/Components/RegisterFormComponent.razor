@@ -1,0 +1,52 @@
+﻿@using Quanda.Shared.DTOs.Requests
+@using Quanda.Client.Repositories.Interfaces
+@using Quanda.Shared.Enums
+@inject IUsersRepository _usersRepository
+
+<EditForm Model="@_registerDto" OnValidSubmit="@HandleValidSubmit" autocomplete="off">
+    <DataAnnotationsValidator />
+    <div class="form-group">
+        <label for="email-input" class="d-block">Email Address</label>
+        <InputText id="email-input" @bind-Value="_registerDto.Email" />
+        <ValidationMessage For="() => _registerDto.Email" />
+    </div>
+    <div class="form-group">
+        <label for="nickname-input" class="d-block">Nickname</label>
+        <InputText id="nickname-input" @bind-Value="_registerDto.Nickname" />
+        <ValidationMessage For="() => _registerDto.Nickname" />
+    </div>
+    <div class="form-group">
+        <label for="password-input" class="d-block">Password</label>
+        <InputText id="password-input" @bind-Value="_registerDto.RawPassword" />
+        <ValidationMessage For="() => _registerDto.RawPassword" />
+    </div>
+    @switch (_registerStatus)
+    {
+
+        case RegisterStatusEnum.SERVER_ERROR:
+            <label class="text-danger d-block">An unexpected error has occurred. Please try again.</label>
+            break;
+        case RegisterStatusEnum.EMAIL_IS_TAKEN:
+            <label class="text-danger d-block">Email address has already been taken.</label>
+            break;
+        case RegisterStatusEnum.NICKNAME_IS_TAKEN:
+            <label class="text-danger d-block">Nickname has already been taken.</label>
+            break;
+        case RegisterStatusEnum.REGISTER_FINISHED:
+            <label class="text-success d-block">Your account has been created and awaits confirmation. Check your email to complete registration.</label>
+            break;
+    }
+
+    <button type="submit" class="btn btn-success">Sign Up</button>
+</EditForm>
+
+@code {
+    private RegisterDTO _registerDto = new();
+
+    private RegisterStatusEnum? _registerStatus;
+
+    private async Task HandleValidSubmit()
+    {
+        _registerStatus = await _usersRepository.RegisterAsync(_registerDto);
+    }
+}
