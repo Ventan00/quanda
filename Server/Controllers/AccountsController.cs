@@ -49,51 +49,62 @@ namespace Quanda.Server.Controllers
                 await _smtpService.SendRegisterConfirmationEmailAsync(registerDto.Email, confirmationCode);
             }
 
-            return @registerStatus switch
+            var response = new RegisterResponseDTO();
+
+            switch (registerStatus)
             {
-                USER_REGISTERED => NoContent(),
-                USER_EMAIL_IS_TAKEN => Conflict(),
-                USER_NICKNAME_IS_TAKEN => Conflict(),
-                USER_DB_ERROR => StatusCode((int)HttpStatusCode.InternalServerError),
-                _ => throw new ArgumentOutOfRangeException()
-            };
+                case USER_REGISTERED:
+                    response.RegisterStatus = RegisterStatusEnum.REGISTER_FINISHED;
+                    return Ok(response);
+                case USER_EMAIL_IS_TAKEN:
+                    response.RegisterStatus = RegisterStatusEnum.EMAIL_IS_TAKEN;
+                    return Conflict(response);
+                case USER_NICKNAME_IS_TAKEN:
+                    response.RegisterStatus = RegisterStatusEnum.NICKNAME_IS_TAKEN;
+                    return Conflict(response);
+                case USER_DB_ERROR:
+                    response.RegisterStatus = RegisterStatusEnum.SERVER_ERROR;
+                    return StatusCode((int)HttpStatusCode.InternalServerError);
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDTO loginDto)
         {
-            var loginResponseDto = new LoginResponseDTO
+            var response = new LoginResponseDTO
             {
                 LoginStatus = LoginStatusEnum.INVALID_CREDENTIALS
             };
 
             var user = await _usersRepository.GetUserByEmailAsync(loginDto.Email);
             if (user is null)
-                return Unauthorized(loginResponseDto);
+                return Unauthorized(response);
 
             var isPasswordCorrect = _userAuthService.VerifyUserPassword(loginDto.RawPassword, user);
             if (!isPasswordCorrect)
-                return Unauthorized(loginResponseDto);
+                return Unauthorized(response);
 
             if (user.IdTempUserNavigation is not null)
             {
-                loginResponseDto.LoginStatus = LoginStatusEnum.EMAIL_NOT_CONFIRMED;
-                return Unauthorized(loginResponseDto);
+                response.LoginStatus = LoginStatusEnum.EMAIL_NOT_CONFIRMED;
+                return Unauthorized(response);
             }
 
             var (refreshToken, refreshTokenExpirationDate) = _jwtService.GenerateRefreshToken();
             var updateStatus = await _usersRepository.UpdateRefreshTokenForUserAsync(user, refreshToken, refreshTokenExpirationDate);
             if (updateStatus == USER_DB_ERROR)
             {
-                loginResponseDto.LoginStatus = LoginStatusEnum.SERVER_ERROR;
-                return StatusCode((int)HttpStatusCode.InternalServerError, loginResponseDto.LoginStatus == LoginStatusEnum.SERVER_ERROR);
+                response.LoginStatus = LoginStatusEnum.SERVER_ERROR;
+                return StatusCode((int)HttpStatusCode.InternalServerError, response.LoginStatus == LoginStatusEnum.SERVER_ERROR);
             }
 
             var accessToken = _jwtService.GenerateAccessToken(user);
             _jwtService.AddTokensToCookies(refreshToken, refreshTokenExpirationDate, accessToken, Response.Cookies);
 
-            loginResponseDto.LoginStatus = LoginStatusEnum.LOGIN_ACCEPTED;
-            return Ok(loginResponseDto);
+            response.LoginStatus = LoginStatusEnum.LOGIN_ACCEPTED;
+            return Ok(response);
         }
 
 
