@@ -110,5 +110,18 @@ namespace Quanda.Server.Controllers
                 _ => throw new ArgumentOutOfRangeException()
             };
         }
+
+
+        [HttpPost("resend-confirmation-email")]
+        public async Task<IActionResult> ResendConfirmationEmail([FromBody] ResendConfirmationEmailDTO resendConfirmationEmailDto)
+        {
+            var code = await _tempUsersRepository.GetConfirmationCodeForUserAsync(resendConfirmationEmailDto.Email);
+            if (code == null)
+                return BadRequest();
+
+            await _smtpService.SendRegisterConfirmationEmailAsync(resendConfirmationEmailDto.Email, code);
+
+            return Ok();
+        }
     }
 }

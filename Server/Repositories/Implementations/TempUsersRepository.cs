@@ -25,5 +25,14 @@ namespace Quanda.Server.Repositories.Implementations
             var isDeleted = await _context.SaveChangesAsync() > 0;
             return isDeleted ? TempUserResult.TEMP_USER_DELETED : TempUserResult.TEMP_USER_DB_ERROR;
         }
+
+        public async Task<string> GetConfirmationCodeForUserAsync(string email)
+        {
+            var tempUser = await _context.TempUsers
+                .Include(tu => tu.IdUserNavigation)
+                .SingleOrDefaultAsync(tu => tu.IdUserNavigation.Email == email);
+
+            return tempUser?.Code;
+        }
     }
 }
