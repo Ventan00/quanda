@@ -17,6 +17,7 @@ namespace Quanda.Server.Data
         public virtual DbSet<UserRole> UserRoles { get; set; }
         public virtual DbSet<TempUser> TempUsers { get; set; }
         public virtual DbSet<RecoveryUser> RecoveryUsers { get; set; }
+        public virtual DbSet<RatingAnswer> RatingAnswers { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options)
@@ -37,6 +38,7 @@ namespace Quanda.Server.Data
             modelBuilder.ApplyConfiguration(new UserRoleEfConfiguration());
             modelBuilder.ApplyConfiguration(new TempUserEfConfiguration());
             modelBuilder.ApplyConfiguration(new RecoveryUserEfConfiguration());
+            modelBuilder.ApplyConfiguration(new RatingAnswerEfConfiguration());
         }
     }
 }

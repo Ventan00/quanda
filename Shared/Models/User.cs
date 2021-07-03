@@ -11,6 +11,7 @@ namespace Quanda.Shared.Models
             Questions = new HashSet<Question>();
             Notifications = new HashSet<Notification>();
             Answers = new HashSet<Answer>();
+            RatingAnswers = new HashSet<RatingAnswer>();
         }
 
         public int IdUser { get; set; }
@@ -32,6 +33,7 @@ namespace Quanda.Shared.Models
         public virtual ICollection<Question> Questions { get; set; }
         public virtual ICollection<Notification> Notifications { get; set; }
         public virtual ICollection<Answer> Answers { get; set; }
+        public virtual ICollection<RatingAnswer> RatingAnswers { get; set; }
         public virtual Service IdServiceNavigation { get; set; }
         public virtual TempUser IdTempUserNavigation { get; set; }
         public virtual RecoveryUser IdRecoveryUserNavigation { get; set; }

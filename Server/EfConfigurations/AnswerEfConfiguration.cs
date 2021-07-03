@@ -18,8 +18,6 @@ namespace Quanda.Server.EfConfigurations
 
             builder.Property(a => a.Text).IsRequired().HasColumnType("text");
 
-            builder.Property(a => a.Rating).IsRequired().HasDefaultValue(0);
-
             builder.Property(a => a.IsModified).IsRequired().HasDefaultValue(false);
 
             builder.Property(a => a.IdQuestion).IsRequired();
