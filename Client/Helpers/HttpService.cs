@@ -9,7 +9,7 @@ namespace Quanda.Client.Helpers
     {
         private readonly HttpClient httpClient;
 
-        private static JsonSerializerOptions DefaultJsonSerializerOptions =>  new() { PropertyNameCaseInsensitive = true };
+        private static JsonSerializerOptions DefaultJsonSerializerOptions => new() { PropertyNameCaseInsensitive = true };
 
         public HttpService(HttpClient httpClient)
         {
@@ -45,6 +45,17 @@ namespace Quanda.Client.Helpers
             var stringContent = new StringContent(dataJson, Encoding.UTF8, "application/json");
             var response = await httpClient.PostAsync(url, stringContent);
             return new HttpResponseWrapper<object>(null, response.IsSuccessStatusCode, response);
+        }
+
+        public async Task<HttpResponseWrapper<TR>> PostWithResponse<T, TR>(string url, T data)
+        {
+            var dataJson = JsonSerializer.Serialize(data);
+            var stringContent = new StringContent(dataJson, Encoding.UTF8, "application/json");
+            var responseHTTP = await httpClient.PostAsync(url, stringContent);
+
+            var response = await Deserialize<TR>(responseHTTP, DefaultJsonSerializerOptions);
+
+            return new HttpResponseWrapper<TR>(response, responseHTTP.IsSuccessStatusCode, responseHTTP);
         }
 
         public async Task<HttpResponseWrapper<object>> Delete(string url)
