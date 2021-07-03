@@ -1,0 +1,45 @@
+﻿@page "/recover/email-confirmation"
+
+@using Quanda.Client.Components
+@using Quanda.Shared.DTOs.Requests
+@inject IUsersRepository _usersRepository
+
+<label class="d-block text-muted">Please fill in fields bellow with the data you provided during registration </label>
+<RecoveryFormComponent OnValidSubmit="@HandleValidSubmit" IsPending="@_isPending" SubmitText="Resend confirmation email" />
+
+@if (_isEmailSend == true)
+{
+    <label class="d-block text-success">Confirmation email for connected account has been resend, please check your inbox</label>
+}
+else if (_isEmailSend == false)
+{
+    <label class="d-block text-danger">Confirmation email has already been resend for the given email, please check your inbox</label>
+}
+
+
+@code {
+    private static readonly List<string> EmailsProvided = new();
+
+    private bool _isPending;
+
+    private bool? _isEmailSend;
+
+    public async Task HandleValidSubmit(RecoverDTO recoverDto)
+    {
+        _isEmailSend = null;
+        _isPending = true;
+
+        if (EmailsProvided.Contains(recoverDto.Email))
+        {
+            _isEmailSend = false;
+        }
+        else
+        {
+            await _usersRepository.ResendConfirmationEmailAsync(recoverDto);
+            EmailsProvided.Add(recoverDto.Email);
+            _isEmailSend = true;
+        }
+
+        _isPending = false;
+    }
+}
