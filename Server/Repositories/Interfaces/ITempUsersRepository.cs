@@ -8,5 +8,6 @@ namespace Quanda.Server.Repositories.Interfaces
     {
         public Task<TempUserResult> DeleteTempUserByCodeAsync(string code);
         public Task<string> GetConfirmationCodeForUserAsync(string email);
+        public Task<bool> ExtendValidityAsync(string email);
     }
 }
