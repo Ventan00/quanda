@@ -1,17 +1,22 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Quanda.Server.Data;
 using Quanda.Server.Repositories.Interfaces;
 using Quanda.Server.Utils;
+using Quanda.Shared.Models;
 
 namespace Quanda.Server.Repositories.Implementations
 {
     public class TempUsersRepository : ITempUsersRepository
     {
         private readonly AppDbContext _context;
-        public TempUsersRepository(AppDbContext context)
+        private readonly IConfiguration _configuration;
+        public TempUsersRepository(AppDbContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
         }
 
         public async Task<TempUserResult> DeleteTempUserByCodeAsync(string code)
@@ -28,11 +33,25 @@ namespace Quanda.Server.Repositories.Implementations
 
         public async Task<string> GetConfirmationCodeForUserAsync(string email)
         {
-            var tempUser = await _context.TempUsers
-                .Include(tu => tu.IdUserNavigation)
-                .SingleOrDefaultAsync(tu => tu.IdUserNavigation.Email == email);
+            var tempUser = await GetTempUserByEmailAsync(email);
 
             return tempUser?.Code;
+        }
+
+        public async Task<bool> ExtendValidityAsync(string email)
+        {
+            var tempUser = await GetTempUserByEmailAsync(email);
+
+            tempUser.ExpirationDate = DateTime.Now.AddMinutes(int.Parse(_configuration["RegisterEmailConfirmationMaxTimeInMinutes"]));
+
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        private async Task<TempUser> GetTempUserByEmailAsync(string email)
+        {
+            return await _context.TempUsers
+                .Include(tu => tu.IdUserNavigation)
+                .SingleOrDefaultAsync(tu => tu.IdUserNavigation.Email == email);
         }
     }
 }

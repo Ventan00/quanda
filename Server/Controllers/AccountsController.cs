@@ -124,15 +124,19 @@ namespace Quanda.Server.Controllers
 
 
         [HttpPost("resend-confirmation-email")]
-        public async Task<IActionResult> ResendConfirmationEmail([FromBody] ResendConfirmationEmailDTO resendConfirmationEmailDto)
+        public async Task<IActionResult> ResendConfirmationEmail([FromBody] RecoverDTO recoverDto)
         {
-            var code = await _tempUsersRepository.GetConfirmationCodeForUserAsync(resendConfirmationEmailDto.Email);
+            var code = await _tempUsersRepository.GetConfirmationCodeForUserAsync(recoverDto.Email);
             if (code == null)
-                return BadRequest();
+                return NoContent();
 
-            await _smtpService.SendRegisterConfirmationEmailAsync(resendConfirmationEmailDto.Email, code);
+            var isExtended = await _tempUsersRepository.ExtendValidityAsync(recoverDto.Email);
+            if (!isExtended)
+                return StatusCode((int)HttpStatusCode.InternalServerError);
 
-            return Ok();
+            await _smtpService.SendRegisterConfirmationEmailAsync(recoverDto.Email, code);
+
+            return NoContent();
         }
     }
 }

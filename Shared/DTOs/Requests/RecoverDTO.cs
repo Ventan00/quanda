@@ -2,7 +2,7 @@
 
 namespace Quanda.Shared.DTOs.Requests
 {
-    public class ResendConfirmationEmailDTO
+    public class RecoverDTO
     {
         [Required]
         [EmailAddress]
