@@ -34,5 +34,6 @@ namespace Quanda.Shared.Models
         public virtual ICollection<Answer> Answers { get; set; }
         public virtual Service IdServiceNavigation { get; set; }
         public virtual TempUser IdTempUserNavigation { get; set; }
+        public virtual RecoveryUser IdRecoveryUserNavigation { get; set; }
     }
 }
