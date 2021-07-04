@@ -22,7 +22,7 @@ namespace Quanda.Client.Repositories.Implementations
             _httpService = httpService;
         }
 
-        public async Task<List<Question>> GetQuestions(int page, SORT_OPTION_ENUM sortingBy, List<Category> categories)
+        public async Task<List<Question>> GetQuestions(int page, SortOptionEnum sortingBy, List<Category> categories)
         {
             var url = $"{ApiUrl}?skip={page * _skipAmount}&sortOption={Enum.GetName(sortingBy)}";
             if (categories.Count != 0)

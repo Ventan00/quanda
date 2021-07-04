@@ -1,6 +1,6 @@
 ﻿namespace Quanda.Shared.Enums
 {
-    public enum QuestionResult
+    public enum QuestionStatusResult
     {
         QUESTION_NOT_FOUND,
         QUESTION_DELETED,

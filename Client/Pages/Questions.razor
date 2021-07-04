@@ -102,9 +102,9 @@
     {
         questions = await QuestionsReposiotry.GetQuestions(activePage, activeHeader switch
         {
-            0 => SORT_OPTION_ENUM.Date,
-            1 => SORT_OPTION_ENUM.Views,
-            2 => SORT_OPTION_ENUM.Answers
+            0 => SortOptionEnum.Date,
+            1 => SortOptionEnum.Views,
+            2 => SortOptionEnum.Answers
         }, selectedCategories);
 
     }

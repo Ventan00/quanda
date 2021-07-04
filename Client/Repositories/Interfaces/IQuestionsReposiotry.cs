@@ -9,6 +9,6 @@ namespace Quanda.Client.Repositories.Interfaces
 {
     public interface IQuestionsReposiotry
     {
-        public Task<List<Question>> GetQuestions(int page, SORT_OPTION_ENUM sortingBy, List<Category> categories);
+        public Task<List<Question>> GetQuestions(int page, SortOptionEnum sortingBy, List<Category> categories);
     }
 }

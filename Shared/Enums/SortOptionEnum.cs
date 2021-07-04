@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Quanda.Shared.Enums
 {
-    public enum SORT_OPTION_ENUM
+    public enum SortOptionEnum
     {
         Date,Tags,Views,Answers
     }

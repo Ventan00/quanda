@@ -42,6 +42,7 @@ namespace Quanda.Server
             services.AddScoped<IAnswerRepository, AnswerRepository>();
             services.AddScoped<IUsersRepository, UsersRepository>();
             services.AddScoped<ITempUsersRepository, TempUsersRepository>();
+            services.AddScoped<ICategoryRepository, CategoryRepository>();
 
             //custom services
             services.AddScoped<IUserAuthService, UserAuthService>();

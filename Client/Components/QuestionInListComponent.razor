@@ -46,7 +46,7 @@
                 </div>
                 <div class="question-user-answers">
                     <div class="question-user-answers-text">Answers: </div>
-                    <div class="question-user-answers-value">@question.Answers.Count</div>
+                    <div class="question-user-answers-value">@answers</div>
                 </div>
             </div>
         </a>
@@ -56,11 +56,13 @@
     [Parameter]
     public Question question { get; set; }
 
-    public GetUserForQuestionByIDDTO user { get; set; }
+    public GetUserForQuestionByIDDTO user;
+
+    int answers=0;
+
     public List<string> categories = new List<string> { "testowy", "testowy2" };
 
-    private string finished;
-
+    private string finished = string.Empty;
     private string questionURL = string.Empty;
     private string userURL = string.Empty;
     private MarkupString description;
@@ -70,6 +72,8 @@
         questionURL = $"questions/{question.IdQuestion}";
         userURL = $"users/{question.IdUser}";
         user = await UsersReposiotry.GetDataForQuestionAsync(question.IdUser);
+        var tmp = await AnswersReposiotry.GetAnswersAsync(question.IdQuestion);
+        answers = tmp.Count;
         finished = question.IsFinished ? "#closed" : "";
 
     }
