@@ -138,5 +138,41 @@ namespace Quanda.Server.Repositories.Implementations
 
             return AnswerResult.SUCCESS;
         }
+ 
+        public async Task<AnswerResult> UpdateRatingAnswerAsync(int idAnswer, int idUserLogged, UpdateRatingAnswer updateRatingAnswer)
+        {
+            var answerRated = await _context.RatingAnswers.SingleOrDefaultAsync(ra => ra.IdAnswer == idAnswer && ra.IdUser == idUserLogged);
+            if(answerRated == null)
+            {
+                var existsAnswer = await _context.Answers.AnyAsync(a => a.IdAnswer == idAnswer);
+                if (!existsAnswer)
+                    return AnswerResult.ANSWER_DELETED;
+                var existsUser = await _context.Users.AnyAsync(u => u.IdUser == idUserLogged);
+                if (!existsUser)
+                    return AnswerResult.USER_DELETED;
+                await _context.AddAsync(new RatingAnswer
+                {
+                    IdAnswer = idAnswer,
+                    IdUser = idUserLogged,
+                    Value = updateRatingAnswer.Rating == 1
+                });
+                if (!(await _context.SaveChangesAsync() > 0))
+                    return AnswerResult.ADD_DB_ERROR;
+            }
+            else
+            {
+                var ownerAnswer = await _context.Answers.AnyAsync(a => a.IdAnswer == idAnswer && a.IdUser == idUserLogged);
+                if (!ownerAnswer)
+                {
+                        _context.RatingAnswers.Remove(answerRated);
+                        if (!(await _context.SaveChangesAsync() > 0))
+                            return AnswerResult.DELETE_DB_ERROR;
+                }
+                else
+                    return AnswerResult.OWNER_OF_ANSWER;
+
+            }
+            return AnswerResult.SUCCESS;
+        }
     }
 }

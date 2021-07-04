@@ -58,6 +58,20 @@ namespace Quanda.Server.Controllers
             return NoContent();
         }
 
+        [HttpPut("{idAnswer}/rating")]
+        public async Task<IActionResult> UpdateRatingAnswer(int idAnswer, [FromBody] UpdateRatingAnswer updateRatingAnswer)
+        {
+            int requestIdUser = 26; //future => Request.GetUser();
+            var result = await _repository.UpdateRatingAnswerAsync(idAnswer, requestIdUser, updateRatingAnswer);
+            if (result == AnswerResult.ANSWER_DELETED || result == AnswerResult.USER_DELETED)
+                return BadRequest(result.ToString());
+            else if (result == AnswerResult.OWNER_OF_ANSWER)
+                return BadRequest(result.ToString());
+            else if(result == AnswerResult.ADD_DB_ERROR || result == AnswerResult.DELETE_DB_ERROR)
+                return StatusCode(500, result.ToString());
 
+            return NoContent();
+        }
+       
     }
 }

@@ -8,6 +8,7 @@
         ADD_DB_ERROR,
         UPDATE_DB_ERROR,
         DELETE_DB_ERROR,
-        SUCCESS
+        SUCCESS,
+        OWNER_OF_ANSWER
     }
 }
