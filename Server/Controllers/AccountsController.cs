@@ -1,15 +1,19 @@
 ﻿using System;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using static Quanda.Server.Utils.UserStatus;
 using static Quanda.Server.Utils.TempUserResult;
 using Quanda.Server.Repositories.Interfaces;
 using Quanda.Server.Services.Interfaces;
+using Quanda.Server.Utils;
 using Quanda.Shared.DTOs.Requests;
 using Quanda.Shared.DTOs.Responses;
 using Quanda.Shared.Enums;
+using Quanda.Shared.Models;
 
 namespace Quanda.Server.Controllers
 {
@@ -135,6 +139,20 @@ namespace Quanda.Server.Controllers
                 return StatusCode((int)HttpStatusCode.InternalServerError);
 
             await _smtpService.SendRegisterConfirmationEmailAsync(recoverDto.Email, code);
+
+            return NoContent();
+        }
+
+        [HttpPost("recover-password")]
+        public async Task<IActionResult> RecoverPassword([FromBody] RecoverDTO recoverDto)
+        {
+            var user = await _usersRepository.GetUserByEmailAsync(recoverDto.Email);
+            if (user is null || user.IdTempUserNavigation is not null)
+                return NoContent();
+
+            var recoveryJwt = _jwtService.GeneratePasswordRecoveryToken(user);
+
+            await _smtpService.SendPasswordRecoveryEmailAsync(recoverDto.Email, new JwtSecurityTokenHandler().WriteToken(recoveryJwt), user.IdUser);
 
             return NoContent();
         }

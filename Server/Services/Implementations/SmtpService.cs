@@ -15,16 +15,26 @@ namespace Quanda.Server.Services.Implementations
         }
 
 
-        public async Task SendRegisterConfirmationEmailAsync(string registerDtoEmail, string confirmationCode)
+        public async Task SendRegisterConfirmationEmailAsync(string email, string confirmationCode)
         {
-            var smtpClient = new SmtpClient(_smtpConfigSection["Host"])
+            var smtpClient = CreateSmtpClient();
+            await smtpClient.SendMailAsync(_smtpConfigSection["Email"], email, "QUANDA - Complete register", $"https://localhost:44358/api/accounts/confirm-email/{confirmationCode}");
+        }
+
+        public async Task SendPasswordRecoveryEmailAsync(string email, string recoveryJwt, int idUser)
+        {
+            var smtpClient = CreateSmtpClient();
+            await smtpClient.SendMailAsync(_smtpConfigSection["Email"], email, "QUANDA - Recover password", $"https://localhost:44358/api/accounts/recover-password/{idUser}/{recoveryJwt}");
+        }
+
+        private SmtpClient CreateSmtpClient()
+        {
+            return new(_smtpConfigSection["Host"])
             {
                 Port = int.Parse(_smtpConfigSection["Port"]),
                 Credentials = new NetworkCredential(_smtpConfigSection["Email"], _smtpConfigSection["Password"]),
                 EnableSsl = bool.Parse(_smtpConfigSection["EnableSsl"]),
             };
-
-            await smtpClient.SendMailAsync(_smtpConfigSection["Email"], registerDtoEmail, "QUANDA - Complete register", $"https://localhost:44358/api/accounts/confirm-email/{confirmationCode}");
         }
     }
 }

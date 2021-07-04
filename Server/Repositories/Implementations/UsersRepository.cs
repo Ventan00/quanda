@@ -36,7 +36,8 @@ namespace Quanda.Server.Repositories.Implementations
             var user = new User
             {
                 Nickname = registerDto.Nickname,
-                Email = registerDto.Email
+                Email = registerDto.Email,
+                RegistrationDate = DateTime.Now
             };
 
             user.HashedPassword = new PasswordHasher<User>().HashPassword(user, registerDto.RawPassword);

@@ -15,6 +15,7 @@ namespace Quanda.Server.Services.Implementations
     public class JwtService : IJwtService
     {
         private readonly IConfigurationSection _jwtConfigurationSection;
+
         public JwtService(IConfiguration configuration)
         {
             _jwtConfigurationSection = configuration.GetSection("JwtSettings");
@@ -60,6 +61,22 @@ namespace Quanda.Server.Services.Implementations
 
             responseCookies.Append("access_token", new JwtSecurityTokenHandler().WriteToken(accessToken), cookieOptions);
             responseCookies.Append("refresh_token", refreshToken, cookieOptions);
+        }
+
+        public JwtSecurityToken GeneratePasswordRecoveryToken(User user)
+        {
+            var userClaims = new List<Claim>
+            {
+                new(ClaimTypes.NameIdentifier, user.IdUser.ToString()),
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(user.HashedPassword + "-" + user.RegistrationDate));
+
+            return new JwtSecurityToken(
+                claims: userClaims,
+                expires: DateTime.Now.AddMinutes(int.Parse(_jwtConfigurationSection["PasswordRecoveryTokenValidityInMinutes"])),
+                signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
+            );
         }
     }
 }
