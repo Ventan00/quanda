@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Quanda.Shared.Models;
 
@@ -37,6 +38,8 @@ namespace Quanda.Server.EfConfigurations
             builder.Property(u => u.Bio).IsRequired(false);
 
             builder.Property(u => u.Avatar).IsRequired(false);
+
+            builder.Property(u => u.RegistrationDate).IsRequired();
 
             builder.Property(u => u.RefreshToken).HasMaxLength(36).IsRequired(false);
 
