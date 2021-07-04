@@ -26,7 +26,6 @@ namespace Quanda.Server.Repositories.Implementations
             {
                 IdAnswer = a.IdAnswer,
                 Text = a.Text,
-                Rating = a.Rating,
                 IsModified = a.IsModified,
                 IdUser = a.IdUser,
                 IdRootAnswer = a.IdRootAnswer

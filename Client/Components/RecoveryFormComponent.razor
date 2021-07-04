@@ -1,0 +1,33 @@
+﻿@using Quanda.Shared.DTOs.Requests
+
+<EditForm Model="_recoverDto" OnValidSubmit="() => OnValidSubmit.InvokeAsync(_recoverDto)">
+    <DataAnnotationsValidator />
+    <div class="form-group">
+        <label for="email-input" class="d-block">Email Address</label>
+        <InputText id="email-input" @bind-Value="_recoverDto.Email" />
+        <ValidationMessage For="() => _recoverDto.Email" />
+    </div>
+
+
+    @if (IsPending)
+    {
+        <button type="submit" class="btn btn-dark d-block" disabled>Sending ...</button>
+    }
+    else
+    {
+        <button type="submit" class="btn btn-success d-block">@SubmitText</button>
+    }
+</EditForm>
+
+@code {
+    private readonly RecoverDTO _recoverDto = new();
+
+    [Parameter]
+    public string SubmitText { get; set; }
+
+    [Parameter]
+    public bool IsPending { get; set; }
+
+    [Parameter]
+    public EventCallback<RecoverDTO> OnValidSubmit { get; set; }
+}

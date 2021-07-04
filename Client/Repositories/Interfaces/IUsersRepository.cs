@@ -8,5 +8,6 @@ namespace Quanda.Client.Repositories.Interfaces
     {
         public Task<LoginStatusEnum> LoginAsync(LoginDTO loginDto);
         public Task<RegisterStatusEnum> RegisterAsync(RegisterDTO registerDto);
+        public Task ResendConfirmationEmailAsync(RecoverDTO recoverDto);
     }
 }

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Quanda.Server.Data;
 
-namespace Quanda.Server.Migrations
+namespace Quanda.Server.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210703194335_Added Recovery_User table")]
+    partial class AddedRecovery_Usertable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -38,6 +40,11 @@ namespace Quanda.Server.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint(1)")
                         .HasDefaultValue(false);
+
+                    b.Property<int>("Rating")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
 
                     b.Property<string>("Text")
                         .IsRequired()
@@ -156,25 +163,6 @@ namespace Quanda.Server.Migrations
                     b.HasIndex("IdCategory");
 
                     b.ToTable("Question_Category");
-                });
-
-            modelBuilder.Entity("Quanda.Shared.Models.RatingAnswer", b =>
-                {
-                    b.Property<int>("IdAnswer")
-                        .HasColumnType("int");
-
-                    b.Property<int>("IdUser")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("Value")
-                        .HasColumnType("tinyint(1)");
-
-                    b.HasKey("IdAnswer", "IdUser")
-                        .HasName("RatingAnswer_pk");
-
-                    b.HasIndex("IdUser");
-
-                    b.ToTable("Rating_Answer");
                 });
 
             modelBuilder.Entity("Quanda.Shared.Models.RecoveryUser", b =>
@@ -441,27 +429,6 @@ namespace Quanda.Server.Migrations
                     b.Navigation("IdQuestionNavigation");
                 });
 
-            modelBuilder.Entity("Quanda.Shared.Models.RatingAnswer", b =>
-                {
-                    b.HasOne("Quanda.Shared.Models.Answer", "IdAnswerNavigation")
-                        .WithMany("RatingAnswers")
-                        .HasForeignKey("IdAnswer")
-                        .HasConstraintName("Answer_RatingAnswer")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Quanda.Shared.Models.User", "IdUserNavigation")
-                        .WithMany("RatingAnswers")
-                        .HasForeignKey("IdUser")
-                        .HasConstraintName("User_RatingAnswer")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("IdAnswerNavigation");
-
-                    b.Navigation("IdUserNavigation");
-                });
-
             modelBuilder.Entity("Quanda.Shared.Models.RecoveryUser", b =>
                 {
                     b.HasOne("Quanda.Shared.Models.User", "IdUserNavigation")
@@ -518,8 +485,6 @@ namespace Quanda.Server.Migrations
             modelBuilder.Entity("Quanda.Shared.Models.Answer", b =>
                 {
                     b.Navigation("InverseIdRootAnswersNavigation");
-
-                    b.Navigation("RatingAnswers");
                 });
 
             modelBuilder.Entity("Quanda.Shared.Models.Category", b =>
@@ -559,8 +524,6 @@ namespace Quanda.Server.Migrations
                     b.Navigation("Notifications");
 
                     b.Navigation("Questions");
-
-                    b.Navigation("RatingAnswers");
 
                     b.Navigation("UserRoles");
                 });
