@@ -15,6 +15,8 @@ namespace Quanda.Server.EfConfigurations
 
             builder.Property(tu => tu.Code).HasMaxLength(36).IsRequired();
 
+            builder.HasIndex(tu => tu.Code).IsUnique().HasDatabaseName("Unique_code");
+
             builder.Property(tu => tu.ExpirationDate).IsRequired();
 
             builder.HasOne(tu => tu.IdUserNavigation)

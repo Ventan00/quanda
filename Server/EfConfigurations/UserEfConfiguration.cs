@@ -18,11 +18,15 @@ namespace Quanda.Server.EfConfigurations
 
             builder.Property(u => u.Nickname).HasMaxLength(30).IsRequired();
 
+            builder.HasIndex(u => u.Nickname).IsUnique().HasDatabaseName("Unique_nickname");
+
             builder.Property(u => u.FirstName).HasMaxLength(30).IsRequired(false);
 
             builder.Property(u => u.LastName).HasMaxLength(30).IsRequired(false);
 
             builder.Property(u => u.Email).IsRequired();
+
+            builder.HasIndex(u => u.Email).IsUnique().HasDatabaseName("Unique_email");
 
             builder.Property(u => u.HashedPassword).HasMaxLength(84).IsRequired();
 
