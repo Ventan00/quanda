@@ -36,16 +36,16 @@ namespace Quanda.Client.Repositories.Implementations
             return registerResponseDto?.RegisterStatus ?? RegisterStatusEnum.SERVER_ERROR;
         }
 
-<<<<<<< HEAD
         public async Task<GetUserForQuestionByIDDTO> GetDataForQuestionAsync(int questionIdUser)
         {
-            //todo After pull add httpService implementation
-            return _httpService.Get<GetUserForQuestionByIDDTO>($"{ApiUrl}/data/for-question/{questionIdUser}").Response;
-=======
+            var response = await _httpService.Get<GetUserForQuestionByIDDTO>($"{ApiUrl}/data/for-question/{questionIdUser}");
+            return response.Response;
+        }
+
         public async Task ResendConfirmationEmailAsync(RecoverDTO recoverDto)
         {
             await _httpService.Post($"{ApiUrl}/resend-confirmation-email", recoverDto);
->>>>>>> 0394272f8fcd042e3271a122f2cc8af3d859f9d0
+
         }
     }
 }

@@ -24,9 +24,14 @@ namespace Quanda.Server.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetQuestions([FromRoute] int skip, [FromRoute] string sortOption, [FromRoute] List<int> category)
+        public async Task<IActionResult> GetQuestions([FromQuery] int skip, [FromQuery] string sortOption, [FromQuery] List<int> category=null)
         {
-            return Ok(await _repository.GetQuestions(skip,(SORT_OPTION_ENUM)Enum.Parse(typeof(SORT_OPTION_ENUM),sortOption), category));
+            Console.WriteLine("\n\n\n\n\n\n\n\n" + category!=null+"\n\n\n\n\n\n\n\n");
+            if (category == null)
+                category = new List<int>();
+            var questions = await _repository.GetQuestions(skip,
+                (SORT_OPTION_ENUM) Enum.Parse(typeof(SORT_OPTION_ENUM), sortOption), category);
+            return Ok(questions);
         }
 
         [HttpGet("{QuestionID}")]

@@ -22,7 +22,7 @@ namespace Quanda.Server.Repositories.Implementations
             _context = context;
         }
 
-        public async Task<List<Question>> GetQuestions(int skip, SORT_OPTION_ENUM sortOption, List<int> categories)
+        public async Task<List<Question>> GetQuestions(int skip, SORT_OPTION_ENUM sortOption, List<int>? categories)
         {
             if (categories.Count() == 0)
             {

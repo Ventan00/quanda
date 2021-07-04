@@ -3,103 +3,109 @@
 @using Quanda.Shared.Enums
 @page "/questions"
 @inject IQuestionsReposiotry QuestionsReposiotry
-<div class="questions-list-container">
-    <h1>Pytania</h1>
-    <div class="questions-header" style="margin-bottom: 0;">
-        <div class="questions-sorting-label">Sortowanie</div>
-    </div>
-    <div class="questions-header">
-        <div class="questions-heder-field">
-            <div class="questions-heder-field-label">
-                Ilość pytań:
-            </div>
-            <div class="questions-heder-field-value">
-                @questionAmount
-            </div>
+
+    <div class="questions-list-container">
+        <h1>Pytania</h1>
+        <div class="questions-header" style="margin-bottom: 0;">
+            <div class="questions-sorting-label">Sortowanie</div>
         </div>
-        <div class="questions-sorting-options">
-            @if (activeHeader == 0)
-            {
-                <div class="questions-sorting-option questions-sorting-option-active">
-                    Data publikacji
+        <div class="questions-header">
+            <div class="questions-heder-field">
+                <div class="questions-heder-field-label">
+                    Ilość pytań:
                 </div>
-            }
-            else
-            {
-                <div class="questions-sorting-option questions-sorting-option">
-                    Data publikacji
+                <div class="questions-heder-field-value">
+                    @questionAmount
                 </div>
-            }
-            @if (activeHeader == 1)
-            {
-                <div class="questions-sorting-option questions-sorting-option-active">
-                    Ilość wyświetleń
-                </div>
-            }
-            else
-            {
-                <div class="questions-sorting-option questions-sorting-option">
-                    Ilość wyświetleń
-                </div>
-            }
-            @if (activeHeader == 2)
-            {
-                <div class="questions-sorting-option questions-sorting-option-active">
-                    Ilość odpowiedzi
-                </div>
-            }
-            else
-            {
-                <div class="questions-sorting-option questions-sorting-option">
-                    Ilość odpowiedzi
-                </div>
-            }
-        </div>
-    </div>
-    <div class="questions-tags-label">
-        Tagi:
-    </div>
-    <div class="questions-header">
-        <div class="questions-tags-container">
-            @foreach (Category cat in selectedCategories)
-            {
-                <div class="questions-tag">
-                    <div class="questions-tag-val">
-                        @cat.Name
+            </div>
+            <div class="questions-sorting-options">
+                @if (activeHeader == 0)
+                {
+                    <div class="questions-sorting-option questions-sorting-option-active">
+                        Data publikacji
                     </div>
-                    <div class="questions-tag-close">
-                        x
+                }
+                else
+                {
+                    <div class="questions-sorting-option questions-sorting-option">
+                        Data publikacji
                     </div>
-                </div>
-            }
-            <div class="questions-tag questions-tag-select">
-                Wybierz tag...
+                }
+                @if (activeHeader == 1)
+                {
+                    <div class="questions-sorting-option questions-sorting-option-active">
+                        Ilość wyświetleń
+                    </div>
+                }
+                else
+                {
+                    <div class="questions-sorting-option questions-sorting-option">
+                        Ilość wyświetleń
+                    </div>
+                }
+                @if (activeHeader == 2)
+                {
+                    <div class="questions-sorting-option questions-sorting-option-active">
+                        Ilość odpowiedzi
+                    </div>
+                }
+                else
+                {
+                    <div class="questions-sorting-option questions-sorting-option">
+                        Ilość odpowiedzi
+                    </div>
+                }
             </div>
         </div>
+        <div class="questions-tags-label">
+            Tagi:
+        </div>
+        <div class="questions-header">
+            <div class="questions-tags-container">
+                @foreach (Category cat in selectedCategories)
+                {
+                    <div class="questions-tag">
+                        <div class="questions-tag-val">
+                            @cat.Name
+                        </div>
+                        <div class="questions-tag-close">
+                            x
+                        </div>
+                    </div>
+                }
+                <div class="questions-tag questions-tag-select">
+                    Wybierz tag...
+                </div>
+            </div>
+        </div>
+        @if (questions != null) {
+            @foreach (var que in questions)
+            {
+                <QuestionInListComponent question="que" />
+
+                
+            }
+        }
     </div>
-    @foreach (var que in questions)
-    {
-        <QuestionInListComponent question=que />
-    }
-</div>
 
 @code {
     private int questionAmount = 0;
     private int activeHeader = 0;
     private int activePage = 0;
     private List<Category> selectedCategories = new List<Category>();
-    private List<Question> questions = new List<Question>();
+    private List<Question> questions;
     protected async override Task OnInitializedAsync()
     {
         await GetQuestions();
     }
     private async Task GetQuestions()
     {
-        questions = await QuestionsReposiotry.GetQuestions(activePage,activeHeader switch{
+        questions = await QuestionsReposiotry.GetQuestions(activePage, activeHeader switch
+        {
             0 => SORT_OPTION_ENUM.Date,
             1 => SORT_OPTION_ENUM.Views,
             2 => SORT_OPTION_ENUM.Answers
-            },selectedCategories);
+        }, selectedCategories);
 
     }
 }

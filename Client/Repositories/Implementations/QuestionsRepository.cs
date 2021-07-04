@@ -24,8 +24,12 @@ namespace Quanda.Client.Repositories.Implementations
 
         public async Task<List<Question>> GetQuestions(int page, SORT_OPTION_ENUM sortingBy, List<Category> categories)
         {
-            var url = $"{ApiUrl}?skip={page*_skipAmount}&sortOption={Enum.GetName(sortingBy)}&category={string.Join("&category=",categories.Select(cat => cat.IdCategory).ToList())}";
-            var response = await _httpService.Get<List<Question>>(ApiUrl);
+            var url = $"{ApiUrl}?skip={page * _skipAmount}&sortOption={Enum.GetName(sortingBy)}";
+            if (categories.Count != 0)
+            {
+                url+=$"&category={string.Join("&category=", categories.Select(cat => cat.IdCategory).ToList())}";
+            }
+            var response = await _httpService.Get<List<Question>>(url);
             return response.Response;
 
         }

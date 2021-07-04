@@ -11,7 +11,7 @@ namespace Quanda.Server.Repositories.Interfaces
 {
     public interface IQuestionRepository
     {
-        Task<List<Question>> GetQuestions(int skip, SORT_OPTION_ENUM sortOption, List<int> categories);
+        Task<List<Question>> GetQuestions(int skip, SORT_OPTION_ENUM sortOption, List<int>? categories);
         Task<Question> GetQuestion(int questionId);
         Task<QuestionResult> AddQuestion(AddQuestionDTO question);
         Task<QuestionResult> UpdateQuestion(int questionId, UpdateQuestionDTO question);

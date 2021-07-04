@@ -1,68 +1,77 @@
 ﻿@using Quanda.Shared.Models
 @using System.Text.RegularExpressions
+@using Microsoft.AspNetCore.Components
 @inject IAnswerRepository AnswersReposiotry
 @inject IUsersRepository UsersReposiotry
-<div class="question-container">
-    <a href="@questionURL">
-        <div class="question-header">
-            <div class="question-text">
-                @question.Header
-            </div>
-            <div class="question-date">
-                @question.PublishDate.ToString("dd-MM-yyyy")
-            </div>
-        </div>
-        <div class="question-categories">
-            <div class="question-category-label">
-                Categories:
-            </div>
-            <div class="question-categories-containter">
-                @foreach (var category in question.QuestionCategories)
-                {
-                    <div class="question-category">
-                        @category.IdCategoryNavigation.Name
-                    </div>
-                }
-            </div>
-        </div>
-        <div class="question-description">
-            @question.Description
-        </div>
-        <div class="question-footer">
-            <div class="question-user-info">
-                <div class="question-user-image">
-                    <img src="@question.IdUserNavigation.Avatar" href="@userURL" />
-                </div>
-                <div class="question-user-nick">
-                    @question.IdUserNavigation.Nickname
-                </div>
-            </div>
-            <div class="question-user-views">
-                <div class="question-user-views-text">Views: </div>
-                <div class="question-user-views-value">@question.Views</div>
-            </div>
-            <div class="question-user-answers">
-                <div class="question-user-answers-text">Answers: </div>
-                <div class="question-user-answers-value">@question.Answers.Count</div>
-            </div>
-        </div>
-    </a>
-</div>
+@if(user != null) {
+    <div class="question-container">
+        <a href="questionURL">
 
+            <div class="question-header">
+                <div class="question-text">
+                    @question.Header
+                </div>
+                <div class="question-date">
+                    @question.PublishDate.ToString("dd-MM-yyyy") @finished
+                </div>
+            </div>
+            <div class="question-categories">
+                <div class="question-category-label">
+                    Categories:
+                </div>
+                <div class="question-categories-containter">
+                    @foreach (var category in categories)
+                        {
+                            <div class="question-category">
+                                @category
+                            </div>
+                        }
+                </div>
+            </div>
+            <div class="question-description">
+                @description
+            </div>
+            <div class="question-footer">
+                <div class="question-user-info">
+                    <div class="question-user-image">
+                        <img src="@user.Avatar" href="@userURL" />
+                    </div>
+                    <div class="question-user-nick">
+                        @user.Nick
+                    </div>
+                </div>
+                <div class="question-user-views">
+                    <div class="question-user-views-text">Views: </div>
+                    <div class="question-user-views-value">@question.Views</div>
+                </div>
+                <div class="question-user-answers">
+                    <div class="question-user-answers-text">Answers: </div>
+                    <div class="question-user-answers-value">@question.Answers.Count</div>
+                </div>
+            </div>
+        </a>
+    </div>
+}
 @code {
     [Parameter]
     public Question question { get; set; }
-    public User user { get; set; }
 
+    public GetUserForQuestionByIDDTO user { get; set; }
+    public List<string> categories = new List<string> { "testowy", "testowy2" };
+
+    private string finished;
 
     private string questionURL = string.Empty;
     private string userURL = string.Empty;
+    private MarkupString description;
     protected async override Task OnInitializedAsync()
     {
-        question.Description = Regex.Replace(question.Description, "<img [^>]*/>", "");
+        description = (MarkupString)Regex.Replace(question.Description, "<img [^>]* />", "");
         questionURL = $"questions/{question.IdQuestion}";
         userURL = $"users/{question.IdUser}";
-        var user = await UsersReposiotry.GetDataForQuestionAsync(question.IdUser);
+        user = await UsersReposiotry.GetDataForQuestionAsync(question.IdUser);
+        finished = question.IsFinished ? "#closed" : "";
+
     }
 
 }
