@@ -1,11 +1,13 @@
 ﻿@using Quanda.Shared.Models
 @using Quanda.Client.Components
+@using Quanda.Shared.Enums
 @page "/questions"
+@inject IQuestionsReposiotry QuestionsReposiotry
 <div class="questions-list-container">
     <h1>Pytania</h1>
     <div class="questions-header" style="margin-bottom: 0;">
         <div class="questions-sorting-label">Sortowanie</div>
-    </div> 
+    </div>
     <div class="questions-header">
         <div class="questions-heder-field">
             <div class="questions-heder-field-label">
@@ -84,7 +86,20 @@
 @code {
     private int questionAmount = 0;
     private int activeHeader = 0;
+    private int activePage = 0;
     private List<Category> selectedCategories = new List<Category>();
     private List<Question> questions = new List<Question>();
+    protected async override Task OnInitializedAsync()
+    {
+        await GetQuestions();
+    }
+    private async Task GetQuestions()
+    {
+        questions = await QuestionsReposiotry.GetQuestions(activePage,activeHeader switch{
+            0 => SORT_OPTION_ENUM.Date,
+            1 => SORT_OPTION_ENUM.Views,
+            2 => SORT_OPTION_ENUM.Answers
+            },selectedCategories);
 
+    }
 }

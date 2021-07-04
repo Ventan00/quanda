@@ -16,37 +16,38 @@ namespace Quanda.Server.Repositories.Implementations
     public class QuestionRepository: IQuestionRepository
     {
         private readonly AppDbContext _context;
+        private readonly int _takeAmount = 10;
         public QuestionRepository(AppDbContext context)
         {
             _context = context;
         }
 
-        public async Task<List<Question>> GetQuestions(GetQuestionsDTO getQuestionsDto)
+        public async Task<List<Question>> GetQuestions(int skip, SORT_OPTION_ENUM sortOption, List<int> categories)
         {
-            if (getQuestionsDto.Categories.Count() == 0)
+            if (categories.Count() == 0)
             {
-                switch (getQuestionsDto.SortingOption)
+                switch (sortOption)
                 {
                     case SORT_OPTION_ENUM.Date:
                         return await _context.Questions
                             .OrderBy(question => question.PublishDate)
-                            .Skip(getQuestionsDto.Skip)
-                            .Take(10)
+                            .Skip(skip)
+                            .Take(_takeAmount)
                             .ToListAsync();
                     case SORT_OPTION_ENUM.Tags:
                         return null;
                     case SORT_OPTION_ENUM.Views:
                         return await _context.Questions
                             .OrderBy(question => question.Views)
-                            .Skip(getQuestionsDto.Skip)
-                            .Take(10)
+                            .Skip(skip)
+                            .Take(_takeAmount)
                             .ToListAsync();
                     case SORT_OPTION_ENUM.Answers:
                         return await _context.Questions
                             .Include(question => question.Answers)
                             .OrderBy(question => question.Views)
-                            .Skip(getQuestionsDto.Skip)
-                            .Take(10)
+                            .Skip(skip)
+                            .Take(_takeAmount)
                             .ToListAsync();
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -54,45 +55,45 @@ namespace Quanda.Server.Repositories.Implementations
             }
             else
             {
-                switch (getQuestionsDto.SortingOption)
+                switch (sortOption)
                 {
                     case SORT_OPTION_ENUM.Date:
                         return await _context.Questions
                             .Include(question => question.QuestionCategories)
                             .Where(
                                 question => _context.QuestionCategories
-                                    .Include(qc => qc.IdCategoryNavigation)
+                                    .Include(qc => qc.IdCategoryNavigation.IdCategory)
                                     .Where(qc => qc.IdQuestion==question.IdQuestion)
-                                    .Any(qc => getQuestionsDto.Categories.Any(cat => qc.IdCategoryNavigation==cat))
+                                    .Any(qc => categories.Any(cat => qc.IdCategoryNavigation.IdCategory==cat))
                                                 )
                             .OrderBy(question => question.PublishDate)
-                            .Skip(getQuestionsDto.Skip)
-                            .Take(10)
+                            .Skip(skip)
+                            .Take(_takeAmount)
                             .ToListAsync();
                     case SORT_OPTION_ENUM.Tags:
                         return await _context.Questions
                             .Include(question => question.QuestionCategories)
                             .Where(
                                 question => _context.QuestionCategories
-                                    .Include(qc => qc.IdCategoryNavigation)
+                                    .Include(qc => qc.IdCategoryNavigation.IdCategory)
                                     .Where(qc => qc.IdQuestion == question.IdQuestion)
-                                    .Any(qc => getQuestionsDto.Categories.Any(cat => qc.IdCategoryNavigation == cat))
+                                    .Any(qc => categories.Any(cat => qc.IdCategoryNavigation.IdCategory == cat))
                                                 )
-                            .Skip(getQuestionsDto.Skip)
-                            .Take(10)
+                            .Skip(skip)
+                            .Take(_takeAmount)
                             .ToListAsync();
                     case SORT_OPTION_ENUM.Views:
                         return await _context.Questions
                             .Include(question => question.QuestionCategories)
                             .Where(
                                 question => _context.QuestionCategories
-                                    .Include(qc => qc.IdCategoryNavigation)
+                                    .Include(qc => qc.IdCategoryNavigation.IdCategory)
                                     .Where(qc => qc.IdQuestion == question.IdQuestion)
-                                    .Any(qc => getQuestionsDto.Categories.Any(cat => qc.IdCategoryNavigation == cat))
+                                    .Any(qc => categories.Any(cat => qc.IdCategoryNavigation.IdCategory == cat))
                             )
                             .OrderBy(question => question.Views)
-                            .Skip(getQuestionsDto.Skip)
-                            .Take(10)
+                            .Skip(skip)
+                            .Take(_takeAmount)
                             .ToListAsync();
                     case SORT_OPTION_ENUM.Answers:
                         return await _context.Questions
@@ -100,13 +101,13 @@ namespace Quanda.Server.Repositories.Implementations
                             .Include(question => question.Answers)
                             .Where(
                                 question => _context.QuestionCategories
-                                    .Include(qc => qc.IdCategoryNavigation)
+                                    .Include(qc => qc.IdCategoryNavigation.IdCategory)
                                     .Where(qc => qc.IdQuestion == question.IdQuestion)
-                                    .Any(qc => getQuestionsDto.Categories.Any(cat => qc.IdCategoryNavigation == cat))
+                                    .Any(qc => categories.Any(cat => qc.IdCategoryNavigation.IdCategory == cat))
                             )
                             .OrderBy(question => question.Answers.Count)
-                            .Skip(getQuestionsDto.Skip)
-                            .Take(10)
+                            .Skip(skip)
+                            .Take(_takeAmount)
                             .ToListAsync();
                     default:
                         throw new ArgumentOutOfRangeException();

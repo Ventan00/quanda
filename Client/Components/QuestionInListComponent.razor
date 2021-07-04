@@ -1,5 +1,7 @@
 ﻿@using Quanda.Shared.Models
 @using System.Text.RegularExpressions
+@inject IAnswerRepository AnswersReposiotry
+@inject IUsersRepository UsersReposiotry
 <div class="question-container">
     <a href="@questionURL">
         <div class="question-header">
@@ -15,12 +17,12 @@
                 Categories:
             </div>
             <div class="question-categories-containter">
-            @foreach (var category in question.QuestionCategories)
-            {
-                <div class="question-category">
-                    @category.IdCategoryNavigation.Name
-                </div>
-            }
+                @foreach (var category in question.QuestionCategories)
+                {
+                    <div class="question-category">
+                        @category.IdCategoryNavigation.Name
+                    </div>
+                }
             </div>
         </div>
         <div class="question-description">
@@ -50,14 +52,17 @@
 @code {
     [Parameter]
     public Question question { get; set; }
+    public User user { get; set; }
+
 
     private string questionURL = string.Empty;
     private string userURL = string.Empty;
-    protected override void OnInitialized()
+    protected async override Task OnInitializedAsync()
     {
         question.Description = Regex.Replace(question.Description, "<img [^>]*/>", "");
         questionURL = $"questions/{question.IdQuestion}";
         userURL = $"users/{question.IdUser}";
+        var user = await UsersReposiotry.GetDataForQuestionAsync(question.IdUser);
     }
 
 }

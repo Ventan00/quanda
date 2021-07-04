@@ -8,6 +8,7 @@ using Quanda.Server.Repositories.Interfaces;
 using Quanda.Server.Utils;
 using Quanda.Shared.Models;
 using Quanda.Shared.DTOs.Requests;
+using Quanda.Shared.Enums;
 
 namespace Quanda.Server.Controllers
 {
@@ -23,9 +24,9 @@ namespace Quanda.Server.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetQuestion([FromBody] GetQuestionsDTO getQuestionsDto)
+        public async Task<IActionResult> GetQuestions([FromRoute] int skip, [FromRoute] string sortOption, [FromRoute] List<int> category)
         {
-            return Ok(await _repository.GetQuestions(getQuestionsDto));
+            return Ok(await _repository.GetQuestions(skip,(SORT_OPTION_ENUM)Enum.Parse(typeof(SORT_OPTION_ENUM),sortOption), category));
         }
 
         [HttpGet("{QuestionID}")]

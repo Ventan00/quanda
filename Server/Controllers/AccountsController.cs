@@ -134,5 +134,15 @@ namespace Quanda.Server.Controllers
 
             return Ok();
         }
+
+        [HttpGet("data/for-question/{idQuestion:int}")]
+        public async Task<IActionResult> GetUserForQuestionByIDDTO([FromRoute]int idUser)
+        {
+            var result =await _usersRepository.GetUserForQuestionByID(idUser);
+            if (result == null)
+                return NotFound();
+            else
+                return Ok(result);
+        }
     }
 }
