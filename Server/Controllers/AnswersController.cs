@@ -20,7 +20,8 @@ namespace Quanda.Server.Controllers
         [HttpGet("{idQuestion}")]
         public async Task<IActionResult> GetAnswers(int idQuestion)
         {
-            var result = await _repository.GetAnswersAsync(idQuestion);
+            int requestIdUser = 25; //future => Request.GetUser();
+            var result = await _repository.GetAnswersAsync(idQuestion, requestIdUser);
             return Ok(result);
         }
 
@@ -56,5 +57,7 @@ namespace Quanda.Server.Controllers
                 return StatusCode(500, result.ToString());
             return NoContent();
         }
+
+
     }
 }

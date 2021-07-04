@@ -8,7 +8,7 @@ namespace Quanda.Server.Repositories.Interfaces
 {
     public interface IAnswerRepository
     {
-        Task<List<AnswerBoxResponseDto>> GetAnswersAsync(int idQuestion);
+        Task<List<AnswerBoxResponseDto>> GetAnswersAsync(int idQuestion, int idUserLogged);
 
         Task<AnswerResult> AddAnswerAsync(AddAnswerDTO answerDTO);
 

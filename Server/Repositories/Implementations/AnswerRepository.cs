@@ -19,17 +19,30 @@ namespace Quanda.Server.Repositories.Implementations
             _context = context;
         }
 
-        public async Task<List<AnswerBoxResponseDto>> GetAnswersAsync(int idQuestion)
+        public async Task<List<AnswerBoxResponseDto>> GetAnswersAsync(int idQuestion, int idUserLogged)
         {
             List<AnswerBoxResponseDto> answersBox = new();
-            var answers = await _context.Answers.Where(a => a.IdQuestion == idQuestion).Select(a => new AnswerResponseDTO 
+            var answers = await _context.Answers.Where(a => a.IdQuestion == idQuestion).Select(a => new AnswerResponseDTO
             {
                 IdAnswer = a.IdAnswer,
                 Text = a.Text,
+                Rating = a.RatingAnswers.Select(ra => new { ValueAns = ra.Value == false ? -1 : 1 }).Sum(r => r.ValueAns),
                 IsModified = a.IsModified,
-                IdUser = a.IdUser,
-                IdRootAnswer = a.IdRootAnswer
+                UserResponseDTO =  new UserResponseDTO { 
+                    IdUser = a.IdUserNavigation.IdUser,
+                    Nickname = a.IdUserNavigation.Nickname,
+                    Avatar = a.IdUserNavigation.Avatar
+                },
+                IdRootAnswer = a.IdRootAnswer,
+                Mark = 0
             }).ToListAsync();
+            foreach (var ans in answers)
+            {
+                var ratingAnswer = await _context.RatingAnswers.SingleOrDefaultAsync(ra => ra.IdUser == idUserLogged && ra.IdAnswer == ans.IdAnswer);
+                if (ratingAnswer != null)
+                    ans.Mark = (ratingAnswer.Value == true ? 1 : -1);
+            }
+
             var mainAnswers = answers.Where(a => a.IdRootAnswer == null).ToList();
             foreach (var ans in mainAnswers)
             {
@@ -40,12 +53,13 @@ namespace Quanda.Server.Repositories.Implementations
                     Text = a.Text,
                     Rating = a.Rating,
                     IsModified = a.IsModified,
-                    IdUser = a.IdUser,
-                    IdRootAnswer = a.IdRootAnswer
+                    UserResponseDTO = a.UserResponseDTO,
+                    IdRootAnswer = a.IdRootAnswer,
+                    Mark = a.Mark
                 }).SingleOrDefault();
-                if(nextAnswer != null)
+                if (nextAnswer != null)
                 {
-                    while(nextAnswer != null)
+                    while (nextAnswer != null)
                     {
                         leavesAnswer.Add(nextAnswer);
                         nextAnswer = answers.Where(a => a.IdRootAnswer == nextAnswer.IdAnswer).Select(a => new AnswerResponseDTO
@@ -54,11 +68,12 @@ namespace Quanda.Server.Repositories.Implementations
                             Text = a.Text,
                             Rating = a.Rating,
                             IsModified = a.IsModified,
-                            IdUser = a.IdUser,
-                            IdRootAnswer = a.IdRootAnswer
+                            UserResponseDTO = a.UserResponseDTO,
+                            IdRootAnswer = a.IdRootAnswer,
+                            Mark = a.Mark
                         }).SingleOrDefault();
                     }
-                    
+
                 }
                 answersBox.Add(new AnswerBoxResponseDto
                 {
@@ -66,7 +81,7 @@ namespace Quanda.Server.Repositories.Implementations
                     ChildAnswers = leavesAnswer.OrderBy(a => a.IdAnswer).ToList()
                 });
             }
-                
+
 
             return answersBox;
         }
@@ -79,7 +94,7 @@ namespace Quanda.Server.Repositories.Implementations
             var existsUser = await _context.Users.AnyAsync(u => u.IdUser == answerDTO.IdUser);
             if (!existsUser)
                 return AnswerResult.USER_DELETED;
-            if(answerDTO.IdRootAnswer != null)
+            if (answerDTO.IdRootAnswer != null)
             {
                 bool existsRootAnswer = await _context.Answers.AnyAsync(a => a.IdAnswer == answerDTO.IdRootAnswer);
                 if (!existsRootAnswer)
