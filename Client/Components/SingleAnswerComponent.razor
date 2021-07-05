@@ -1,0 +1,40 @@
+﻿@inject IAnswerRepository answerRepository
+@if (Answer.Mark >= 1)
+{
+    <button style="background-color:orange">
+        +
+    </button>
+}
+else
+{
+    <button type="button" @onclick="@(() => IncreaseRating.InvokeAsync(Answer))" disabled="@DisableButton">
+        +
+    </button>
+}
+<label>
+    @Answer.Rating
+</label>
+@if (Answer.Mark <= -1)
+{
+    <button style="background-color:orange">
+        -
+    </button>
+}
+else
+{
+    <button @onclick="@(() => DecreaseRating.InvokeAsync(Answer))" disabled="@DisableButton">
+        -
+    </button>
+}
+<input type="text" value="@Answer.Text => @Answer.Mark" readonly>
+@code {
+    [Parameter]
+    public AnswerResponseDTO Answer { get; set; }
+    [Parameter]
+    public EventCallback<AnswerResponseDTO> IncreaseRating { get; set; }
+    [Parameter]
+    public EventCallback<AnswerResponseDTO> DecreaseRating { get; set; }
+    [Parameter]
+    public bool DisableButton { get; set; }
+
+}

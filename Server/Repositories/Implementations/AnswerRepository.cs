@@ -139,7 +139,7 @@ namespace Quanda.Server.Repositories.Implementations
             return AnswerResult.SUCCESS;
         }
  
-        public async Task<AnswerResult> UpdateRatingAnswerAsync(int idAnswer, int idUserLogged, UpdateRatingAnswer updateRatingAnswer)
+        public async Task<AnswerResult> UpdateRatingAnswerAsync(int idAnswer, int idUserLogged, UpdateRatingAnswerDTO updateRatingAnswer)
         {
             var answerRated = await _context.RatingAnswers.SingleOrDefaultAsync(ra => ra.IdAnswer == idAnswer && ra.IdUser == idUserLogged);
             if(answerRated == null)

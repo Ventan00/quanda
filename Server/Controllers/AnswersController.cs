@@ -58,8 +58,8 @@ namespace Quanda.Server.Controllers
             return NoContent();
         }
 
-        [HttpPut("{idAnswer}/rating")]
-        public async Task<IActionResult> UpdateRatingAnswer(int idAnswer, [FromBody] UpdateRatingAnswer updateRatingAnswer)
+        [HttpPost("{idAnswer}/rating")]
+        public async Task<IActionResult> UpdateRatingAnswer(int idAnswer, [FromBody] UpdateRatingAnswerDTO updateRatingAnswer)
         {
             int requestIdUser = 26; //future => Request.GetUser();
             var result = await _repository.UpdateRatingAnswerAsync(idAnswer, requestIdUser, updateRatingAnswer);

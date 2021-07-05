@@ -1,16 +1,77 @@
 ﻿@inject IAnswerRepository answerRepository
+@inject IJSRuntime js
 <h3>AnswersToQuestionsComponent</h3>
 <div class="answers-container">
+    @if (Answers == null)
+    {
+        <div class="loader"><h1>Loading...</h1></div>
 
+    }
+    else
+    {
+        if (Answers.Count() > 0)
+        {
+            @foreach (var answerBox in Answers)
+            {
+                <div class="answer-Main">
+                    <SingleAnswerComponent Answer="answerBox.MainAnswer" IncreaseRating="IncreaseRating" DecreaseRating="DecreaseRating" DisableButton="@DisableButton"/>
+                </div>
+                <div class="answer-Main_child">
+                    @foreach (var answerChild in answerBox.ChildAnswers)
+                    {
+                        <div class="answer-child" style="text-indent: 2%;">
+                            <p>
+                                <SingleAnswerComponent Answer="answerChild" IncreaseRating="IncreaseRating" DecreaseRating="DecreaseRating" />
+                            </p>
+                        </div>
+                    }
+                </div>
+            }
+        }
+    }
 </div>
+
 
 @code {
     [Parameter]
     public List<AnswerBoxResponseDto> Answers { get; set; }
+    public bool DisableButton { get; set; }
 
     protected async override Task OnInitializedAsync()
     {
         Answers = await answerRepository.GetAnswersAsync(1);
+    }
+
+    private async Task IncreaseRating(AnswerResponseDTO answer)
+    {
+        DisableButton = true;
+        var result = await answerRepository.UpdateRatingAnswerAsync(answer.IdAnswer, answer.Mark + 1);
+        if (result.Item1)
+        {
+            answer.Mark += 1;
+            answer.Rating += 1;
+        }
+        else
+        {
+            await js.InvokeVoidAsync("alert", result.Item2);
+        }
+        DisableButton = false;
+    }
+
+    private async Task DecreaseRating(AnswerResponseDTO answer)
+    {
+        DisableButton = true;
+        var result = await answerRepository.UpdateRatingAnswerAsync(answer.IdAnswer, answer.Mark - 1);
+        if (result.Item1)
+        {
+            answer.Mark -= 1;
+            answer.Rating -= 1;
+        }
+        else
+        {
+            await js.InvokeVoidAsync("alert", result.Item2);
+        }
+        DisableButton = false;
     }
 
 }

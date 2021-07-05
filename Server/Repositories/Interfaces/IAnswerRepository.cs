@@ -16,6 +16,6 @@ namespace Quanda.Server.Repositories.Interfaces
 
         Task<AnswerResult> DeleteAnswerAsync(int idAnswer);
 
-        Task<AnswerResult> UpdateRatingAnswerAsync(int idAnswer, int idUserLogged, UpdateRatingAnswer updateRatingAnswer);
+        Task<AnswerResult> UpdateRatingAnswerAsync(int idAnswer, int idUserLogged, UpdateRatingAnswerDTO updateRatingAnswer);
     }
 }
