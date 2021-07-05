@@ -12,5 +12,6 @@ namespace Quanda.Server.Services.Interfaces
         public void AddTokensToCookies(string refreshToken, DateTime refreshTokenExpirationDate,
             JwtSecurityToken accessToken, IResponseCookies responseCookies);
         public JwtSecurityToken GeneratePasswordRecoveryToken(User user);
+        public int? DecryptPasswordRecoveryToken(string jwt, User user);
     }
 }

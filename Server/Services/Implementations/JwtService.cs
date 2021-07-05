@@ -78,5 +78,53 @@ namespace Quanda.Server.Services.Implementations
                 signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
             );
         }
+
+        public int? DecryptPasswordRecoveryToken(string jwt, User user)
+        {
+
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(user.HashedPassword + "-" + user.RegistrationDate)),
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero
+            };
+
+            JwtSecurityToken jwtToken = null;
+            ClaimsPrincipal principal = null;
+
+            try
+            {
+                principal =
+                    new JwtSecurityTokenHandler().ValidateToken(jwt, tokenValidationParameters,
+                        out SecurityToken validatedToken);
+
+                jwtToken = (JwtSecurityToken)validatedToken;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+
+            if (jwtToken == null ||
+                !jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+            {
+                return null;
+            }
+
+            var idUser = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(idUser))
+            {
+                return null;
+            }
+
+            var canParse = int.TryParse(idUser, out var parsedIdUser);
+            if (!canParse)
+                return null;
+
+            return parsedIdUser;
+        }
     }
 }

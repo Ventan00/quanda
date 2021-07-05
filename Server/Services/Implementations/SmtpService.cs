@@ -24,7 +24,7 @@ namespace Quanda.Server.Services.Implementations
         public async Task SendPasswordRecoveryEmailAsync(string email, string recoveryJwt, int idUser)
         {
             var smtpClient = CreateSmtpClient();
-            await smtpClient.SendMailAsync(_smtpConfigSection["Email"], email, "QUANDA - Recover password", $"https://localhost:44358/api/accounts/recover-password/{idUser}/{recoveryJwt}");
+            await smtpClient.SendMailAsync(_smtpConfigSection["Email"], email, "QUANDA - Recover password", $"https://localhost:44358/recover/password/reset?uuid={idUser}&recovery_token={recoveryJwt}");
         }
 
         private SmtpClient CreateSmtpClient()

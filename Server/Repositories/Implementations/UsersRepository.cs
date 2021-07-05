@@ -71,5 +71,18 @@ namespace Quanda.Server.Repositories.Implementations
 
             return await _context.SaveChangesAsync() > 0 ? USER_REFRESH_TOKEN_UPDATED : USER_DB_ERROR;
         }
+
+        public async Task<User> GetUserByIdAsync(int idUser)
+        {
+            return await _context.Users.
+                Include(u => u.IdTempUserNavigation).
+                SingleOrDefaultAsync(u => u.IdUser == idUser);
+        }
+
+        public async Task<bool> SetNewPasswordForUser(User user, string rawPassword)
+        {
+            user.HashedPassword = new PasswordHasher<User>().HashPassword(user, rawPassword);
+            return await _context.SaveChangesAsync() > 0;
+        }
     }
 }
