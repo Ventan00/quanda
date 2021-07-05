@@ -15,6 +15,7 @@ namespace Quanda.Server.Services.Implementations
     public class JwtService : IJwtService
     {
         private readonly IConfigurationSection _jwtConfigurationSection;
+
         public JwtService(IConfiguration configuration)
         {
             _jwtConfigurationSection = configuration.GetSection("JwtSettings");
@@ -60,6 +61,70 @@ namespace Quanda.Server.Services.Implementations
 
             responseCookies.Append("access_token", new JwtSecurityTokenHandler().WriteToken(accessToken), cookieOptions);
             responseCookies.Append("refresh_token", refreshToken, cookieOptions);
+        }
+
+        public JwtSecurityToken GeneratePasswordRecoveryToken(User user)
+        {
+            var userClaims = new List<Claim>
+            {
+                new(ClaimTypes.NameIdentifier, user.IdUser.ToString()),
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(user.HashedPassword + "-" + user.RegistrationDate));
+
+            return new JwtSecurityToken(
+                claims: userClaims,
+                expires: DateTime.Now.AddMinutes(int.Parse(_jwtConfigurationSection["PasswordRecoveryTokenValidityInMinutes"])),
+                signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
+            );
+        }
+
+        public int? DecryptPasswordRecoveryToken(string jwt, User user)
+        {
+
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(user.HashedPassword + "-" + user.RegistrationDate)),
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero
+            };
+
+            JwtSecurityToken jwtToken = null;
+            ClaimsPrincipal principal = null;
+
+            try
+            {
+                principal =
+                    new JwtSecurityTokenHandler().ValidateToken(jwt, tokenValidationParameters,
+                        out SecurityToken validatedToken);
+
+                jwtToken = (JwtSecurityToken)validatedToken;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+
+            if (jwtToken == null ||
+                !jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+            {
+                return null;
+            }
+
+            var idUser = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(idUser))
+            {
+                return null;
+            }
+
+            var canParse = int.TryParse(idUser, out var parsedIdUser);
+            if (!canParse)
+                return null;
+
+            return parsedIdUser;
         }
     }
 }
