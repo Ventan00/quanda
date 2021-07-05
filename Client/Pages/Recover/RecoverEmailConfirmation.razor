@@ -35,7 +35,7 @@ else if (_isEmailSend == false)
         }
         else
         {
-            await _usersRepository.ResendConfirmationEmailAsync(recoverDto);
+            await _usersRepository.RecoverConfirmationEmailAsync(recoverDto);
             EmailsProvided.Add(recoverDto.Email);
             _isEmailSend = true;
         }
