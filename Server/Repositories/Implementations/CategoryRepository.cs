@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Quanda.Server.Data;
 using Quanda.Server.Repositories.Interfaces;
+using Quanda.Shared.DTOs.Requests;
+using Quanda.Shared.Enums;
 using Quanda.Shared.Models;
 
 namespace Quanda.Server.Repositories.Implementations
@@ -29,6 +31,40 @@ namespace Quanda.Server.Repositories.Implementations
                 .Where(qc => qc.IdQuestion == idQuestion)
                 .Select(qc => qc.IdCategoryNavigation)
                 .ToListAsync();
+        }
+
+        public async Task<CategoryResultEnum> UpdateCategoryAsync(UpdateCategoryDTO category, int idCategory)
+        {
+            var Cat = await _context.Categories.Where(cat => cat.IdCategory == idCategory).SingleAsync();
+            if (Cat == null)
+                return CategoryResultEnum.CATEGORY_NOT_FOUND;
+            Cat.IdMainCategory = category.IdMainCategory;
+            Cat.Name = category.Name;
+            return await _context.SaveChangesAsync() == 1 ? CategoryResultEnum.CATEGORY_UPDATED : CategoryResultEnum.CATEGORY_DATABASE_ERROR;
+        }
+
+        public async Task<CategoryResultEnum> AddCategoryAsync(AddCategoryDTO category)
+        {
+            Category cat = new Category
+            {
+                IdMainCategory = category.IdMainCategory,
+                Name = category.Name
+            };
+            await _context.AddAsync(cat);
+            return await _context.SaveChangesAsync() == 1
+                ? CategoryResultEnum.CATEGORY_CREATED
+                : CategoryResultEnum.CATEGORY_DATABASE_ERROR;
+        }
+
+        public async Task<CategoryResultEnum> DeleteCategoryAsync(int idCategory)
+        {
+            var Cat = await _context.Categories.Where(cat => cat.IdCategory == idCategory).SingleAsync();
+            if (Cat == null)
+                return CategoryResultEnum.CATEGORY_NOT_FOUND;
+            _context.Remove(Cat);
+            return await _context.SaveChangesAsync() == 1
+                ? CategoryResultEnum.CATEGORY_DELETED
+                : CategoryResultEnum.CATEGORY_DATABASE_ERROR;
         }
     }
 }

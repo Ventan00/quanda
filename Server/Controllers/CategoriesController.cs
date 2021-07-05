@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Quanda.Server.Repositories.Interfaces;
+using Quanda.Shared.DTOs.Requests;
+using Quanda.Shared.Enums;
 
 namespace Quanda.Server.Controllers
 {
@@ -30,20 +32,38 @@ namespace Quanda.Server.Controllers
             return Ok(await _repository.GetCategoriesAsync());
         }
 
-        [HttpPut] 
-        public async Task<IActionResult> UpdateCategory()
+        [HttpPut("{IdCategory:int}")] 
+        public async Task<IActionResult> UpdateCategory([FromBody] UpdateCategoryDTO category,[FromRoute] int IdCategory )
         {
-            return Ok();
+            return await _repository.UpdateCategoryAsync(category, IdCategory) switch
+            {
+                CategoryResultEnum.CATEGORY_NOT_FOUND => NotFound(),
+                CategoryResultEnum.CATEGORY_UPDATED => Ok(),
+                CategoryResultEnum.CATEGORY_DATABASE_ERROR => BadRequest(),
+                _ => throw new ArgumentException()
+            };
+            
         }
         [HttpPost]
-        public async Task<IActionResult> AddCategory()
+        public async Task<IActionResult> AddCategory([FromBody] AddCategoryDTO category)
         {
-            return Ok();
+            return await _repository.AddCategoryAsync(category) switch
+            {
+                CategoryResultEnum.CATEGORY_CREATED => Ok(),
+                CategoryResultEnum.CATEGORY_DATABASE_ERROR => BadRequest(),
+                _ => throw new ArgumentException()
+            };
         }
-        [HttpDelete]
-        public async Task<IActionResult> DeleteCategory()
+        [HttpDelete("{IdCategory:int}")]
+        public async Task<IActionResult> DeleteCategory([FromRoute] int IdCategory)
         {
-            return Ok();
+            return await _repository.DeleteCategoryAsync(IdCategory) switch
+            {
+                CategoryResultEnum.CATEGORY_NOT_FOUND => NotFound(),
+                CategoryResultEnum.CATEGORY_DELETED => Ok(),
+                CategoryResultEnum.CATEGORY_DATABASE_ERROR => BadRequest(),
+                _ => throw new ArgumentException()
+            };
         }
 
     }

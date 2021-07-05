@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Quanda.Shared.DTOs.Requests;
+using Quanda.Shared.Enums;
 using Quanda.Shared.Models;
 
 namespace Quanda.Server.Repositories.Interfaces
@@ -10,5 +12,8 @@ namespace Quanda.Server.Repositories.Interfaces
     {
         Task<List<Category>> GetCategoriesAsync();
         Task<List<Category>> GetCategoriesOfQuestinAsync(int idQuestion);
+        Task<CategoryResultEnum> UpdateCategoryAsync(UpdateCategoryDTO category, int idCategory);
+        Task<CategoryResultEnum> AddCategoryAsync(AddCategoryDTO category);
+        Task<CategoryResultEnum> DeleteCategoryAsync(int idCategory);
     }
 }
