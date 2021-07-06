@@ -25,18 +25,22 @@ namespace Quanda.Server.Services.Implementations
 
         public async Task SendRegisterConfirmationEmailAsync(string email, string confirmationCode)
         {
+            var subject = "QUANDA - Complete register";
+
             var href = $"{_hostBaseUrl}/api/accounts/confirm-email/{confirmationCode}";
             var body = GlobalVariables.AccountConfirmationEmailBodyHtml.Replace("href_template", href);
 
-            await SendEmailAsync("QUANDA - Complete register", body, true, email);
+            await SendEmailAsync(subject, body, true, email);
         }
 
         public async Task SendPasswordRecoveryEmailAsync(string email, string recoveryJwt, int idUser)
         {
+            var subject = "QUANDA - Recover password";
+
             var href = $"{_hostBaseUrl}/recover/password/reset?uuid={idUser}&recovery_token={recoveryJwt}";
             var body = GlobalVariables.PasswordRecoveryEmailBodyHtml.Replace("href_template", href);
 
-            await SendEmailAsync("QUANDA - Recover password", body, true, email);
+            await SendEmailAsync(subject, body, true, email);
         }
 
         private SmtpClient CreateSmtpClient()
