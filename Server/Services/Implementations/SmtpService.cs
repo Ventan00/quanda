@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Quanda.Server.Services.Interfaces;
+using Quanda.Server.Utils;
 
 namespace Quanda.Server.Services.Implementations
 {
@@ -22,17 +23,20 @@ namespace Quanda.Server.Services.Implementations
             }
         }
 
-
         public async Task SendRegisterConfirmationEmailAsync(string email, string confirmationCode)
         {
             var href = $"{_hostBaseUrl}/api/accounts/confirm-email/{confirmationCode}";
-            await SendEmailAsync(email, "QUANDA - Complete register", $"{href}");
+            var body = GlobalVariables.AccountConfirmationEmailBodyHtml.Replace("href_template", href);
+
+            await SendEmailAsync("QUANDA - Complete register", body, true, email);
         }
 
         public async Task SendPasswordRecoveryEmailAsync(string email, string recoveryJwt, int idUser)
         {
             var href = $"{_hostBaseUrl}/recover/password/reset?uuid={idUser}&recovery_token={recoveryJwt}";
-            await SendEmailAsync(email, "QUANDA - Recover password", $"{href}");
+            var body = GlobalVariables.PasswordRecoveryEmailBodyHtml.Replace("href_template", href);
+
+            await SendEmailAsync("QUANDA - Recover password", body, true, email);
         }
 
         private SmtpClient CreateSmtpClient()
@@ -45,10 +49,26 @@ namespace Quanda.Server.Services.Implementations
             };
         }
 
-        private async Task SendEmailAsync(string recipientEmail, string subject, string body)
+        private async Task SendEmailAsync(string subject, string body, bool isBodyHtml, params string[] recipients)
         {
-            var smtpClient = CreateSmtpClient();
-            await smtpClient.SendMailAsync(_smtpConfigSection["Email"], recipientEmail, subject, $"{body}");
+            using (var mail = new MailMessage())
+            {
+                mail.From = new MailAddress(_smtpConfigSection["Email"]);
+
+                foreach (var recipient in recipients)
+                {
+                    mail.To.Add(recipient);
+                }
+
+                mail.Subject = subject;
+                mail.Body = body;
+                mail.IsBodyHtml = isBodyHtml;
+
+                using (var smtpClient = CreateSmtpClient())
+                {
+                    await smtpClient.SendMailAsync(mail);
+                }
+            }
         }
     }
 }
