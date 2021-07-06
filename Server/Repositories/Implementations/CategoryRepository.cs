@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Quanda.Server.Data;
 using Quanda.Server.Repositories.Interfaces;
 using Quanda.Shared.DTOs.Requests;
+using Quanda.Shared.DTOs.Responses;
 using Quanda.Shared.Enums;
 using Quanda.Shared.Models;
 
@@ -19,17 +20,30 @@ namespace Quanda.Server.Repositories.Implementations
         {
             _context = context;
         }
-        public async Task<List<Category>> GetCategoriesAsync()
+        public async Task<List<CategoriesResponseDTO>> GetCategoriesAsync()
         {
-            return await _context.Categories.ToListAsync();
+            return await _context.Categories
+                .Select(category => new CategoriesResponseDTO()
+                {
+                    IdCategory = category.IdCategory,
+                    IdMainCategory = category.IdMainCategory,
+                    Name = category.Name
+                })
+                .ToListAsync();
         }
 
-        public async Task<List<Category>> GetCategoriesOfQuestinAsync(int idQuestion)
+        public async Task<List<CategoriesResponseDTO>> GetCategoriesOfQuestionAsync(int idQuestion)
         {
             return await _context.QuestionCategories
                 .Include(qc => qc.IdCategoryNavigation)
                 .Where(qc => qc.IdQuestion == idQuestion)
                 .Select(qc => qc.IdCategoryNavigation)
+                .Select(category => new CategoriesResponseDTO()
+                {
+                    IdCategory = category.IdCategory,
+                    IdMainCategory = category.IdMainCategory,
+                    Name = category.Name
+                })
                 .ToListAsync();
         }
 

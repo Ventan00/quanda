@@ -1,0 +1,87 @@
+﻿@using Quanda.Shared.Models
+@if (Categories != null) {
+    <div class="categories-popup">
+        <div class="categories-popup-up">
+            <div class="categories-popup-up-list">
+                @foreach (var category in Categories.Where(category => category.IdMainCategory == null))
+                {
+                    <div class="categories-first-level-category" @onclick="@(()=>InsideCategorySelectionChange(category))">
+                        <div class="category-popup-text"><div class=".category-popup-text-expand" @onclick="@(()=>OpenClose(category))"> > </div>@category.Name</div>
+                        <div class="category-popup-close">
+                            @if (SelectedCategories.Contains(category))
+                            {
+                                @:x
+                            }
+                        </div>
+                    </div>
+                    if (OpenedCategories[category])
+                    {
+                        @foreach (var cat in Categories.Where(cat => cat.IdMainCategory == category.IdCategory))
+                        {
+                            <div class="categories-second-level-category" @onclick="@(()=>InsideCategorySelectionChange(cat))">
+                                <div class="category-popup-text">@cat.Name</div>
+                                <div class="category-popup-close">
+                                    @if (SelectedCategories.Contains(cat))
+                                    {
+                                        @:x
+                                    }
+                                </div>
+                            </div>
+                        }
+
+                    }
+                }
+            </div>
+        </div>
+        <div class="categories-popup-down">
+            <input type="text" placeholder="Enter tag..." class="categories-popup-input" />
+            <button class="categories-popup-close-btn" @onclick="PopUpClosed">Close</button>
+        </div>
+    </div>
+}
+@code {
+    [Parameter]
+    public List<CategoriesResponseDTO> Categories { get; set; }
+    [Parameter]
+    public EventCallback<int> CategorySelected { get; set; }
+    [Parameter]
+    public EventCallback<int> CategoryDeSelected { get; set; }
+    [Parameter]
+    public EventCallback PopUpClosed { get; set; }
+
+    List<CategoriesResponseDTO> SelectedCategories;
+    Dictionary<CategoriesResponseDTO, bool> OpenedCategories;
+
+    protected async override Task OnInitializedAsync()
+    {
+        SelectedCategories = new List<CategoriesResponseDTO>();
+        OpenedCategories = new Dictionary<CategoriesResponseDTO, bool>();
+        foreach (var category in Categories.Where(category => category.IdMainCategory == null))
+        {
+            OpenedCategories.Add(category, false);
+        }
+
+    }
+
+    private async Task InsideCategorySelectionChange(CategoriesResponseDTO category)
+    {
+        if (SelectedCategories.Contains(category))
+        {
+            SelectedCategories.Remove(category);
+            await CategoryDeSelected.InvokeAsync(category.IdCategory);
+        }
+        else
+        {
+            SelectedCategories.Add(category);
+            await CategorySelected.InvokeAsync(category.IdCategory);
+        }
+        StateHasChanged();
+    }
+
+    private void OpenClose(CategoriesResponseDTO category)
+    {
+        OpenedCategories[category] = !OpenedCategories[category];
+        StateHasChanged();
+    }
+
+}

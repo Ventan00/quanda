@@ -23,7 +23,7 @@ namespace Quanda.Server.Controllers
         [HttpGet("question/{idQuestion:int}")]
         public async Task<IActionResult> GetCategoriesOfQuestion(int idQuestion)
         {
-            var result = await _repository.GetCategoriesOfQuestinAsync(idQuestion);
+            var result = await _repository.GetCategoriesOfQuestionAsync(idQuestion);
             return result != null ? Ok(result) : NotFound();
         }
         [HttpGet]

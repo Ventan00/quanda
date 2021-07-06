@@ -29,6 +29,7 @@ namespace Quanda.Client
             services.AddScoped<IHttpService, HttpService>();
             services.AddScoped<IAnswerRepository, AnswerRepository>();
             services.AddScoped<IQuestionsReposiotry, QuestionsRepository>();
+            services.AddScoped<ICategoriesReposiotry, CategoriesRepository>();
         }
     }
 }
