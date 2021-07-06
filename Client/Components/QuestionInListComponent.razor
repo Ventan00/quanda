@@ -1,11 +1,9 @@
 ﻿@using Quanda.Shared.Models
 @using System.Text.RegularExpressions
 @using Microsoft.AspNetCore.Components
-@inject IAnswerRepository AnswersReposiotry
-@inject IUsersRepository UsersReposiotry
-@if(user != null) {
+@if(question != null) {
     <div class="question-container">
-        <a href="questionURL">
+        <a href="@questionURL">
 
             <div class="question-header">
                 <div class="question-text">
@@ -20,7 +18,7 @@
                     Categories:
                 </div>
                 <div class="question-categories-containter">
-                    @foreach (var category in categories)
+                    @foreach (var category in question.Categories)
                         {
                             <div class="question-category">
                                 @category
@@ -32,21 +30,23 @@
                 @description
             </div>
             <div class="question-footer">
-                <div class="question-user-info">
-                    <div class="question-user-image">
-                        <img src="@user.Avatar" href="@userURL" />
+                <a href="@userURL">
+                    <div class="question-user-info">
+                        <div class="question-user-image">
+                            <img src="@question.Avatar" />
+                        </div>
+                        <div class="question-user-nick">
+                            @question.Nickname
+                        </div>
                     </div>
-                    <div class="question-user-nick">
-                        @user.Nick
-                    </div>
-                </div>
+                </a>
                 <div class="question-user-views">
                     <div class="question-user-views-text">Views: </div>
                     <div class="question-user-views-value">@question.Views</div>
                 </div>
                 <div class="question-user-answers">
                     <div class="question-user-answers-text">Answers: </div>
-                    <div class="question-user-answers-value">@answers</div>
+                    <div class="question-user-answers-value">@question.AnswersCount</div>
                 </div>
             </div>
         </a>
@@ -54,27 +54,24 @@
 }
 @code {
     [Parameter]
-    public Question question { get; set; }
-
-    public GetUserForQuestionByIDDTO user;
-
-    int answers=0;
-
-    public List<string> categories = new List<string> { "testowy", "testowy2" };
-
+    public GetQuestionsDTO question { get; set; }
+    
     private string finished = string.Empty;
     private string questionURL = string.Empty;
     private string userURL = string.Empty;
     private MarkupString description;
-    protected async override Task OnInitializedAsync()
+
+    protected async override Task OnParametersSetAsync()
     {
         description = (MarkupString)Regex.Replace(question.Description, "<img [^>]* />", "");
         questionURL = $"questions/{question.IdQuestion}";
         userURL = $"users/{question.IdUser}";
-        user = await UsersReposiotry.GetDataForQuestionAsync(question.IdUser);
-        var tmp = await AnswersReposiotry.GetAnswersAsync(question.IdQuestion);
-        answers = tmp.Count;
         finished = question.IsFinished ? "#closed" : "";
+    }
+
+    protected async override Task OnInitializedAsync()
+    {
+
 
     }
 

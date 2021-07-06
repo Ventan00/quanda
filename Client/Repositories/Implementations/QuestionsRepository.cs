@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Quanda.Client.Helpers;
 using Quanda.Client.Repositories.Interfaces;
 using Quanda.Shared.DTOs.Requests;
+using Quanda.Shared.DTOs.Responses;
 using Quanda.Shared.Enums;
 using Quanda.Shared.Models;
 
@@ -22,14 +23,15 @@ namespace Quanda.Client.Repositories.Implementations
             _httpService = httpService;
         }
 
-        public async Task<List<Question>> GetQuestions(int page, SortOptionEnum sortingBy, List<Category> categories)
+        public async Task<List<GetQuestionsDTO>> GetQuestions(int page, SortOptionEnum sortingBy, List<int> categories)
         {
             var url = $"{ApiUrl}?skip={page * _skipAmount}&sortOption={Enum.GetName(sortingBy)}";
             if (categories.Count != 0)
             {
-                url+=$"&category={string.Join("&category=", categories.Select(cat => cat.IdCategory).ToList())}";
+                url+=$"&category={string.Join("&category=", categories)}";
             }
-            var response = await _httpService.Get<List<Question>>(url);
+            var response = await _httpService.Get<List<GetQuestionsDTO>>(url);
+            
             return response.Response;
 
         }

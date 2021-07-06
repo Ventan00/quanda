@@ -8,6 +8,8 @@ namespace Quanda.Shared.Enums
 {
     public enum SortOptionEnum
     {
-        Date,Tags,Views,Answers
+        Date,
+        Views,
+        Answers
     }
 }

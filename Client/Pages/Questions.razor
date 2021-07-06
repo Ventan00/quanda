@@ -19,7 +19,7 @@
                 </div>
             </div>
             <div class="questions-sorting-options">
-                @if (activeHeader == 0)
+                @if (activeSorting == 0)
                 {
                     <div class="questions-sorting-option questions-sorting-option-active">
                         Data publikacji
@@ -27,23 +27,23 @@
                 }
                 else
                 {
-                    <div class="questions-sorting-option questions-sorting-option">
+                    <div class="questions-sorting-option questions-sorting-option" @onclick="() => SetSorting(0)">
                         Data publikacji
                     </div>
                 }
-                @if (activeHeader == 1)
+                @if (activeSorting == 1)
                 {
-                    <div class="questions-sorting-option questions-sorting-option-active">
+                    <div class="questions-sorting-option questions-sorting-option-active" >
                         Ilość wyświetleń
                     </div>
                 }
                 else
                 {
-                    <div class="questions-sorting-option questions-sorting-option">
+                    <div class="questions-sorting-option questions-sorting-option" @onclick="() => SetSorting(1)">
                         Ilość wyświetleń
                     </div>
                 }
-                @if (activeHeader == 2)
+                @if (activeSorting == 2)
                 {
                     <div class="questions-sorting-option questions-sorting-option-active">
                         Ilość odpowiedzi
@@ -51,7 +51,7 @@
                 }
                 else
                 {
-                    <div class="questions-sorting-option questions-sorting-option">
+                    <div class="questions-sorting-option questions-sorting-option" @onclick="() => SetSorting(2)">
                         Ilość odpowiedzi
                     </div>
                 }
@@ -62,11 +62,11 @@
         </div>
         <div class="questions-header">
             <div class="questions-tags-container">
-                @foreach (Category cat in selectedCategories)
+                @foreach (var cat in selectedCategories)
                 {
                     <div class="questions-tag">
                         <div class="questions-tag-val">
-                            @cat.Name
+                            @categories[cat].Name
                         </div>
                         <div class="questions-tag-close">
                             x
@@ -82,25 +82,24 @@
             @foreach (var que in questions)
             {
                 <QuestionInListComponent question="que" />
-
-                
             }
         }
     </div>
 
 @code {
     private int questionAmount = 0;
-    private int activeHeader = 0;
+    private int activeSorting = 0;
     private int activePage = 0;
-    private List<Category> selectedCategories = new List<Category>();
-    private List<Question> questions;
+    private List<int> selectedCategories = new List<int>();
+    private List<Category> categories = new List<Category>();
+    public List<GetQuestionsDTO> questions { get; set; }
     protected async override Task OnInitializedAsync()
     {
         await GetQuestions();
     }
     private async Task GetQuestions()
     {
-        questions = await QuestionsReposiotry.GetQuestions(activePage, activeHeader switch
+        questions = await QuestionsReposiotry.GetQuestions(activePage, activeSorting switch
         {
             0 => SortOptionEnum.Date,
             1 => SortOptionEnum.Views,
@@ -108,4 +107,12 @@
         }, selectedCategories);
 
     }
+
+    private async void SetSorting(int i)
+    {
+        activeSorting = i;
+        await GetQuestions();
+        StateHasChanged();
+    }
+
 }
