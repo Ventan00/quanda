@@ -5,23 +5,26 @@
             <div class="categories-popup-up-list">
                 @foreach (var category in Categories.Where(category => category.IdMainCategory == null))
                 {
-                    <div class="categories-first-level-category" @onclick="@(()=>InsideCategorySelectionChange(category))">
-                        <div class="category-popup-text"><div class=".category-popup-text-expand" @onclick="@(()=>OpenClose(category))"> > </div>@category.Name</div>
+                    <div class="categories-first-level-category">
+                        <div class="category-popup-text">
+                            <div class=".category-popup-text-expand" @onclick="@(() => OpenClose(category))"> > </div>
+                            <div @onclick="@(() => InsideCategorySelectionChange(category))">@category.Name</div>
+                        </div>
                         <div class="category-popup-close">
-                            @if (SelectedCategories.Contains(category))
+                            @if (SelectedCategories.Contains(category.IdCategory))
                             {
                                 @:x
                             }
                         </div>
                     </div>
-                    if (OpenedCategories[category])
+                    if (OpenedCategories[category.IdCategory])
                     {
-                        @foreach (var cat in Categories.Where(cat => cat.IdMainCategory == category.IdCategory))
+                        @foreach (var cat in Categories.Where(cate => cate.IdMainCategory == category.IdCategory))
                         {
                             <div class="categories-second-level-category" @onclick="@(()=>InsideCategorySelectionChange(cat))">
                                 <div class="category-popup-text">@cat.Name</div>
                                 <div class="category-popup-close">
-                                    @if (SelectedCategories.Contains(cat))
+                                    @if (SelectedCategories.Contains(cat.IdCategory))
                                     {
                                         @:x
                                     }
@@ -49,38 +52,40 @@
     [Parameter]
     public EventCallback PopUpClosed { get; set; }
 
-    List<CategoriesResponseDTO> SelectedCategories;
-    Dictionary<CategoriesResponseDTO, bool> OpenedCategories;
+    List<int> SelectedCategories;
+    Dictionary<int, bool> OpenedCategories;
 
     protected async override Task OnInitializedAsync()
     {
-        SelectedCategories = new List<CategoriesResponseDTO>();
-        OpenedCategories = new Dictionary<CategoriesResponseDTO, bool>();
+        SelectedCategories = new List<int>();
+        OpenedCategories = new Dictionary<int, bool>();
         foreach (var category in Categories.Where(category => category.IdMainCategory == null))
         {
-            OpenedCategories.Add(category, false);
+            OpenedCategories.Add(category.IdCategory, false);
         }
 
     }
 
     private async Task InsideCategorySelectionChange(CategoriesResponseDTO category)
     {
-        if (SelectedCategories.Contains(category))
+        int IdCategory = category.IdCategory;
+        Console.WriteLine($"Category id: {IdCategory}");
+        if (SelectedCategories.Contains(IdCategory))
         {
-            SelectedCategories.Remove(category);
-            await CategoryDeSelected.InvokeAsync(category.IdCategory);
+            SelectedCategories.Remove(IdCategory);
+            await CategoryDeSelected.InvokeAsync(IdCategory);
         }
         else
         {
-            SelectedCategories.Add(category);
-            await CategorySelected.InvokeAsync(category.IdCategory);
+            SelectedCategories.Add(IdCategory);
+            await CategorySelected.InvokeAsync(IdCategory);
         }
         StateHasChanged();
     }
 
     private void OpenClose(CategoriesResponseDTO category)
     {
-        OpenedCategories[category] = !OpenedCategories[category];
+        OpenedCategories[category.IdCategory] = !OpenedCategories[category.IdCategory];
         StateHasChanged();
     }
 

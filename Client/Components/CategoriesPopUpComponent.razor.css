@@ -43,6 +43,7 @@
 
 .categories-second-level-category {
     padding-left: 20px;
+    display: flex;
 }
 
 .category-popup-text {
@@ -54,6 +55,7 @@
 .category-popup-text-expand {
     color: #212129 !important;
     cursor: pointer;
+    margin-right: 5px;
 }
 
 .categories-popup-input {
