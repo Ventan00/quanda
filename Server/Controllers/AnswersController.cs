@@ -61,7 +61,7 @@ namespace Quanda.Server.Controllers
         [HttpPost("{idAnswer}/rating")]
         public async Task<IActionResult> UpdateRatingAnswer(int idAnswer, [FromBody] UpdateRatingAnswerDTO updateRatingAnswer)
         {
-            int requestIdUser = 26; //future => Request.GetUser();
+            int requestIdUser = 25; //future => Request.GetUser();
             var result = await _repository.UpdateRatingAnswerAsync(idAnswer, requestIdUser, updateRatingAnswer);
             if (result == AnswerResult.ANSWER_DELETED || result == AnswerResult.USER_DELETED)
                 return BadRequest(result.ToString());

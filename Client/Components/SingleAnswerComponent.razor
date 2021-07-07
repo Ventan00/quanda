@@ -1,32 +1,43 @@
-﻿@inject IAnswerRepository answerRepository
-@if (Answer.Mark >= 1)
-{
-    <button style="background-color:orange">
-        +
-    </button>
-}
-else
-{
-    <button type="button" @onclick="@(() => IncreaseRating.InvokeAsync(Answer))" disabled="@DisableButton">
-        +
-    </button>
-}
-<label>
-    @Answer.Rating
-</label>
-@if (Answer.Mark <= -1)
-{
-    <button style="background-color:orange">
-        -
-    </button>
-}
-else
-{
-    <button @onclick="@(() => DecreaseRating.InvokeAsync(Answer))" disabled="@DisableButton">
-        -
-    </button>
-}
-<input type="text" value="@Answer.Text => @Answer.Mark" readonly>
+﻿<div class="answer row">
+    <div class="answer-rating column">
+        <div>
+            @if (Answer.Mark == 1)
+            {
+                <button class="triangle-up" style="color:orange"/>
+            }
+            else
+            {
+                <button class="triangle-up" @onclick="@(() => IncreaseRating.InvokeAsync(Answer))" disabled="@DisableButton"/>
+            }
+        </div>
+        <div class="rating-text">
+                @Answer.Rating
+        </div>
+        <div>
+            @if (Answer.Mark == -1)
+            {
+                <button class="triangle-down" style="color:orange" />
+            }
+            else
+            {
+                <button class="triangle-down" @onclick="@(() => DecreaseRating.InvokeAsync(Answer))" disabled="@DisableButton"/>
+            }
+        </div>
+    </div>
+    <div class="answer-text">
+        @*<input class="answer-text placeholder="@Answer.Text" column" type="text" id="text" size="50" >*@
+            @Answer.Text
+    </div>
+    <div class="edit-option-text">
+        <div>
+            <button>E</button>
+        </div>
+        <div>
+            <button @onclick="@(() => DeleteAnswer.InvokeAsync(Answer))" >X</button>
+        </div>
+    </div>
+</div>
+
 @code {
     [Parameter]
     public AnswerResponseDTO Answer { get; set; }
@@ -34,6 +45,8 @@ else
     public EventCallback<AnswerResponseDTO> IncreaseRating { get; set; }
     [Parameter]
     public EventCallback<AnswerResponseDTO> DecreaseRating { get; set; }
+    [Parameter]
+    public EventCallback<AnswerResponseDTO> DeleteAnswer { get; set; }
     [Parameter]
     public bool DisableButton { get; set; }
 

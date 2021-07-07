@@ -37,5 +37,14 @@ namespace Quanda.Client.Repositories.Implementations
 
             return new(true,null);
         }
+
+        public async Task<Tuple<bool, string>> DeleteAnswer(int idAnswer)
+        {
+            var response = await httpService.Delete($"{url}/{idAnswer}");
+            if (!response.Success)
+                return new(false,await response.GetBody());
+            return new(true,null);
+        }
+
     }
 }

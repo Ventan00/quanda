@@ -1,4 +1,5 @@
-﻿@inject IAnswerRepository answerRepository
+﻿@page "/test"
+@inject IAnswerRepository answerRepository
 @inject IJSRuntime js
 <h3>AnswersToQuestionsComponent</h3>
 <div class="answers-container">
@@ -14,15 +15,13 @@
             @foreach (var answerBox in Answers)
             {
                 <div class="answer-Main">
-                    <SingleAnswerComponent Answer="answerBox.MainAnswer" IncreaseRating="IncreaseRating" DecreaseRating="DecreaseRating" DisableButton="@DisableButton"/>
+                    <SingleAnswerComponent Answer="answerBox.MainAnswer" IncreaseRating="IncreaseRating" DecreaseRating="DecreaseRating" DeleteAnswer="DeleteAnswer" DisableButton="@DisableButton" />
                 </div>
                 <div class="answer-Main_child">
                     @foreach (var answerChild in answerBox.ChildAnswers)
                     {
-                        <div class="answer-child" style="text-indent: 2%;">
-                            <p>
-                                <SingleAnswerComponent Answer="answerChild" IncreaseRating="IncreaseRating" DecreaseRating="DecreaseRating" />
-                            </p>
+                        <div class="answer-child" style="margin-left: 10px;">
+                                <SingleAnswerComponent Answer="answerChild" IncreaseRating="IncreaseRating" DecreaseRating="DecreaseRating" DeleteAnswer="DeleteAnswer" DisableButton="@DisableButton"/>
                         </div>
                     }
                 </div>
@@ -73,5 +72,26 @@
         }
         DisableButton = false;
     }
+
+    private async Task DeleteAnswer(AnswerResponseDTO answer)
+    {
+        var confirmed = await js.InvokeAsync<bool>("confirm", "Do want to delete answer?");
+        if (confirmed)
+        {
+            var result = await answerRepository.DeleteAnswer(answer.IdAnswer);
+            if (result.Item1)
+            {
+                await OnInitializedAsync();
+            }
+            else
+            {
+                await js.InvokeVoidAsync("alert", result.Item2);
+                await OnInitializedAsync();
+            }
+        }
+
+    }
+
+
 
 }
