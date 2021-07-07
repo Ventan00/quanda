@@ -3,15 +3,15 @@
         <div>
             @if (Answer.Mark == 1)
             {
-                <button class="triangle-up" style="color:orange"/>
+                <button class="triangle-up" style="color:orange" />
             }
             else
             {
-                <button class="triangle-up" @onclick="@(() => IncreaseRating.InvokeAsync(Answer))" disabled="@DisableButton"/>
+                <button class="triangle-up" @onclick="@(() => IncreaseRating.InvokeAsync(Answer))" disabled="@DisableButton" />
             }
         </div>
         <div class="rating-text">
-                @Answer.Rating
+            @Answer.Rating
         </div>
         <div>
             @if (Answer.Mark == -1)
@@ -20,22 +20,26 @@
             }
             else
             {
-                <button class="triangle-down" @onclick="@(() => DecreaseRating.InvokeAsync(Answer))" disabled="@DisableButton"/>
+                <button class="triangle-down" @onclick="@(() => DecreaseRating.InvokeAsync(Answer))" disabled="@DisableButton" />
             }
         </div>
     </div>
     <div class="answer-text">
         @*<input class="answer-text placeholder="@Answer.Text" column" type="text" id="text" size="50" >*@
-            @Answer.Text
+        @Answer.Text
     </div>
-    <div class="edit-option-text">
-        <div>
-            <button>E</button>
+    @if (Answer.UserResponseDTO.IdUser == 25)
+    {
+        <div class="edit-option-text">
+            <div>
+                <button>E</button>
+            </div>
+            <div>
+                <button @onclick="@(() => DeleteAnswer.InvokeAsync(Answer))">X</button>
+            </div>
         </div>
-        <div>
-            <button @onclick="@(() => DeleteAnswer.InvokeAsync(Answer))" >X</button>
-        </div>
-    </div>
+    }
+
 </div>
 
 @code {

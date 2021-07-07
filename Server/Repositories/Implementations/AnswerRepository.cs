@@ -127,12 +127,14 @@ namespace Quanda.Server.Repositories.Implementations
             return AnswerResult.SUCCESS;
         }
 
-        public async Task<AnswerResult> DeleteAnswerAsync(int idAnswer)
+        public async Task<AnswerResult> DeleteAnswerAsync(int idAnswer, int idUserLogged)
         {
             var answer = await _context.Answers.SingleOrDefaultAsync(a => a.IdAnswer == idAnswer);
             if (answer == null)
                 return AnswerResult.ANSWER_DELETED;
             _context.Answers.Remove(answer);
+            if (answer.IdUser != idUserLogged)
+                return AnswerResult.NOT_OWNER_OF_ANSWER;
             if (!(await _context.SaveChangesAsync() > 0))
                 return AnswerResult.DELETE_DB_ERROR;
 

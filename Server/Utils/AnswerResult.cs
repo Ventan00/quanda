@@ -9,6 +9,7 @@
         UPDATE_DB_ERROR,
         DELETE_DB_ERROR,
         SUCCESS,
-        OWNER_OF_ANSWER
+        OWNER_OF_ANSWER,
+        NOT_OWNER_OF_ANSWER
     }
 }

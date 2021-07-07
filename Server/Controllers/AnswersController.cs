@@ -11,6 +11,7 @@ namespace Quanda.Server.Controllers
     public class AnswersController : ControllerBase
     {
         private readonly IAnswerRepository _repository;
+        private readonly int requestIdUser = 25; //future => Request.GetUser();
 
         public AnswersController(IAnswerRepository repository)
         {
@@ -20,7 +21,6 @@ namespace Quanda.Server.Controllers
         [HttpGet("{idQuestion}")]
         public async Task<IActionResult> GetAnswers(int idQuestion)
         {
-            int requestIdUser = 25; //future => Request.GetUser();
             var result = await _repository.GetAnswersAsync(idQuestion, requestIdUser);
             return Ok(result);
         }
@@ -50,7 +50,7 @@ namespace Quanda.Server.Controllers
         [HttpDelete("{idAnswer}")]
         public async Task<IActionResult> DeleteAnswer(int idAnswer)
         {
-            var result = await _repository.DeleteAnswerAsync(idAnswer);
+            var result = await _repository.DeleteAnswerAsync(idAnswer, requestIdUser);
             if (result == AnswerResult.ANSWER_DELETED)
                 return NotFound(result.ToString());
             else if (result == AnswerResult.DELETE_DB_ERROR)
@@ -61,13 +61,14 @@ namespace Quanda.Server.Controllers
         [HttpPost("{idAnswer}/rating")]
         public async Task<IActionResult> UpdateRatingAnswer(int idAnswer, [FromBody] UpdateRatingAnswerDTO updateRatingAnswer)
         {
-            int requestIdUser = 25; //future => Request.GetUser();
             var result = await _repository.UpdateRatingAnswerAsync(idAnswer, requestIdUser, updateRatingAnswer);
             if (result == AnswerResult.ANSWER_DELETED || result == AnswerResult.USER_DELETED)
                 return BadRequest(result.ToString());
             else if (result == AnswerResult.OWNER_OF_ANSWER)
                 return BadRequest(result.ToString());
-            else if(result == AnswerResult.ADD_DB_ERROR || result == AnswerResult.DELETE_DB_ERROR)
+            else if (result == AnswerResult.NOT_OWNER_OF_ANSWER)
+                return Forbid(result.ToString());
+            else if (result == AnswerResult.ADD_DB_ERROR || result == AnswerResult.DELETE_DB_ERROR)
                 return StatusCode(500, result.ToString());
 
             return NoContent();
