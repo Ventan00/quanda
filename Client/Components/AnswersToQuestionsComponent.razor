@@ -15,13 +15,13 @@
             @foreach (var answerBox in Answers)
             {
                 <div class="answer-Main">
-                    <SingleAnswerComponent Answer="answerBox.MainAnswer" IncreaseRating="IncreaseRating" DecreaseRating="DecreaseRating" DeleteAnswer="DeleteAnswer" DisableButton="@DisableButton" />
+                    <SingleAnswerComponent Answer="answerBox.MainAnswer" ReloadAnswers="OnInitializedAsync"/>
                 </div>
                 <div class="answer-Main_child">
                     @foreach (var answerChild in answerBox.ChildAnswers)
                     {
                         <div class="answer-child" style="margin-left: 10px;">
-                                <SingleAnswerComponent Answer="answerChild" IncreaseRating="IncreaseRating" DecreaseRating="DecreaseRating" DeleteAnswer="DeleteAnswer" DisableButton="@DisableButton"/>
+                                <SingleAnswerComponent Answer="answerChild" ReloadAnswers="OnInitializedAsync"/>
                         </div>
                     }
                 </div>
@@ -34,64 +34,11 @@
 @code {
     [Parameter]
     public List<AnswerBoxResponseDto> Answers { get; set; }
-    public bool DisableButton { get; set; }
 
     protected async override Task OnInitializedAsync()
     {
         Answers = await answerRepository.GetAnswersAsync(1);
     }
-
-    private async Task IncreaseRating(AnswerResponseDTO answer)
-    {
-        DisableButton = true;
-        var result = await answerRepository.UpdateRatingAnswerAsync(answer.IdAnswer, answer.Mark + 1);
-        if (result.Item1)
-        {
-            answer.Mark += 1;
-            answer.Rating += 1;
-        }
-        else
-        {
-            await js.InvokeVoidAsync("alert", result.Item2);
-        }
-        DisableButton = false;
-    }
-
-    private async Task DecreaseRating(AnswerResponseDTO answer)
-    {
-        DisableButton = true;
-        var result = await answerRepository.UpdateRatingAnswerAsync(answer.IdAnswer, answer.Mark - 1);
-        if (result.Item1)
-        {
-            answer.Mark -= 1;
-            answer.Rating -= 1;
-        }
-        else
-        {
-            await js.InvokeVoidAsync("alert", result.Item2);
-        }
-        DisableButton = false;
-    }
-
-    private async Task DeleteAnswer(AnswerResponseDTO answer)
-    {
-        var confirmed = await js.InvokeAsync<bool>("confirm", "Do want to delete answer?");
-        if (confirmed)
-        {
-            var result = await answerRepository.DeleteAnswer(answer.IdAnswer);
-            if (result.Item1)
-            {
-                await OnInitializedAsync();
-            }
-            else
-            {
-                await js.InvokeVoidAsync("alert", result.Item2);
-                await OnInitializedAsync();
-            }
-        }
-
-    }
-
 
 
 }

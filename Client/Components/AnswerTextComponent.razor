@@ -1,0 +1,23 @@
+﻿<div class="column">
+    <div>
+        <input class="answer-text column" @bind-value="@Text" type="text" id="text" size="50">
+    </div>
+    <div class="row">
+        <div>
+            <button @onclick="@(()=> EditText.InvokeAsync(Text))">Publish</button>
+        </div>
+        <div>
+            <button @onclick="@(()=> SetEditMode.InvokeAsync())">Discard</button>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public string Text { get; set; }
+    [Parameter]
+    public EventCallback SetEditMode { get; set; }
+    [Parameter]
+    public EventCallback<string> EditText { get; set; }
+}

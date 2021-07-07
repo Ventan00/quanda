@@ -152,6 +152,12 @@ namespace Quanda.Server.Repositories.Implementations
                 var existsUser = await _context.Users.AnyAsync(u => u.IdUser == idUserLogged);
                 if (!existsUser)
                     return AnswerResult.USER_DELETED;
+                var ownerAnswer = await _context.Answers.AnyAsync(a => a.IdAnswer == idAnswer && a.IdUser == idUserLogged);
+                if (ownerAnswer)
+                {
+                    return AnswerResult.OWNER_OF_ANSWER;
+                }
+
                 await _context.AddAsync(new RatingAnswer
                 {
                     IdAnswer = idAnswer,

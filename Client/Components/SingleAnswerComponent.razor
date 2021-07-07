@@ -1,4 +1,6 @@
-﻿<div class="answer row">
+﻿@inject IAnswerRepository answerRepository
+@inject IJSRuntime js
+<div class="answer row">
     <div class="answer-rating column">
         <div>
             @if (Answer.Mark == 1)
@@ -7,7 +9,7 @@
             }
             else
             {
-                <button class="triangle-up" @onclick="@(() => IncreaseRating.InvokeAsync(Answer))" disabled="@DisableButton" />
+                <button class="triangle-up" @onclick="@(async() => await IncreaseRating())" disabled="@DisableButton" />
             }
         </div>
         <div class="rating-text">
@@ -20,25 +22,33 @@
             }
             else
             {
-                <button class="triangle-down" @onclick="@(() => DecreaseRating.InvokeAsync(Answer))" disabled="@DisableButton" />
+                <button class="triangle-down" @onclick="@(async() => await DecreaseRating())" disabled="@DisableButton" />
             }
         </div>
     </div>
-    <div class="answer-text">
-        @*<input class="answer-text placeholder="@Answer.Text" column" type="text" id="text" size="50" >*@
-        @Answer.Text
-    </div>
-    @if (Answer.UserResponseDTO.IdUser == 25)
+    @if (EditMode)
     {
-        <div class="edit-option-text">
-            <div>
-                <button>E</button>
-            </div>
-            <div>
-                <button @onclick="@(() => DeleteAnswer.InvokeAsync(Answer))">X</button>
-            </div>
-        </div>
+        <AnswerTextComponent Text="@Answer.Text" SetEditMode="SetEditMode" EditText="UpdateAnswer"></AnswerTextComponent>
     }
+    else
+    {
+        <div class="answer-text">
+            @*<input class="answer-text placeholder="@Answer.Text" column" type="text" id="text" size="50" >*@
+            @Answer.Text
+        </div>
+        @if (Answer.UserResponseDTO.IdUser == 25)
+        {
+            <div class="edit-option-text">
+                <div>
+                    <button @onclick="@SetEditMode">E</button>
+                </div>
+                <div>
+                    <button @onclick="@(async () =>await DeleteAnswer())">X</button>
+                </div>
+            </div>
+        }
+    }
+
 
 </div>
 
@@ -46,12 +56,74 @@
     [Parameter]
     public AnswerResponseDTO Answer { get; set; }
     [Parameter]
-    public EventCallback<AnswerResponseDTO> IncreaseRating { get; set; }
-    [Parameter]
-    public EventCallback<AnswerResponseDTO> DecreaseRating { get; set; }
-    [Parameter]
-    public EventCallback<AnswerResponseDTO> DeleteAnswer { get; set; }
-    [Parameter]
+    public EventCallback ReloadAnswers { get; set; }
     public bool DisableButton { get; set; }
+    public bool EditMode { get; set; }
+
+    private async Task IncreaseRating()
+    {
+        DisableButton = true;
+        var result = await answerRepository.UpdateRatingAnswerAsync(Answer.IdAnswer, Answer.Mark + 1);
+        if (result.Item1)
+        {
+            Answer.Mark += 1;
+            Answer.Rating += 1;
+        }
+        else
+        {
+            await js.InvokeVoidAsync("alert", result.Item2);
+        }
+        DisableButton = false;
+    }
+
+    private async Task DecreaseRating()
+    {
+        DisableButton = true;
+        var result = await answerRepository.UpdateRatingAnswerAsync(Answer.IdAnswer, Answer.Mark - 1);
+        if (result.Item1)
+        {
+            Answer.Mark -= 1;
+            Answer.Rating -= 1;
+        }
+        else
+        {
+            await js.InvokeVoidAsync("alert", result.Item2);
+        }
+        DisableButton = false;
+    }
+
+    private async Task DeleteAnswer()
+    {
+        var confirmed = await js.InvokeAsync<bool>("confirm", "Do want to delete answer?");
+        if (confirmed)
+        {
+            var result = await answerRepository.DeleteAnswer(Answer.IdAnswer);
+            await ReloadAnswers.InvokeAsync();
+            if (!result.Item1)
+            {
+                await js.InvokeVoidAsync("alert", result.Item2);
+            }
+        }
+
+    }
+
+    private void SetEditMode()
+    {
+        EditMode = !EditMode;
+    }
+
+    private async Task UpdateAnswer(String text)
+    {
+        var tmpText = Answer.Text;
+        Answer.Text = text;
+        var result = await answerRepository.UpdateAnswer(Answer.IdAnswer, text);
+
+        if (!result.Item1)
+        {
+            Answer.Text = tmpText;
+            await js.InvokeVoidAsync("alert", result.Item2);
+        }
+        EditMode = !EditMode;
+    }
 
 }

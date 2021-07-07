@@ -46,5 +46,17 @@ namespace Quanda.Client.Repositories.Implementations
             return new(true,null);
         }
 
+        public async Task<Tuple<bool, string>> UpdateAnswer(int idAnswer, String text)
+        {
+            UpdateAnswerDTO updateAnswerDTO = new()
+            {
+                Text = text
+            };
+
+            var response = await httpService.Put<UpdateAnswerDTO>($"{url}/{idAnswer}", updateAnswerDTO);
+            if (!response.Success)
+                return new(false,await response.GetBody());
+            return new(true,null);
+        }
     }
 }
