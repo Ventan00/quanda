@@ -13,17 +13,20 @@ namespace Quanda.Client.Authentication
 {
     public class AuthenticationService : IAuthenticationService
     {
+        private readonly IHttpService _httpService;
         private readonly IUsersRepository _usersRepository;
         private readonly HttpClient _httpClient;
         private readonly AuthenticationStateProvider _authStateProvider;
         private readonly ILocalStorageService _localStorage;
 
         public AuthenticationService(
+            IHttpService httpService,
             IUsersRepository usersRepository,
             HttpClient httpClient,
             AuthenticationStateProvider authStateProvider,
             ILocalStorageService localStorage)
         {
+            _httpService = httpService;
             _usersRepository = usersRepository;
             _httpClient = httpClient;
             _authStateProvider = authStateProvider;
@@ -54,6 +57,31 @@ namespace Quanda.Client.Authentication
 
             ((AuthStateProvider)_authStateProvider).NotifyUserLogout();
             _httpClient.DefaultRequestHeaders.Authorization = null;
+        }
+
+        public async Task<bool> RefreshTokenAsync()
+        {
+            var accessToken = await _localStorage.GetItemAsync<string>("access_token");
+            var refreshToken = await _localStorage.GetItemAsync<string>("refresh_token");
+
+            var refreshDto = new RefreshRequestDTO
+            {
+                AccessToken = accessToken,
+                RefreshToken = refreshToken
+            };
+
+            var response = await _httpService.PostWithResponse<RefreshRequestDTO, RefreshResponseDTO>
+                ("api/accounts/refresh", refreshDto);
+
+            if (!response.Success)
+                return false;
+
+            await _localStorage.SetItemAsync("access_token", response.Response.AccessToken);
+            await _localStorage.SetItemAsync("refresh_token", response.Response.RefreshToken);
+            _httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("bearer", response.Response.AccessToken);
+
+            return true;
         }
     }
 }
