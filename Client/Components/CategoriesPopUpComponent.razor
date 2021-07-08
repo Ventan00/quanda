@@ -51,13 +51,13 @@
     public EventCallback<int> CategoryDeSelected { get; set; }
     [Parameter]
     public EventCallback PopUpClosed { get; set; }
+    [Parameter]
+    public List<int> SelectedCategories { get; set; }
 
-    List<int> SelectedCategories;
     Dictionary<int, bool> OpenedCategories;
 
     protected async override Task OnInitializedAsync()
     {
-        SelectedCategories = new List<int>();
         OpenedCategories = new Dictionary<int, bool>();
         foreach (var category in Categories.Where(category => category.IdMainCategory == null))
         {
@@ -69,15 +69,12 @@
     private async Task InsideCategorySelectionChange(CategoriesResponseDTO category)
     {
         int IdCategory = category.IdCategory;
-        Console.WriteLine($"Category id: {IdCategory}");
         if (SelectedCategories.Contains(IdCategory))
         {
-            SelectedCategories.Remove(IdCategory);
             await CategoryDeSelected.InvokeAsync(IdCategory);
         }
         else
         {
-            SelectedCategories.Add(IdCategory);
             await CategorySelected.InvokeAsync(IdCategory);
         }
         StateHasChanged();

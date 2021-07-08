@@ -68,7 +68,7 @@
                     <div class="questions-tag-val">
                         @categories.Where(cate=>cate.IdCategory==cat).First().Name
                     </div>
-                    <div class="questions-tag-close">
+                    <div class="questions-tag-close" @onclick="(() => CategoryDeSelected(cat))">
                         x
                     </div>
                 </div>
@@ -86,15 +86,22 @@
         }
     }
 </div>
+@if (questionAmount != 0)
+{
+    <div class="questions-pagination">
+        <PaginationComponent ElementsSize=questionAmount PageSize=10 PageSelectedListener="ChangeActivePage" ActualPage="activePage"/>
+    </div>
+}
+
 @if (categoriesPopUpOpen)
 {
-    <CategoriesPopUpComponent Categories="categories" CategorySelected="CategorySelected" CategoryDeSelected="CategoryDeSelected" PopUpClosed="ChangePopUpStatus" />
+    <CategoriesPopUpComponent Categories="categories" CategorySelected="CategorySelected" CategoryDeSelected="CategoryDeSelected" PopUpClosed="ChangePopUpStatus" SelectedCategories="selectedCategories" />
 }
 
 @code {
     private int questionAmount = 0;
     private int activeSorting = 0;
-    private int activePage = 0;
+    public int activePage = 0;
     private List<int> selectedCategories = new List<int>();
 
     private List<CategoriesResponseDTO> categories { get; set; }
@@ -105,6 +112,7 @@
     {
         await GetQuestions();
         categories = await CategoriesReposiotry.GetCategories();
+        await GetQuestionsAmount();
     }
     private async Task GetQuestions()
     {
@@ -117,27 +125,44 @@
 
     }
 
-    private async void SetSorting(int i)
+    private async Task GetQuestionsAmount()
+    {
+        questionAmount = await QuestionsReposiotry.GetQuestionsAmount(selectedCategories);
+    }
+    private async Task SetSorting(int i)
     {
         activeSorting = i;
         await GetQuestions();
         StateHasChanged();
     }
 
-    private void CategorySelected(int i)
+    private async Task CategorySelected(int i)
     {
+        activePage = 0;
         selectedCategories.Add(i);
+        await GetQuestions();
+        await GetQuestionsAmount();
         StateHasChanged();
     }
-    private void CategoryDeSelected(int i)
+    private async Task CategoryDeSelected(int i)
     {
+        activePage = 0;
         selectedCategories.Remove(i);
+        await GetQuestions();
+        await GetQuestionsAmount();
         StateHasChanged();
     }
 
     private void ChangePopUpStatus()
     {
         categoriesPopUpOpen = !categoriesPopUpOpen;
+        StateHasChanged();
+    }
+
+    private async Task ChangeActivePage(int i)
+    {
+        activePage = i;
+        await GetQuestions();
         StateHasChanged();
     }
 }

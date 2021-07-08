@@ -36,5 +36,15 @@ namespace Quanda.Client.Repositories.Implementations
 
         }
 
+        public async Task<int> GetQuestionsAmount(List<int> categories)
+        {
+            var url = $"{ApiUrl}/count?";
+            if (categories.Count != 0)
+            {
+                url += $"category={string.Join("&category=", categories)}";
+            }
+            var response = await _httpService.Get<int>(url);
+            return response.Response;
+        }
     }
 }

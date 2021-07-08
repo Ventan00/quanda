@@ -78,5 +78,13 @@ namespace Quanda.Server.Controllers
             else return BadRequest();
         }
 
+        [HttpGet("count")]
+        public async Task<IActionResult> GetAmountOfQuestions([FromQuery] List<int> category = null)
+        {
+            if (category == null)
+                category = new List<int>();
+            return Ok(await _repository.GetAmountOfQuestions(category));
+        }
+
     }
 }

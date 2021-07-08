@@ -267,5 +267,16 @@ namespace Quanda.Server.Repositories.Implementations
             Question.IsFinished = true;
             return await _context.SaveChangesAsync() == 1 ? QuestionStatusResult.QUESTION_SET_TO_FINISHED : QuestionStatusResult.QUESTION_DATABASE_ERROR;
         }
+
+        public async Task<int> GetAmountOfQuestions(List<int> category)
+        {
+            if (category.Count==0)
+                return await _context.Questions.CountAsync();
+           return await _context.QuestionCategories
+                .Where(qc => category.Any(cat => qc.IdCategory == cat))
+                .GroupBy(qc => qc.IdQuestion)
+                .Select(qcg => qcg.Key)
+                .CountAsync();
+        }
     }
 }

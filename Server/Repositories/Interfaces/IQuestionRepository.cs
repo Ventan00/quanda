@@ -19,5 +19,6 @@ namespace Quanda.Server.Repositories.Interfaces
         Task<QuestionStatusResult> RemoveQuestion(int questionId);
         Task<QuestionStatusResult> SetToCheck(int questionId,bool value);
         Task<QuestionStatusResult> SetFinished(int questionId);
+        Task<int> GetAmountOfQuestions(List<int> category);
     }
 }
