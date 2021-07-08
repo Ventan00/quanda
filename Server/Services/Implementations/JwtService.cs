@@ -51,18 +51,6 @@ namespace Quanda.Server.Services.Implementations
             );
         }
 
-        public void AddTokensToCookies(string refreshToken, DateTime refreshTokenExpirationDate, JwtSecurityToken accessToken, IResponseCookies responseCookies)
-        {
-            var cookieOptions = new CookieOptions
-            {
-                HttpOnly = true,
-                Expires = DateTime.Now.AddMinutes(10),
-            };
-
-            responseCookies.Append("access_token", new JwtSecurityTokenHandler().WriteToken(accessToken), cookieOptions);
-            responseCookies.Append("refresh_token", refreshToken, cookieOptions);
-        }
-
         public JwtSecurityToken GeneratePasswordRecoveryToken(User user)
         {
             var userClaims = new List<Claim>

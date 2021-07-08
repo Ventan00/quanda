@@ -2,18 +2,19 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static Quanda.Server.Utils.UserStatus;
 using static Quanda.Server.Utils.TempUserResult;
 using Quanda.Server.Repositories.Interfaces;
 using Quanda.Server.Services.Interfaces;
-using Quanda.Server.Utils;
 using Quanda.Shared.DTOs.Requests;
 using Quanda.Shared.DTOs.Responses;
 using Quanda.Shared.Enums;
 
 namespace Quanda.Server.Controllers
 {
+    [AllowAnonymous]
     [ApiController]
     [Route("api/[controller]")]
     public class AccountsController : ControllerBase
@@ -102,9 +103,11 @@ namespace Quanda.Server.Controllers
             }
 
             var accessToken = _jwtService.GenerateAccessToken(user);
-            _jwtService.AddTokensToCookies(refreshToken, refreshTokenExpirationDate, accessToken, Response.Cookies);
 
+            response.RefreshToken = refreshToken;
+            response.AccessToken = new JwtSecurityTokenHandler().WriteToken(accessToken);
             response.LoginStatus = LoginStatusEnum.LOGIN_ACCEPTED;
+
             return Ok(response);
         }
 

@@ -1,14 +1,18 @@
 using System;
+using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Text;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Quanda.Server.Data;
+using Quanda.Server.Extensions;
 using Quanda.Server.Repositories.Implementations;
 using Quanda.Server.Repositories.Interfaces;
 using Quanda.Server.Services.Implementations;
@@ -50,6 +54,25 @@ namespace Quanda.Server
                     ValidateLifetime = true,
                     ClockSkew = TimeSpan.Zero,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]))
+                };
+
+                jwtBearerOptions.Events = new JwtBearerEvents
+                {
+                    OnTokenValidated = tokenValidatedContext =>
+                    {
+                        try
+                        {
+                            tokenValidatedContext.HttpContext.Request
+                                .SetUserId(tokenValidatedContext.Principal);
+                        }
+                        catch
+                        {
+                            tokenValidatedContext.Response.StatusCode = 401;
+                            tokenValidatedContext.Response.CompleteAsync();
+                        }
+
+                        return Task.CompletedTask;
+                    }
                 };
             });
 
