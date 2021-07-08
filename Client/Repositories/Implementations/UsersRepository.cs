@@ -20,12 +20,11 @@ namespace Quanda.Client.Repositories.Implementations
             _httpService = httpService;
         }
 
-        public async Task<LoginStatusEnum> LoginAsync(LoginDTO loginDto)
+        public async Task<LoginResponseDTO> LoginAsync(LoginDTO loginDto)
         {
             var response = await _httpService.PostWithResponse<LoginDTO, LoginResponseDTO>($"{ApiUrl}/login", loginDto);
             var loginResponseDto = response.Response;
-
-            return loginResponseDto?.LoginStatus ?? LoginStatusEnum.SERVER_ERROR;
+            return loginResponseDto;
         }
 
         public async Task<RegisterStatusEnum> RegisterAsync(RegisterDTO registerDto)

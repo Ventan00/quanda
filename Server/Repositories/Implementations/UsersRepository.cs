@@ -61,6 +61,8 @@ namespace Quanda.Server.Repositories.Implementations
         {
             return await _context.Users.
                 Include(u => u.IdTempUserNavigation).
+                Include(u => u.UserRoles).
+                ThenInclude(ur => ur.IdRoleNavigation).
                 SingleOrDefaultAsync(u => u.Email == email);
         }
 

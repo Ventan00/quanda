@@ -2,8 +2,12 @@
 @using Quanda.Client.Repositories.Interfaces
 @using Quanda.Shared.DTOs.Requests
 @using Quanda.Shared.Enums
-@inject IUsersRepository _usersRepository
-@inject NavigationManager _navManager;
+@using Blazored.LocalStorage
+@using Quanda.Client.Authentication
+@inject IAuthenticationService _authenticationService
+@inject NavigationManager _navManager
+@inject ILocalStorageService _localStorageService
+@inject IToastService _toastService
 
 <EditForm Model="@_loginDto" OnValidSubmit="@HandleValidSubmit" autocomplete="off">
     <DataAnnotationsValidator />
@@ -39,9 +43,12 @@
 
     private async Task HandleValidSubmit()
     {
-        _loginStatus = await _usersRepository.LoginAsync(_loginDto);
+        var loginResponseDto = await _authenticationService.LoginAsync(_loginDto);
+        _loginStatus = loginResponseDto.LoginStatus;
+
         if (_loginStatus == LoginStatusEnum.LOGIN_ACCEPTED)
         {
+            _toastService.ShowSuccess("You have logged in.");
             _navManager.NavigateTo("");
         }
     }
