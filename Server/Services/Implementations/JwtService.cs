@@ -21,6 +21,11 @@ namespace Quanda.Server.Services.Implementations
             _jwtConfigurationSection = configuration.GetSection("JwtSettings");
         }
 
+        public string WriteToken(SecurityToken securityToken)
+        {
+            return new JwtSecurityTokenHandler().WriteToken(securityToken);
+        }
+
         public (string refreshToken, DateTime expirationDate) GenerateRefreshToken()
         {
             var refreshToken = Guid.NewGuid().ToString();
@@ -67,9 +72,8 @@ namespace Quanda.Server.Services.Implementations
             );
         }
 
-        public int? DecryptPasswordRecoveryToken(string jwt, User user)
+        public ClaimsPrincipal GetPrincipalFromPasswordRecoveryToken(string jwt, User user)
         {
-
             var tokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuerSigningKey = true,
@@ -80,39 +84,46 @@ namespace Quanda.Server.Services.Implementations
                 ClockSkew = TimeSpan.Zero
             };
 
-            JwtSecurityToken jwtToken = null;
-            ClaimsPrincipal principal = null;
+            return ValidateAndGetPrincipalFromJwt(jwt, tokenValidationParameters);
+        }
 
+        public ClaimsPrincipal GetPrincipalFromExpiredToken(string jwt)
+        {
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateAudience = true,
+                ValidateIssuer = true,
+                ValidIssuer = _jwtConfigurationSection["Issuer"],
+                ValidAudience = _jwtConfigurationSection["Audience"],
+                ValidateLifetime = false,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(_jwtConfigurationSection["SecurityKey"]))
+            };
+
+            return ValidateAndGetPrincipalFromJwt(jwt, tokenValidationParameters);
+        }
+
+        private ClaimsPrincipal ValidateAndGetPrincipalFromJwt(string jwt, TokenValidationParameters tokenValidationParameters)
+        {
             try
             {
-                principal =
-                    new JwtSecurityTokenHandler().ValidateToken(jwt, tokenValidationParameters,
-                        out SecurityToken validatedToken);
+                ClaimsPrincipal principal = new JwtSecurityTokenHandler()
+                    .ValidateToken(jwt, tokenValidationParameters, out var securityToken);
 
-                jwtToken = (JwtSecurityToken)validatedToken;
+                var jwtSecurityToken = securityToken as JwtSecurityToken;
+                if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256,
+                    StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return null;
+                }
+
+                return principal;
             }
-            catch (Exception)
+            catch
             {
                 return null;
             }
-
-            if (jwtToken == null ||
-                !jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
-            {
-                return null;
-            }
-
-            var idUser = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(idUser))
-            {
-                return null;
-            }
-
-            var canParse = int.TryParse(idUser, out var parsedIdUser);
-            if (!canParse)
-                return null;
-
-            return parsedIdUser;
         }
     }
 }
