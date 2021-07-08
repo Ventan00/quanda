@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
+using System.Net.Http.Headers;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -105,7 +107,7 @@ namespace Quanda.Server.Controllers
             var accessToken = _jwtService.GenerateAccessToken(user);
 
             response.RefreshToken = refreshToken;
-            response.AccessToken = new JwtSecurityTokenHandler().WriteToken(accessToken);
+            response.AccessToken = _jwtService.WriteToken(accessToken);
             response.LoginStatus = LoginStatusEnum.LOGIN_ACCEPTED;
 
             return Ok(response);
@@ -150,7 +152,7 @@ namespace Quanda.Server.Controllers
 
             var recoveryJwt = _jwtService.GeneratePasswordRecoveryToken(user);
             var base64UrlEncodedRecoveryJwt = Microsoft.IdentityModel.Tokens.Base64UrlEncoder
-                .Encode(new JwtSecurityTokenHandler().WriteToken(recoveryJwt));
+                .Encode(_jwtService.WriteToken(recoveryJwt));
 
             await _smtpService.SendPasswordRecoveryEmailAsync(recoverDto.Email, base64UrlEncodedRecoveryJwt, user.IdUser);
 
@@ -167,8 +169,15 @@ namespace Quanda.Server.Controllers
             var decodedRecoveryJwt = Microsoft.IdentityModel.Tokens.Base64UrlEncoder
                 .Decode(passwordResetDto.UrlEncodedRecoveryJwt);
 
-            var decryptedIdUser = _jwtService.DecryptPasswordRecoveryToken(decodedRecoveryJwt, providedUser);
-            if (decryptedIdUser == null || decryptedIdUser != providedUser.IdUser)
+            var principal = _jwtService.GetPrincipalFromPasswordRecoveryToken(decodedRecoveryJwt, providedUser);
+            if (principal is null)
+                return BadRequest();
+
+            var claimIdUser = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (claimIdUser is null || !int.TryParse(claimIdUser, out _))
+                return BadRequest();
+
+            if (providedUser.IdUser != int.Parse(claimIdUser))
                 return BadRequest();
 
             var isChanged = await _usersRepository.SetNewPasswordForUser(providedUser, passwordResetDto.RawPassword);
@@ -176,6 +185,35 @@ namespace Quanda.Server.Controllers
                 return StatusCode((int)HttpStatusCode.InternalServerError);
 
             return NoContent();
+        }
+
+        [HttpPost("refresh")]
+        public async Task<IActionResult> Refresh([FromBody] RefreshRequestDTO refreshDto)
+        {
+            var principal = _jwtService.GetPrincipalFromExpiredToken(refreshDto.AccessToken);
+            if (principal is null)
+                return BadRequest();
+
+            var claimIdUser = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (claimIdUser is null || !int.TryParse(claimIdUser, out _))
+                return BadRequest();
+
+            var user = await _usersRepository.GetUserByRefreshTokenAsync(refreshDto.RefreshToken);
+            if (user is null || user.RefreshTokenExpirationDate <= DateTime.Now || user.IdUser != int.Parse(claimIdUser))
+                return BadRequest();
+
+            var (refreshToken, expirationDate) = _jwtService.GenerateRefreshToken();
+            var updateStatus = await _usersRepository.UpdateRefreshTokenForUserAsync(user, refreshToken, expirationDate);
+            if (updateStatus != USER_REFRESH_TOKEN_UPDATED)
+                return StatusCode((int)HttpStatusCode.InternalServerError);
+
+            var accessToken = _jwtService.GenerateAccessToken(user);
+
+            return Ok(new RefreshResponseDTO
+            {
+                AccessToken = _jwtService.WriteToken(accessToken),
+                RefreshToken = refreshToken
+            });
         }
     }
 }
