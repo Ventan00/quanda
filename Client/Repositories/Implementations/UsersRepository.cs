@@ -36,16 +36,26 @@ namespace Quanda.Client.Repositories.Implementations
             return registerResponseDto?.RegisterStatus ?? RegisterStatusEnum.SERVER_ERROR;
         }
 
+        public async Task RecoverConfirmationEmailAsync(RecoverDTO recoverDto)
+        {
+            await _httpService.Post($"{ApiUrl}/recover-confirmation-email", recoverDto);
+        }
+
+        public async Task RecoverPasswordAsync(RecoverDTO recoverDto)
+        {
+            await _httpService.Post($"{ApiUrl}/recover-password", recoverDto);
+        }
+
+        public async Task<bool> ResetPasswordAsync(PasswordResetDTO passwordResetDto)
+        {
+            var response = await _httpService.Post($"{ApiUrl}/reset-password", passwordResetDto);
+            return response.Success;
+        }
+        
         public async Task<GetUserForQuestionByIDDTO> GetDataForQuestionAsync(int questionIdUser)
         {
             var response = await _httpService.Get<GetUserForQuestionByIDDTO>($"{ApiUrl}/data/for-question/{questionIdUser}");
             return response.Response;
-        }
-
-        public async Task ResendConfirmationEmailAsync(RecoverDTO recoverDto)
-        {
-            await _httpService.Post($"{ApiUrl}/resend-confirmation-email", recoverDto);
-
         }
     }
 }

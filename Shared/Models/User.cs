@@ -24,6 +24,7 @@ namespace Quanda.Shared.Models
         public string PhoneNumber { get; set; }
         public string Bio { get; set; }
         public string Avatar { get; set; }
+        public DateTime RegistrationDate { get; set; }
         public string RefreshToken { get; set; }
         public DateTime? RefreshTokenExpirationDate { get; set; }
         public int? IdService { get; set; }
@@ -36,6 +37,5 @@ namespace Quanda.Shared.Models
         public virtual ICollection<RatingAnswer> RatingAnswers { get; set; }
         public virtual Service IdServiceNavigation { get; set; }
         public virtual TempUser IdTempUserNavigation { get; set; }
-        public virtual RecoveryUser IdRecoveryUserNavigation { get; set; }
     }
 }

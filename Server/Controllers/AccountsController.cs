@@ -1,12 +1,13 @@
 ﻿using System;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net;
-using System.Net.Mail;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using static Quanda.Server.Utils.UserStatus;
 using static Quanda.Server.Utils.TempUserResult;
 using Quanda.Server.Repositories.Interfaces;
 using Quanda.Server.Services.Interfaces;
+using Quanda.Server.Utils;
 using Quanda.Shared.DTOs.Requests;
 using Quanda.Shared.DTOs.Responses;
 using Quanda.Shared.Enums;
@@ -107,7 +108,6 @@ namespace Quanda.Server.Controllers
             return Ok(response);
         }
 
-
         [HttpGet("confirm-email/{code}")]
         public async Task<IActionResult> ConfirmEmail(string code)
         {
@@ -122,9 +122,8 @@ namespace Quanda.Server.Controllers
             };
         }
 
-
-        [HttpPost("resend-confirmation-email")]
-        public async Task<IActionResult> ResendConfirmationEmail([FromBody] RecoverDTO recoverDto)
+        [HttpPost("recover-confirmation-email")]
+        public async Task<IActionResult> RecoverConfirmationEmail([FromBody] RecoverDTO recoverDto)
         {
             var code = await _tempUsersRepository.GetConfirmationCodeForUserAsync(recoverDto.Email);
             if (code == null)
@@ -139,6 +138,44 @@ namespace Quanda.Server.Controllers
             return NoContent();
         }
 
+        [HttpPost("recover-password")]
+        public async Task<IActionResult> RecoverPassword([FromBody] RecoverDTO recoverDto)
+        {
+            var user = await _usersRepository.GetUserByEmailAsync(recoverDto.Email);
+            if (user is null || user.IdTempUserNavigation is not null)
+                return NoContent();
+
+            var recoveryJwt = _jwtService.GeneratePasswordRecoveryToken(user);
+            var base64UrlEncodedRecoveryJwt = Microsoft.IdentityModel.Tokens.Base64UrlEncoder
+                .Encode(new JwtSecurityTokenHandler().WriteToken(recoveryJwt));
+
+            await _smtpService.SendPasswordRecoveryEmailAsync(recoverDto.Email, base64UrlEncodedRecoveryJwt, user.IdUser);
+
+            return NoContent();
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] PasswordResetDTO passwordResetDto)
+        {
+            var providedUser = await _usersRepository.GetUserByIdAsync((int)passwordResetDto.IdUser);
+            if (providedUser is null || providedUser.IdTempUserNavigation is not null)
+                return BadRequest();
+
+            var decodedRecoveryJwt = Microsoft.IdentityModel.Tokens.Base64UrlEncoder
+                .Decode(passwordResetDto.UrlEncodedRecoveryJwt);
+
+            var decryptedIdUser = _jwtService.DecryptPasswordRecoveryToken(decodedRecoveryJwt, providedUser);
+            if (decryptedIdUser == null || decryptedIdUser != providedUser.IdUser)
+                return BadRequest();
+
+            var isChanged = await _usersRepository.SetNewPasswordForUser(providedUser, passwordResetDto.RawPassword);
+            if (!isChanged)
+                return StatusCode((int)HttpStatusCode.InternalServerError);
+
+            return NoContent();
+        }
+        
+
         [HttpGet("data/for-question/{idUser:int}")]
         public async Task<IActionResult> GetUserForQuestionByIDDTO([FromRoute]int idUser)
         {
@@ -147,6 +184,6 @@ namespace Quanda.Server.Controllers
                 return NotFound();
             else
                 return Ok(result);
-        }
+         }
     }
 }
