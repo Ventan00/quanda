@@ -8,6 +8,6 @@ namespace Quanda.Client.Authentication
     {
         public Task<LoginResponseDTO> LoginAsync(LoginDTO loginDto);
         public Task LogoutAsync();
-        public Task<bool> RefreshTokenAsync();
+        public Task<string> RefreshTokenAsync();
     }
 }

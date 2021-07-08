@@ -1,5 +1,8 @@
 ﻿@using Blazored.Toast.Configuration
+@using Quanda.Client.Authentication
 @inherits LayoutComponentBase
+@inject HttpClientInterceptorService _interceptorService
+@implements IDisposable
 
 <div class="page">
     <div class="sidebar">
@@ -23,3 +26,16 @@
                 ShowProgressBar=true
                 SuccessIcon="fa fa-thumbs-up"
                 ErrorIcon="fa fa-bug" />
+
+@code
+{
+    protected override void OnInitialized()
+    {
+        _interceptorService.RegisterEvents();
+    }
+
+    public void Dispose()
+    {
+        _interceptorService.DisposeEvents();
+    }
+}

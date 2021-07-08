@@ -4,6 +4,6 @@ namespace Quanda.Client.Authentication
 {
     public interface IRefreshTokenService
     {
-        public Task<bool> TryRefreshTokenAsync();
+        public Task<string> TryRefreshTokenAsync();
     }
 }

@@ -21,17 +21,17 @@ namespace Quanda.Client.Authentication
             _localStorage = localStorage;
         }
 
-        public async Task<bool> TryRefreshTokenAsync()
+        public async Task<string> TryRefreshTokenAsync()
         {
             if (!await _localStorage.ContainKeyAsync("access_token") ||
                 !await _localStorage.ContainKeyAsync("refresh_token"))
-                return false;
+                return null;
 
             var authState = await _authProvider.GetAuthenticationStateAsync();
             var exp = authState.User.FindFirst(c => c.Type.Equals("exp"))?.Value;
 
             if (string.IsNullOrEmpty(exp))
-                return false;
+                return null;
 
             var expTime = DateTimeOffset.FromUnixTimeSeconds(Convert.ToInt64(exp));
 
@@ -39,7 +39,7 @@ namespace Quanda.Client.Authentication
             if (diff.TotalMinutes <= 2)
                 return await _authService.RefreshTokenAsync();
 
-            return false;
+            return null;
         }
     }
 }

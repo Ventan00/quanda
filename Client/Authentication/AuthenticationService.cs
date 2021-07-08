@@ -59,7 +59,7 @@ namespace Quanda.Client.Authentication
             _httpClient.DefaultRequestHeaders.Authorization = null;
         }
 
-        public async Task<bool> RefreshTokenAsync()
+        public async Task<string> RefreshTokenAsync()
         {
             var accessToken = await _localStorage.GetItemAsync<string>("access_token");
             var refreshToken = await _localStorage.GetItemAsync<string>("refresh_token");
@@ -74,14 +74,18 @@ namespace Quanda.Client.Authentication
                 ("api/accounts/refresh", refreshDto);
 
             if (!response.Success)
-                return false;
+            {
+                ((AuthStateProvider)_authStateProvider).NotifyUserLogout();
+                return null;
+            }
 
             await _localStorage.SetItemAsync("access_token", response.Response.AccessToken);
             await _localStorage.SetItemAsync("refresh_token", response.Response.RefreshToken);
             _httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("bearer", response.Response.AccessToken);
+            ((AuthStateProvider)_authStateProvider).NotifyUserAuthentication(response.Response.AccessToken);
 
-            return true;
+            return response.Response.AccessToken;
         }
     }
 }
