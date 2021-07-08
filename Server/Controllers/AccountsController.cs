@@ -199,7 +199,7 @@ namespace Quanda.Server.Controllers
                 return BadRequest();
 
             var user = await _usersRepository.GetUserByRefreshTokenAsync(refreshDto.RefreshToken);
-            if (user is null || user.RefreshTokenExpirationDate <= DateTime.Now || user.IdUser != int.Parse(claimIdUser))
+            if (user is null || user.RefreshTokenExpirationDate <= DateTime.UtcNow || user.IdUser != int.Parse(claimIdUser))
                 return BadRequest();
 
             var (refreshToken, expirationDate) = _jwtService.GenerateRefreshToken();

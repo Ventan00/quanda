@@ -29,7 +29,7 @@ namespace Quanda.Server.Services.Implementations
         public (string refreshToken, DateTime expirationDate) GenerateRefreshToken()
         {
             var refreshToken = Guid.NewGuid().ToString();
-            var expirationDate = DateTime.Now.AddMinutes(_jwtConfigModel.RefreshTokenValidityInMinutes);
+            var expirationDate = DateTime.UtcNow.AddMinutes(_jwtConfigModel.RefreshTokenValidityInMinutes);
 
             return (refreshToken, expirationDate);
         }
@@ -51,7 +51,7 @@ namespace Quanda.Server.Services.Implementations
                 issuer: _jwtConfigModel.Issuer,
                 audience: _jwtConfigModel.Audience,
                 claims: userClaims,
-                expires: DateTime.Now.AddMinutes(_jwtConfigModel.AccessTokenValidityInMinutes),
+                expires: DateTime.UtcNow.AddMinutes(_jwtConfigModel.AccessTokenValidityInMinutes),
                 signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
             );
         }
@@ -67,7 +67,7 @@ namespace Quanda.Server.Services.Implementations
 
             return new JwtSecurityToken(
                 claims: userClaims,
-                expires: DateTime.Now.AddMinutes(_jwtConfigModel.PasswordRecoveryTokenValidityInMinutes),
+                expires: DateTime.UtcNow.AddMinutes(_jwtConfigModel.PasswordRecoveryTokenValidityInMinutes),
                 signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
             );
         }
