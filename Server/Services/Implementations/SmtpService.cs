@@ -2,7 +2,8 @@
 using System.Net.Mail;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using Quanda.Server.Models.Settings;
 using Quanda.Server.Services.Interfaces;
 using Quanda.Server.Utils;
 
@@ -10,12 +11,12 @@ namespace Quanda.Server.Services.Implementations
 {
     public class SmtpService : ISmtpService
     {
-        private readonly IConfigurationSection _smtpConfigSection;
+        private readonly SmtpConfigModel _smpConfigModel;
         private readonly string _hostBaseUrl;
 
-        public SmtpService(IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
+        public SmtpService(IOptionsMonitor<SmtpConfigModel> optionsMonitor, IHttpContextAccessor httpContextAccessor)
         {
-            _smtpConfigSection = configuration.GetSection("SmtpSettings");
+            _smpConfigModel = optionsMonitor.CurrentValue;
 
             if (httpContextAccessor.HttpContext is not null)
             {
@@ -45,11 +46,11 @@ namespace Quanda.Server.Services.Implementations
 
         private SmtpClient CreateSmtpClient()
         {
-            return new(_smtpConfigSection["Host"])
+            return new(_smpConfigModel.Host)
             {
-                Port = int.Parse(_smtpConfigSection["Port"]),
-                Credentials = new NetworkCredential(_smtpConfigSection["Email"], _smtpConfigSection["Password"]),
-                EnableSsl = bool.Parse(_smtpConfigSection["EnableSsl"]),
+                Port = _smpConfigModel.Port,
+                Credentials = new NetworkCredential(_smpConfigModel.Email, _smpConfigModel.Password),
+                EnableSsl = _smpConfigModel.EnableSsl,
             };
         }
 
@@ -57,7 +58,7 @@ namespace Quanda.Server.Services.Implementations
         {
             using (var mail = new MailMessage())
             {
-                mail.From = new MailAddress(_smtpConfigSection["Email"]);
+                mail.From = new MailAddress(_smpConfigModel.Email);
 
                 foreach (var recipient in recipients)
                 {

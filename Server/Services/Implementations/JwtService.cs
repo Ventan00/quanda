@@ -4,9 +4,9 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Quanda.Server.Models.Settings;
 using Quanda.Server.Services.Interfaces;
 using Quanda.Shared.Models;
 
@@ -14,11 +14,11 @@ namespace Quanda.Server.Services.Implementations
 {
     public class JwtService : IJwtService
     {
-        private readonly IConfigurationSection _jwtConfigurationSection;
+        private readonly JwtConfigModel _jwtConfigModel;
 
-        public JwtService(IConfiguration configuration)
+        public JwtService(IOptionsMonitor<JwtConfigModel> optionsMonitor)
         {
-            _jwtConfigurationSection = configuration.GetSection("JwtSettings");
+            _jwtConfigModel = optionsMonitor.CurrentValue;
         }
 
         public string WriteToken(SecurityToken securityToken)
@@ -29,7 +29,7 @@ namespace Quanda.Server.Services.Implementations
         public (string refreshToken, DateTime expirationDate) GenerateRefreshToken()
         {
             var refreshToken = Guid.NewGuid().ToString();
-            var expirationDate = DateTime.Now.AddMinutes(int.Parse(_jwtConfigurationSection["RefreshTokenValidityInMinutes"]));
+            var expirationDate = DateTime.Now.AddMinutes(_jwtConfigModel.RefreshTokenValidityInMinutes);
 
             return (refreshToken, expirationDate);
         }
@@ -45,13 +45,13 @@ namespace Quanda.Server.Services.Implementations
                 user.UserRoles.Select(ur => new Claim(ClaimTypes.Role, ur.IdRoleNavigation.Name))
                 );
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtConfigurationSection["SecretKey"]));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtConfigModel.SecretKey));
 
             return new JwtSecurityToken(
-                issuer: _jwtConfigurationSection["Issuer"],
-                audience: _jwtConfigurationSection["Audience"],
+                issuer: _jwtConfigModel.Issuer,
+                audience: _jwtConfigModel.Audience,
                 claims: userClaims,
-                expires: DateTime.Now.AddMinutes(int.Parse(_jwtConfigurationSection["AccessTokenValidityInMinutes"])),
+                expires: DateTime.Now.AddMinutes(_jwtConfigModel.AccessTokenValidityInMinutes),
                 signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
             );
         }
@@ -67,7 +67,7 @@ namespace Quanda.Server.Services.Implementations
 
             return new JwtSecurityToken(
                 claims: userClaims,
-                expires: DateTime.Now.AddMinutes(int.Parse(_jwtConfigurationSection["PasswordRecoveryTokenValidityInMinutes"])),
+                expires: DateTime.Now.AddMinutes(_jwtConfigModel.PasswordRecoveryTokenValidityInMinutes),
                 signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
             );
         }
@@ -93,12 +93,12 @@ namespace Quanda.Server.Services.Implementations
             {
                 ValidateAudience = true,
                 ValidateIssuer = true,
-                ValidIssuer = _jwtConfigurationSection["Issuer"],
-                ValidAudience = _jwtConfigurationSection["Audience"],
+                ValidIssuer = _jwtConfigModel.Issuer,
+                ValidAudience = _jwtConfigModel.Audience,
                 ValidateLifetime = false,
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes(_jwtConfigurationSection["SecurityKey"]))
+                    Encoding.UTF8.GetBytes(_jwtConfigModel.SecretKey))
             };
 
             return ValidateAndGetPrincipalFromJwt(jwt, tokenValidationParameters);

@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Quanda.Server.Data;
 using Quanda.Server.Extensions;
+using Quanda.Server.Models.Settings;
 using Quanda.Server.Repositories.Implementations;
 using Quanda.Server.Repositories.Interfaces;
 using Quanda.Server.Services.Implementations;
@@ -90,6 +91,10 @@ namespace Quanda.Server
             services.AddScoped<IJwtService, JwtService>();
             services.AddScoped<ISmtpService, SmtpService>();
             services.AddHttpContextAccessor();
+
+            //ConfigurationModels
+            services.Configure<JwtConfigModel>(Configuration.GetSection("JwtSettings"));
+            services.Configure<SmtpConfigModel>(Configuration.GetSection("SmtpSettings"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
