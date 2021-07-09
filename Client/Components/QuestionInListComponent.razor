@@ -1,63 +1,71 @@
 ﻿@using Quanda.Shared.Models
 @using System.Text.RegularExpressions
-<div class="question-container">
-    <a href="@questionURL">
-        <div class="question-header">
-            <div class="question-text">
-                @question.Header
-            </div>
-            <div class="question-date">
-                @question.PublishDate.ToString("dd-MM-yyyy")
-            </div>
-        </div>
-        <div class="question-categories">
-            <div class="question-category-label">
-                Categories:
-            </div>
-            <div class="question-categories-containter">
-            @foreach (var category in question.QuestionCategories)
-            {
-                <div class="question-category">
-                    @category.IdCategoryNavigation.Name
-                </div>
-            }
-            </div>
-        </div>
-        <div class="question-description">
-            @question.Description
-        </div>
-        <div class="question-footer">
-            <div class="question-user-info">
-                <div class="question-user-image">
-                    <img src="@question.IdUserNavigation.Avatar" href="@userURL" />
-                </div>
-                <div class="question-user-nick">
-                    @question.IdUserNavigation.Nickname
-                </div>
-            </div>
-            <div class="question-user-views">
-                <div class="question-user-views-text">Views: </div>
-                <div class="question-user-views-value">@question.Views</div>
-            </div>
-            <div class="question-user-answers">
-                <div class="question-user-answers-text">Answers: </div>
-                <div class="question-user-answers-value">@question.Answers.Count</div>
-            </div>
-        </div>
-    </a>
-</div>
+@using Microsoft.AspNetCore.Components
+@if(question != null) {
+    <div class="question-container">
+        <a href="@questionURL">
 
+            <div class="question-header">
+                <div class="question-text">
+                    @question.Header
+                </div>
+                <div class="question-date">
+                    @question.PublishDate.ToString("dd-MM-yyyy") @finished
+                </div>
+            </div>
+            <div class="question-categories">
+                <div class="question-category-label">
+                    Categories:
+                </div>
+                <div class="question-categories-containter">
+                    @foreach (var category in question.Categories)
+                        {
+                            <div class="question-category">
+                                @category
+                            </div>
+                        }
+                </div>
+            </div>
+            <div class="question-description">
+                @description
+            </div>
+            <div class="question-footer">
+                <a href="@userURL">
+                    <div class="question-user-info">
+                        <div class="question-user-image">
+                            <img src="@question.Avatar" />
+                        </div>
+                        <div class="question-user-nick">
+                            @question.Nickname
+                        </div>
+                    </div>
+                </a>
+                <div class="question-user-views">
+                    <div class="question-user-views-text">Views: </div>
+                    <div class="question-user-views-value">@question.Views</div>
+                </div>
+                <div class="question-user-answers">
+                    <div class="question-user-answers-text">Answers: </div>
+                    <div class="question-user-answers-value">@question.AnswersCount</div>
+                </div>
+            </div>
+        </a>
+    </div>
+}
 @code {
     [Parameter]
-    public Question question { get; set; }
-
+    public GetQuestionsDTO question { get; set; }
+    
+    private string finished = string.Empty;
     private string questionURL = string.Empty;
     private string userURL = string.Empty;
-    protected override void OnInitialized()
+    private MarkupString description;
+
+    protected async override Task OnParametersSetAsync()
     {
-        question.Description = Regex.Replace(question.Description, "<img [^>]*/>", "");
+        description = (MarkupString)Regex.Replace(question.Description, "<img [^>]* />", "");
         questionURL = $"questions/{question.IdQuestion}";
         userURL = $"users/{question.IdUser}";
+        finished = question.IsFinished ? "#closed" : "";
     }
-
 }

@@ -1,11 +1,14 @@
 ﻿@using Quanda.Shared.Models
 @using Quanda.Client.Components
+@using Quanda.Shared.Enums
 @page "/questions"
+@inject IQuestionsReposiotry _questionsReposiotry
+@inject ICategoriesReposiotry _categoriesReposiotry
 <div class="questions-list-container">
     <h1>Pytania</h1>
     <div class="questions-header" style="margin-bottom: 0;">
         <div class="questions-sorting-label">Sortowanie</div>
-    </div> 
+    </div>
     <div class="questions-header">
         <div class="questions-heder-field">
             <div class="questions-heder-field-label">
@@ -16,7 +19,7 @@
             </div>
         </div>
         <div class="questions-sorting-options">
-            @if (activeHeader == 0)
+            @if (activeSorting == 0)
             {
                 <div class="questions-sorting-option questions-sorting-option-active">
                     Data publikacji
@@ -24,11 +27,11 @@
             }
             else
             {
-                <div class="questions-sorting-option questions-sorting-option">
+                <div class="questions-sorting-option questions-sorting-option" @onclick="() => SetSorting(0)">
                     Data publikacji
                 </div>
             }
-            @if (activeHeader == 1)
+            @if (activeSorting == 1)
             {
                 <div class="questions-sorting-option questions-sorting-option-active">
                     Ilość wyświetleń
@@ -36,11 +39,11 @@
             }
             else
             {
-                <div class="questions-sorting-option questions-sorting-option">
+                <div class="questions-sorting-option questions-sorting-option" @onclick="() => SetSorting(1)">
                     Ilość wyświetleń
                 </div>
             }
-            @if (activeHeader == 2)
+            @if (activeSorting == 2)
             {
                 <div class="questions-sorting-option questions-sorting-option-active">
                     Ilość odpowiedzi
@@ -48,7 +51,7 @@
             }
             else
             {
-                <div class="questions-sorting-option questions-sorting-option">
+                <div class="questions-sorting-option questions-sorting-option" @onclick="() => SetSorting(2)">
                     Ilość odpowiedzi
                 </div>
             }
@@ -59,32 +62,107 @@
     </div>
     <div class="questions-header">
         <div class="questions-tags-container">
-            @foreach (Category cat in selectedCategories)
+            @foreach (var cat in selectedCategories)
             {
                 <div class="questions-tag">
                     <div class="questions-tag-val">
-                        @cat.Name
+                        @categories.Where(cate=>cate.IdCategory==cat).First().Name
                     </div>
-                    <div class="questions-tag-close">
+                    <div class="questions-tag-close" @onclick="(() => CategoryDeSelected(cat))">
                         x
                     </div>
                 </div>
             }
-            <div class="questions-tag questions-tag-select">
+            <div class="questions-tag questions-tag-select" @onclick="ChangePopUpStatus">
                 Wybierz tag...
             </div>
         </div>
     </div>
-    @foreach (var que in questions)
+    @if (questions != null)
     {
-        <QuestionInListComponent question=que />
+        @foreach (var que in questions)
+        {
+            <QuestionInListComponent question="que" />
+        }
     }
 </div>
+@if (questionAmount != 0)
+{
+    <div class="questions-pagination">
+        <PaginationComponent ElementsSize=questionAmount PageSize=10 PageSelectedListener="ChangeActivePage" ActualPage="activePage"/>
+    </div>
+}
+
+@if (categoriesPopUpOpen)
+{
+    <CategoriesPopUpComponent Categories="categories" CategorySelected="CategorySelected" CategoryDeSelected="CategoryDeSelected" PopUpClosed="ChangePopUpStatus" SelectedCategories="selectedCategories" />
+}
 
 @code {
     private int questionAmount = 0;
-    private int activeHeader = 0;
-    private List<Category> selectedCategories = new List<Category>();
-    private List<Question> questions = new List<Question>();
+    private int activeSorting = 0;
+    public int activePage = 0;
+    private List<int> selectedCategories = new List<int>();
 
+    private List<CategoriesResponseDTO> categories { get; set; }
+    public List<GetQuestionsDTO> questions { get; set; }
+
+    private bool categoriesPopUpOpen = false;
+    protected async override Task OnInitializedAsync()
+    {
+        await GetQuestions();
+        categories = await _categoriesReposiotry.GetCategories();
+        await GetQuestionsAmount();
+    }
+    private async Task GetQuestions()
+    {
+        questions = await _questionsReposiotry.GetQuestions(activePage, activeSorting switch
+        {
+            0 => SortOptionEnum.Date,
+            1 => SortOptionEnum.Views,
+            2 => SortOptionEnum.Answers
+        }, selectedCategories);
+
+    }
+
+    private async Task GetQuestionsAmount()
+    {
+        questionAmount = await _questionsReposiotry.GetQuestionsAmount(selectedCategories);
+    }
+    private async Task SetSorting(int i)
+    {
+        activeSorting = i;
+        await GetQuestions();
+        StateHasChanged();
+    }
+
+    private async Task CategorySelected(int i)
+    {
+        activePage = 0;
+        selectedCategories.Add(i);
+        await GetQuestions();
+        await GetQuestionsAmount();
+        StateHasChanged();
+    }
+    private async Task CategoryDeSelected(int i)
+    {
+        activePage = 0;
+        selectedCategories.Remove(i);
+        await GetQuestions();
+        await GetQuestionsAmount();
+        StateHasChanged();
+    }
+
+    private void ChangePopUpStatus()
+    {
+        categoriesPopUpOpen = !categoriesPopUpOpen;
+        StateHasChanged();
+    }
+
+    private async Task ChangeActivePage(int i)
+    {
+        activePage = i;
+        await GetQuestions();
+        StateHasChanged();
+    }
 }

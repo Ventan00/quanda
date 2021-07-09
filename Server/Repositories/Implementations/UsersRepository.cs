@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -7,6 +8,7 @@ using Quanda.Server.Data;
 using Quanda.Server.Utils;
 using Quanda.Server.Repositories.Interfaces;
 using Quanda.Shared.DTOs.Requests;
+using Quanda.Shared.DTOs.Responses;
 using Quanda.Shared.Models;
 using static Quanda.Server.Utils.UserStatus;
 
@@ -71,7 +73,7 @@ namespace Quanda.Server.Repositories.Implementations
 
             return await _context.SaveChangesAsync() > 0 ? USER_REFRESH_TOKEN_UPDATED : USER_DB_ERROR;
         }
-
+        
         public async Task<User> GetUserByIdAsync(int idUser)
         {
             return await _context.Users.
@@ -83,6 +85,18 @@ namespace Quanda.Server.Repositories.Implementations
         {
             user.HashedPassword = new PasswordHasher<User>().HashPassword(user, rawPassword);
             return await _context.SaveChangesAsync() > 0;
+        }
+        
+        public async Task<GetUserForQuestionByIDDTO> GetUserForQuestionByID(int idUser)
+        {
+            return await _context.Users
+                .Where(user => user.IdUser == idUser)
+                .Select(user => new GetUserForQuestionByIDDTO()
+                {
+                    Avatar = user.Avatar,
+                    Nick = user.Nickname
+                })
+                .SingleAsync();
         }
     }
 }

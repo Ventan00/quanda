@@ -1,0 +1,89 @@
+﻿@using Quanda.Shared.Models
+@if (Categories != null) {
+    <div class="categories-popup">
+        <div class="categories-popup-up">
+            <div class="categories-popup-up-list">
+                @foreach (var category in Categories.Where(category => category.IdMainCategory == null))
+                {
+                    <div class="categories-first-level-category">
+                        <div class="category-popup-text">
+                            <div class=".category-popup-text-expand" @onclick="@(() => OpenClose(category))"> > </div>
+                            <div @onclick="@(() => InsideCategorySelectionChange(category))">@category.Name</div>
+                        </div>
+                        <div class="category-popup-close">
+                            @if (SelectedCategories.Contains(category.IdCategory))
+                            {
+                                @:x
+                            }
+                        </div>
+                    </div>
+                    if (OpenedCategories[category.IdCategory])
+                    {
+                        @foreach (var cat in Categories.Where(cate => cate.IdMainCategory == category.IdCategory))
+                        {
+                            <div class="categories-second-level-category" @onclick="@(()=>InsideCategorySelectionChange(cat))">
+                                <div class="category-popup-text">@cat.Name</div>
+                                <div class="category-popup-close">
+                                    @if (SelectedCategories.Contains(cat.IdCategory))
+                                    {
+                                        @:x
+                                    }
+                                </div>
+                            </div>
+                        }
+
+                    }
+                }
+            </div>
+        </div>
+        <div class="categories-popup-down">
+            <input type="text" placeholder="Enter tag..." class="categories-popup-input" />
+            <button class="categories-popup-close-btn" @onclick="PopUpClosed">Close</button>
+        </div>
+    </div>
+}
+@code {
+    [Parameter]
+    public List<CategoriesResponseDTO> Categories { get; set; }
+    [Parameter]
+    public EventCallback<int> CategorySelected { get; set; }
+    [Parameter]
+    public EventCallback<int> CategoryDeSelected { get; set; }
+    [Parameter]
+    public EventCallback PopUpClosed { get; set; }
+    [Parameter]
+    public List<int> SelectedCategories { get; set; }
+
+    Dictionary<int, bool> OpenedCategories;
+
+    protected async override Task OnInitializedAsync()
+    {
+        OpenedCategories = new Dictionary<int, bool>();
+        foreach (var category in Categories.Where(category => category.IdMainCategory == null))
+        {
+            OpenedCategories.Add(category.IdCategory, false);
+        }
+
+    }
+
+    private async Task InsideCategorySelectionChange(CategoriesResponseDTO category)
+    {
+        int IdCategory = category.IdCategory;
+        if (SelectedCategories.Contains(IdCategory))
+        {
+            await CategoryDeSelected.InvokeAsync(IdCategory);
+        }
+        else
+        {
+            await CategorySelected.InvokeAsync(IdCategory);
+        }
+        StateHasChanged();
+    }
+
+    private void OpenClose(CategoriesResponseDTO category)
+    {
+        OpenedCategories[category.IdCategory] = !OpenedCategories[category.IdCategory];
+        StateHasChanged();
+    }
+
+}
