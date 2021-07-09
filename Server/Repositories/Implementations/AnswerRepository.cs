@@ -56,7 +56,7 @@ namespace Quanda.Server.Repositories.Implementations
                     UserResponseDTO = a.UserResponseDTO,
                     IdRootAnswer = a.IdRootAnswer,
                     Mark = a.Mark
-                }).SingleOrDefault();
+                }).SingleOrDefault(); // could be more
                 if (nextAnswer != null)
                 {
                     while (nextAnswer != null)
@@ -86,12 +86,12 @@ namespace Quanda.Server.Repositories.Implementations
             return answersBox;
         }
 
-        public async Task<AnswerResult> AddAnswerAsync(AddAnswerDTO answerDTO)
+        public async Task<AnswerResult> AddAnswerAsync(AddAnswerDTO answerDTO, int idUserLogged)
         {
             var existsQuestion = await _context.Questions.AnyAsync(q => q.IdQuestion == answerDTO.IdQuestion);
             if (!existsQuestion)
                 return AnswerResult.QUESTION_DELETED;
-            var existsUser = await _context.Users.AnyAsync(u => u.IdUser == answerDTO.IdUser);
+            var existsUser = await _context.Users.AnyAsync(u => u.IdUser == idUserLogged);
             if (!existsUser)
                 return AnswerResult.USER_DELETED;
             if (answerDTO.IdRootAnswer != null)
@@ -105,7 +105,7 @@ namespace Quanda.Server.Repositories.Implementations
             {
                 Text = answerDTO.Text,
                 IdQuestion = answerDTO.IdQuestion,
-                IdUser = answerDTO.IdUser,
+                IdUser = idUserLogged,
                 IdRootAnswer = answerDTO.IdRootAnswer
             }
             );

@@ -28,28 +28,30 @@
     </div>
     @if (EditMode)
     {
-        <AnswerTextComponent Text="@Answer.Text" SetEditMode="SetEditMode" EditText="UpdateAnswer"></AnswerTextComponent>
+        <AnswerTextComponent Text="@Answer.Text" SetEditMode="SetEditMode" SetText="UpdateAnswer"></AnswerTextComponent>
     }
     else
     {
         <div class="answer-text">
-            @*<input class="answer-text placeholder="@Answer.Text" column" type="text" id="text" size="50" >*@
             @Answer.Text
         </div>
-        @if (Answer.UserResponseDTO.IdUser == 25)
-        {
-            <div class="edit-option-text">
+        <div class="edit-option-text">
+            @if (Answer.UserResponseDTO.IdUser == 25)
+            {
+
                 <div>
                     <button @onclick="@SetEditMode">E</button>
                 </div>
                 <div>
                     <button @onclick="@(async () =>await DeleteAnswer())">X</button>
                 </div>
+
+            }
+            <div>
+                <button @onclick="@(() => OnSetReplyAnswer.InvokeAsync(Answer.IdAnswer))">R</button>
             </div>
-        }
+        </div>
     }
-
-
 </div>
 
 @code {
@@ -125,5 +127,8 @@
         }
         EditMode = !EditMode;
     }
+
+    [Parameter]
+    public EventCallback<int> OnSetReplyAnswer { get; set; }
 
 }

@@ -28,7 +28,7 @@ namespace Quanda.Server.Controllers
         [HttpPost]
         public async Task<IActionResult> AddAnswer([FromBody] AddAnswerDTO answerDTO)
         {
-            var result = await _repository.AddAnswerAsync(answerDTO);
+            var result = await _repository.AddAnswerAsync(answerDTO, requestIdUser);
             if (result == AnswerResult.QUESTION_DELETED || result == AnswerResult.USER_DELETED)
                 return BadRequest(result.ToString());
             else if (result == AnswerResult.ADD_DB_ERROR)

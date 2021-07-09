@@ -1,7 +1,6 @@
 ﻿@page "/test"
 @inject IAnswerRepository answerRepository
 @inject IJSRuntime js
-<h3>AnswersToQuestionsComponent</h3>
 <div class="answers-container">
     @if (Answers == null)
     {
@@ -15,30 +14,49 @@
             @foreach (var answerBox in Answers)
             {
                 <div class="answer-Main">
-                    <SingleAnswerComponent Answer="answerBox.MainAnswer" ReloadAnswers="OnInitializedAsync"/>
+                    <SingleAnswerComponent Answer="answerBox.MainAnswer" ReloadAnswers="OnInitializedAsync" OnSetReplyAnswer="setResponseAnswer" />
                 </div>
                 <div class="answer-Main_child">
                     @foreach (var answerChild in answerBox.ChildAnswers)
                     {
                         <div class="answer-child" style="margin-left: 10px;">
-                                <SingleAnswerComponent Answer="answerChild" ReloadAnswers="OnInitializedAsync"/>
+                                <SingleAnswerComponent Answer="answerChild" ReloadAnswers="OnInitializedAsync" OnSetReplyAnswer="setResponseAnswer"/>
                         </div>
                     }
                 </div>
             }
         }
     }
+    <div>
+        <AnswerTextComponent SetText="AddAnswer"></AnswerTextComponent>
+    </div>
 </div>
 
 
 @code {
     [Parameter]
     public List<AnswerBoxResponseDto> Answers { get; set; }
+    public int IdResponseAnswer { get; set; }
 
     protected async override Task OnInitializedAsync()
     {
         Answers = await answerRepository.GetAnswersAsync(1);
     }
+    private async Task AddAnswer(string text)
+    {
+        var result = await answerRepository.AddAnswer(text, 1, IdResponseAnswer);
+
+        if (!result.Item1)
+        {
+            await js.InvokeVoidAsync("alert", result.Item2);
+        }
+        await OnInitializedAsync();
+    }
+    private void setResponseAnswer(int idAnswer)
+    {
+        IdResponseAnswer = idAnswer;
+    }
+
 
 
 }

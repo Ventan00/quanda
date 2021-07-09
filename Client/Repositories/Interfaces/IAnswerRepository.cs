@@ -13,6 +13,8 @@ namespace Quanda.Client.Repositories.Interfaces
 
         Task<Tuple<bool, string>> DeleteAnswer(int idAnswer);
 
-        Task<Tuple<bool, string>> UpdateAnswer(int idAnswer, String text);
+        Task<Tuple<bool, string>> UpdateAnswer(int idAnswer, string text);
+
+        Task<Tuple<bool, string>> AddAnswer(string text, int idQuestion, int idRootAnswer);
     }
 }
