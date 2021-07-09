@@ -2,8 +2,8 @@
 @using Quanda.Client.Components
 @using Quanda.Shared.Enums
 @page "/questions"
-@inject IQuestionsReposiotry QuestionsReposiotry
-@inject ICategoriesReposiotry CategoriesReposiotry
+@inject IQuestionsReposiotry _questionsReposiotry
+@inject ICategoriesReposiotry _categoriesReposiotry
 <div class="questions-list-container">
     <h1>Pytania</h1>
     <div class="questions-header" style="margin-bottom: 0;">
@@ -111,12 +111,12 @@
     protected async override Task OnInitializedAsync()
     {
         await GetQuestions();
-        categories = await CategoriesReposiotry.GetCategories();
+        categories = await _categoriesReposiotry.GetCategories();
         await GetQuestionsAmount();
     }
     private async Task GetQuestions()
     {
-        questions = await QuestionsReposiotry.GetQuestions(activePage, activeSorting switch
+        questions = await _questionsReposiotry.GetQuestions(activePage, activeSorting switch
         {
             0 => SortOptionEnum.Date,
             1 => SortOptionEnum.Views,
@@ -127,7 +127,7 @@
 
     private async Task GetQuestionsAmount()
     {
-        questionAmount = await QuestionsReposiotry.GetQuestionsAmount(selectedCategories);
+        questionAmount = await _questionsReposiotry.GetQuestionsAmount(selectedCategories);
     }
     private async Task SetSorting(int i)
     {
