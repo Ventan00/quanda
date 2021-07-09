@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Blazored.LocalStorage;
+using Blazored.Toast.Services;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 
 namespace Quanda.Client.Authentication
@@ -23,11 +25,12 @@ namespace Quanda.Client.Authentication
 
         public async Task<string> TryRefreshTokenAsync()
         {
-            if (!await _localStorage.ContainKeyAsync("access_token") ||
-                !await _localStorage.ContainKeyAsync("refresh_token"))
-                return null;
-
             var authState = await _authProvider.GetAuthenticationStateAsync();
+            if (authState.User.Identity?.IsAuthenticated != true)
+            {
+                return null;
+            }
+
             var exp = authState.User.FindFirst(c => c.Type.Equals("exp"))?.Value;
 
             if (string.IsNullOrEmpty(exp))
@@ -37,7 +40,9 @@ namespace Quanda.Client.Authentication
 
             var diff = expTime - DateTime.UtcNow;
             if (diff.TotalMinutes <= 2)
+            {
                 return await _authService.RefreshTokenAsync();
+            }
 
             return null;
         }

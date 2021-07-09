@@ -2,6 +2,8 @@
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Blazored.LocalStorage;
+using Blazored.Toast.Services;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Quanda.Client.Helpers;
 using Quanda.Client.Repositories.Interfaces;
@@ -18,19 +20,25 @@ namespace Quanda.Client.Authentication
         private readonly HttpClient _httpClient;
         private readonly AuthenticationStateProvider _authStateProvider;
         private readonly ILocalStorageService _localStorage;
+        private readonly NavigationManager _navManager;
+        private readonly IToastService _toastService;
 
         public AuthenticationService(
             IHttpService httpService,
             IUsersRepository usersRepository,
             HttpClient httpClient,
             AuthenticationStateProvider authStateProvider,
-            ILocalStorageService localStorage)
+            ILocalStorageService localStorage,
+            NavigationManager navManager,
+            IToastService toastService)
         {
             _httpService = httpService;
             _usersRepository = usersRepository;
             _httpClient = httpClient;
             _authStateProvider = authStateProvider;
             _localStorage = localStorage;
+            _navManager = navManager;
+            _toastService = toastService;
         }
 
         public async Task<LoginResponseDTO> LoginAsync(LoginDTO loginDto)
@@ -57,6 +65,7 @@ namespace Quanda.Client.Authentication
 
             ((AuthStateProvider)_authStateProvider).NotifyUserLogout();
             _httpClient.DefaultRequestHeaders.Authorization = null;
+            _navManager.NavigateTo("/login");
         }
 
         public async Task<string> RefreshTokenAsync()
@@ -75,7 +84,8 @@ namespace Quanda.Client.Authentication
 
             if (!response.Success)
             {
-                ((AuthStateProvider)_authStateProvider).NotifyUserLogout();
+                _toastService.ShowError("Your session has expired, please log in.");
+                await LogoutAsync();
                 return null;
             }
 
