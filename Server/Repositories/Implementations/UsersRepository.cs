@@ -64,7 +64,7 @@ namespace Quanda.Server.Repositories.Implementations
             return await GetUserWithDetailsByAsync(u => u.Email == email);
         }
 
-        public async Task<UserStatus> UpdateRefreshTokenForUserAsync(User user, string refreshToken, DateTime refreshTokenExpirationDate)
+        public async Task<UserStatus> UpdateRefreshTokenForUserAsync(User user, string refreshToken, DateTime? refreshTokenExpirationDate)
         {
             user.RefreshToken = refreshToken;
             user.RefreshTokenExpirationDate = refreshTokenExpirationDate;

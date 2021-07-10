@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Quanda.Server.Extensions;
 using static Quanda.Server.Utils.UserStatus;
 using static Quanda.Server.Utils.TempUserResult;
 using Quanda.Server.Repositories.Interfaces;
@@ -214,6 +215,24 @@ namespace Quanda.Server.Controllers
                 AccessToken = _jwtService.WriteToken(accessToken),
                 RefreshToken = refreshToken
             });
+        }
+
+        [Authorize]
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout([FromBody] LogoutDTO logoutDto)
+        {
+            var user = await _usersRepository.GetUserByRefreshTokenAsync(logoutDto.RefreshToken);
+            if (user == null)
+                return Conflict();
+
+            if (user.IdUser != HttpContext.Request.GetUserId())
+                return NotFound();
+
+            var updateStatus = await _usersRepository.UpdateRefreshTokenForUserAsync(user, null, null);
+            if (updateStatus != USER_REFRESH_TOKEN_UPDATED)
+                return StatusCode((int)HttpStatusCode.InternalServerError);
+
+            return NoContent();
         }
     }
 }
