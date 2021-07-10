@@ -1,8 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
+using Quanda.Shared.DTOs.Requests;
 using Toolbelt.Blazor;
 
 namespace Quanda.Client.Authentication
@@ -40,12 +45,20 @@ namespace Quanda.Client.Authentication
                 "/accounts/refresh"
             };
 
-            if (!excludedPaths.Any(path => absPath.Contains(path)))
+            if (excludedPaths.Any(path => absPath.Contains(path)))
+                return;
+
+            var refreshResponse = await _refreshTokenService.TryRefreshTokenAsync();
+            if (refreshResponse is not null)
             {
-                var token = await _refreshTokenService.TryRefreshTokenAsync();
-                if (!string.IsNullOrEmpty(token))
+                e.Request.Headers.Authorization = new AuthenticationHeaderValue("bearer", refreshResponse.AccessToken);
+
+                if (absPath.Contains("/accounts/logout"))
                 {
-                    e.Request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
+                    e.Request.Content = new StringContent(
+                        JsonSerializer.Serialize(new LogoutDTO{RefreshToken = refreshResponse.RefreshToken}),
+                        Encoding.UTF8,
+                        "application/json");
                 }
             }
         }

@@ -7,7 +7,7 @@ namespace Quanda.Client.Authentication
     public interface IAuthenticationService
     {
         public Task<LoginResponseDTO> LoginAsync(LoginDTO loginDto);
-        public Task LogoutAsync();
-        public Task<string> RefreshTokenAsync();
+        public Task LogoutAsync(bool notifyServer = false);
+        public Task<RefreshResponseDTO> RefreshTokenAsync();
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Blazored.LocalStorage;
@@ -58,8 +59,19 @@ namespace Quanda.Client.Authentication
             return result;
         }
 
-        public async Task LogoutAsync()
+        public async Task LogoutAsync(bool notifyServer = false)
         {
+            if (notifyServer)
+            {
+                var logoutDto = new LogoutDTO
+                {
+                    RefreshToken = await _localStorage.GetItemAsync<string>("refresh_token")
+                };
+
+                await _httpService.Post("api/accounts/logout", logoutDto);
+            }
+
+
             await _localStorage.RemoveItemAsync("access_token");
             await _localStorage.RemoveItemAsync("refresh_token");
 
@@ -68,7 +80,7 @@ namespace Quanda.Client.Authentication
             _navManager.NavigateTo("/login");
         }
 
-        public async Task<string> RefreshTokenAsync()
+        public async Task<RefreshResponseDTO> RefreshTokenAsync()
         {
             var accessToken = await _localStorage.GetItemAsync<string>("access_token");
             var refreshToken = await _localStorage.GetItemAsync<string>("refresh_token");
@@ -95,7 +107,7 @@ namespace Quanda.Client.Authentication
                 new AuthenticationHeaderValue("bearer", response.Response.AccessToken);
             ((AuthStateProvider)_authStateProvider).NotifyUserAuthentication(response.Response.AccessToken);
 
-            return response.Response.AccessToken;
+            return response.Response;
         }
     }
 }

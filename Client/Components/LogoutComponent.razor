@@ -11,7 +11,7 @@
 @code {
     private async Task HandleLogout()
     {
-        await _authenticationService.LogoutAsync();
+        await _authenticationService.LogoutAsync(true);
         _toastService.ShowSuccess("You have logged out.");
     }
 }

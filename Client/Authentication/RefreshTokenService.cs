@@ -4,6 +4,7 @@ using Blazored.LocalStorage;
 using Blazored.Toast.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Quanda.Shared.DTOs.Responses;
 
 namespace Quanda.Client.Authentication
 {
@@ -23,7 +24,7 @@ namespace Quanda.Client.Authentication
             _localStorage = localStorage;
         }
 
-        public async Task<string> TryRefreshTokenAsync()
+        public async Task<RefreshResponseDTO> TryRefreshTokenAsync()
         {
             var authState = await _authProvider.GetAuthenticationStateAsync();
             if (authState.User.Identity?.IsAuthenticated != true)
