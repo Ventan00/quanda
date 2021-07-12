@@ -18,9 +18,9 @@ namespace Quanda.Client.Repositories.Implementations
             this.httpService = httpService;
         }
 
-        public async Task<List<AnswerBoxResponseDto>> GetAnswersAsync(int idQuestion)
+        public async Task<List<AnswerResponseDTO>> GetAnswersAsync(int idQuestion)
         {
-            return (await httpService.Get<List<AnswerBoxResponseDto>>($"{url}/{idQuestion}")).Response;
+            return (await httpService.Get<List<AnswerResponseDTO>>($"{url}/{idQuestion}")).Response;
         }
 
         public async Task<Tuple<bool, string>> UpdateRatingAnswerAsync(int idAnswer, int rating)
@@ -65,7 +65,7 @@ namespace Quanda.Client.Repositories.Implementations
             {
                 Text = text,
                 IdQuestion = idQuestion,
-                IdRootAnswer = idRootAnswer == -1 ? null : idRootAnswer
+                IdRootAnswer = idRootAnswer == 0 ? null : idRootAnswer
             };
             var response = await httpService.Post<AddAnswerDTO>($"{url}", addAnswerDTO);
             if (!response.Success)

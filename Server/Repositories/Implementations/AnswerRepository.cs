@@ -19,7 +19,7 @@ namespace Quanda.Server.Repositories.Implementations
             _context = context;
         }
 
-        public async Task<List<AnswerBoxResponseDto>> GetAnswersAsync(int idQuestion, int idUserLogged)
+        public async Task<List<AnswerResponseDTO>> GetAnswersAsync(int idQuestion, int idUserLogged)
         {
             List<AnswerBoxResponseDto> answersBox = new();
             var answers = await _context.Answers.Where(a => a.IdQuestion == idQuestion).Select(a => new AnswerResponseDTO
@@ -34,6 +34,7 @@ namespace Quanda.Server.Repositories.Implementations
                     Avatar = a.IdUserNavigation.Avatar
                 },
                 IdRootAnswer = a.IdRootAnswer,
+                ChildAnswers = new List<AnswerResponseDTO>(),
                 Mark = 0
             }).ToListAsync();
             foreach (var ans in answers)
@@ -41,49 +42,10 @@ namespace Quanda.Server.Repositories.Implementations
                 var ratingAnswer = await _context.RatingAnswers.SingleOrDefaultAsync(ra => ra.IdUser == idUserLogged && ra.IdAnswer == ans.IdAnswer);
                 if (ratingAnswer != null)
                     ans.Mark = (ratingAnswer.Value == true ? 1 : -1);
+                ans.ChildAnswers = answers.Where(a => a.IdRootAnswer == ans.IdAnswer).ToList();
             }
 
-            var mainAnswers = answers.Where(a => a.IdRootAnswer == null).ToList();
-            foreach (var ans in mainAnswers)
-            {
-                List<AnswerResponseDTO> leavesAnswer = new();
-                var nextAnswer = answers.Where(a => a.IdRootAnswer == ans.IdAnswer).Select(a => new AnswerResponseDTO
-                {
-                    IdAnswer = a.IdAnswer,
-                    Text = a.Text,
-                    Rating = a.Rating,
-                    IsModified = a.IsModified,
-                    UserResponseDTO = a.UserResponseDTO,
-                    IdRootAnswer = a.IdRootAnswer,
-                    Mark = a.Mark
-                }).SingleOrDefault(); // could be more
-                if (nextAnswer != null)
-                {
-                    while (nextAnswer != null)
-                    {
-                        leavesAnswer.Add(nextAnswer);
-                        nextAnswer = answers.Where(a => a.IdRootAnswer == nextAnswer.IdAnswer).Select(a => new AnswerResponseDTO
-                        {
-                            IdAnswer = a.IdAnswer,
-                            Text = a.Text,
-                            Rating = a.Rating,
-                            IsModified = a.IsModified,
-                            UserResponseDTO = a.UserResponseDTO,
-                            IdRootAnswer = a.IdRootAnswer,
-                            Mark = a.Mark
-                        }).SingleOrDefault();
-                    }
-
-                }
-                answersBox.Add(new AnswerBoxResponseDto
-                {
-                    MainAnswer = ans,
-                    ChildAnswers = leavesAnswer.OrderBy(a => a.IdAnswer).ToList()
-                });
-            }
-
-
-            return answersBox;
+            return answers.Where(a => a.IdRootAnswer == null).ToList();
         }
 
         public async Task<AnswerResult> AddAnswerAsync(AddAnswerDTO answerDTO, int idUserLogged)

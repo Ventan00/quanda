@@ -7,5 +7,7 @@ namespace Quanda.Shared.DTOs.Responses
         public AnswerResponseDTO MainAnswer { get; set; }
 
         public List<AnswerResponseDTO> ChildAnswers { get; set; }
+
+        public List<AnswerBoxResponseDto> ChildBoxAnswers { get; set; }
     }
 }

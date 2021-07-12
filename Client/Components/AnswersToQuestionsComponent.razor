@@ -9,54 +9,85 @@
     }
     else
     {
-        if (Answers.Count() > 0)
-        {
-            @foreach (var answerBox in Answers)
+            @foreach (var answer in Answers)
             {
+                
                 <div class="answer-Main">
-                    <SingleAnswerComponent Answer="answerBox.MainAnswer" ReloadAnswers="OnInitializedAsync" OnSetReplyAnswer="setResponseAnswer" />
+                    <SingleAnswerComponent Answer="answer" ReloadAnswers="OnInitializedAsync" OnSetReplyAnswer="setResponseAnswer" ActiveResponse="IdResponseAnswer"/>
                 </div>
                 <div class="answer-Main_child">
-                    @foreach (var answerChild in answerBox.ChildAnswers)
+                    @foreach (var and in answer.ChildAnswers)
                     {
-                        <div class="answer-child" style="margin-left: 10px;">
-                                <SingleAnswerComponent Answer="answerChild" ReloadAnswers="OnInitializedAsync" OnSetReplyAnswer="setResponseAnswer"/>
+                        <div class="answer-child" style="margin-left: 20px;">
+                            <SingleAnswerComponent Answer="and" ReloadAnswers="OnInitializedAsync" OnSetReplyAnswer="setResponseAnswer" ActiveResponse="IdResponseAnswer" />
                         </div>
                     }
                 </div>
             }
-        }
-    }
-    <div>
-        <AnswerTextComponent SetText="AddAnswer"></AnswerTextComponent>
-    </div>
+        <div>
+            <AnswerTextComponent Text="@TextAdd" SetText="AddAnswer" SetEditMode="discard"></AnswerTextComponent>
+        </div>
+    }  
 </div>
 
 
 @code {
     [Parameter]
-    public List<AnswerBoxResponseDto> Answers { get; set; }
+    public List<AnswerResponseDTO> Answers { get; set; }
     public int IdResponseAnswer { get; set; }
+    public string TextAdd { get; set; }
 
     protected async override Task OnInitializedAsync()
+    {
+        await GetAnswers();
+    }
+    private async Task GetAnswers()
     {
         Answers = await answerRepository.GetAnswersAsync(1);
     }
     private async Task AddAnswer(string text)
     {
-        var result = await answerRepository.AddAnswer(text, 1, IdResponseAnswer);
+        AnswerResponseDTO answer = null;
+        if(IdResponseAnswer != 0)
+        {
+            foreach (var ans in Answers)
+            {
+                var answerTmp = ans.ChildAnswers.SingleOrDefault(a => a.IdAnswer == IdResponseAnswer);
+                if (answerTmp != null)
+                    answer = answerTmp;
+            }
+        }
+        int idRootAnswer = -1;
+        if(answer != null)
+        {
+            if (answer.IdRootAnswer != null)
+            {
+                idRootAnswer = (int)answer.IdRootAnswer;
+            }
+        }
+        Tuple<bool, string> result = null;
+        if(idRootAnswer != -1)
+            result = await answerRepository.AddAnswer(text, 1, idRootAnswer);
+        else
+            result = await answerRepository.AddAnswer(text, 1, IdResponseAnswer);
 
         if (!result.Item1)
         {
             await js.InvokeVoidAsync("alert", result.Item2);
         }
-        await OnInitializedAsync();
+        await GetAnswers();
     }
     private void setResponseAnswer(int idAnswer)
     {
-        IdResponseAnswer = idAnswer;
+        if (IdResponseAnswer == idAnswer)
+            IdResponseAnswer = 0;
+        else
+            IdResponseAnswer = idAnswer;
+
     }
-
-
+    private void discard()
+    {
+        TextAdd = null;
+    }
 
 }

@@ -5,7 +5,7 @@
         <div>
             @if (Answer.Mark == 1)
             {
-                <button class="triangle-up" style="color:orange" />
+                <button class="triangle-up" style="color:orange" disabled="disabled" />
             }
             else
             {
@@ -18,7 +18,7 @@
         <div>
             @if (Answer.Mark == -1)
             {
-                <button class="triangle-down" style="color:orange" />
+                <button class="triangle-down" style="color:orange" disabled="disabled"/>
             }
             else
             {
@@ -32,9 +32,19 @@
     }
     else
     {
-        <div class="answer-text">
-            @Answer.Text
-        </div>
+        if (Answer.IdAnswer == ActiveResponse)
+        {
+            <div class="answer-text" style="background-color:yellow">
+                @Answer.Text
+            </div> 
+        }
+        else
+        {
+            <div class="answer-text">
+                @Answer.Text
+            </div>
+        }
+
         <div class="edit-option-text">
             @if (Answer.UserResponseDTO.IdUser == 25)
             {
@@ -59,6 +69,10 @@
     public AnswerResponseDTO Answer { get; set; }
     [Parameter]
     public EventCallback ReloadAnswers { get; set; }
+    [Parameter]
+    public EventCallback<int> OnSetReplyAnswer { get; set; }
+    [Parameter]
+    public int ActiveResponse { get; set; }
     public bool DisableButton { get; set; }
     public bool EditMode { get; set; }
 
@@ -127,8 +141,4 @@
         }
         EditMode = !EditMode;
     }
-
-    [Parameter]
-    public EventCallback<int> OnSetReplyAnswer { get; set; }
-
 }
