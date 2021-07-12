@@ -47,7 +47,7 @@ namespace Quanda.Client.Authentication
             var result = await _usersRepository.LoginAsync(loginDto);
 
             if (result.LoginStatus != LoginStatusEnum.LOGIN_ACCEPTED)
-                return null;
+                return result;
 
             await _localStorage.SetItemAsync("access_token", result.AccessToken);
             await _localStorage.SetItemAsync("refresh_token", result.RefreshToken);

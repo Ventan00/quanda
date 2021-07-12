@@ -44,6 +44,7 @@
     private async Task HandleValidSubmit()
     {
         var loginResponseDto = await _authenticationService.LoginAsync(_loginDto);
+
         _loginStatus = loginResponseDto.LoginStatus;
 
         if (_loginStatus == LoginStatusEnum.LOGIN_ACCEPTED)
