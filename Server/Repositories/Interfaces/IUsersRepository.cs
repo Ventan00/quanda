@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Quanda.Server.Utils;
 using Quanda.Shared.DTOs.Requests;
+using Quanda.Shared.DTOs.Responses;
 using Quanda.Shared.Models;
 
 namespace Quanda.Server.Repositories.Interfaces

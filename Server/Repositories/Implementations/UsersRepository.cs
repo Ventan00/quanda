@@ -9,6 +9,7 @@ using Quanda.Server.Data;
 using Quanda.Server.Utils;
 using Quanda.Server.Repositories.Interfaces;
 using Quanda.Shared.DTOs.Requests;
+using Quanda.Shared.DTOs.Responses;
 using Quanda.Shared.Models;
 using static Quanda.Server.Utils.UserStatus;
 
@@ -71,12 +72,11 @@ namespace Quanda.Server.Repositories.Implementations
 
             return await _context.SaveChangesAsync() > 0 ? USER_REFRESH_TOKEN_UPDATED : USER_DB_ERROR;
         }
-
+        
         public async Task<User> GetUserByIdAsync(int idUser)
         {
             return await GetUserWithDetailsByAsync(u => u.IdUser == idUser);
         }
-
         public async Task<bool> SetNewPasswordForUser(User user, string rawPassword)
         {
             user.HashedPassword = new PasswordHasher<User>().HashPassword(user, rawPassword);
@@ -96,5 +96,6 @@ namespace Quanda.Server.Repositories.Implementations
                 ThenInclude(ur => ur.IdRoleNavigation).
                 SingleOrDefaultAsync(predicate);
         }
+
     }
 }

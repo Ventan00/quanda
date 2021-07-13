@@ -50,5 +50,6 @@ namespace Quanda.Client.Repositories.Implementations
             var response = await _httpService.Post($"{ApiUrl}/reset-password", passwordResetDto);
             return response.Success;
         }
+        
     }
 }
