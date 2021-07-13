@@ -223,7 +223,7 @@ namespace Quanda.Server.Controllers
         {
             var user = await _usersRepository.GetUserByRefreshTokenAsync(logoutDto.RefreshToken);
             if (user == null)
-                return Conflict();
+                return NotFound();
 
             if (user.IdUser != HttpContext.Request.GetUserId())
                 return NotFound();
