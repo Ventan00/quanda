@@ -1,13 +1,8 @@
-﻿div {
-    column-gap: 40px;
-    
-}
-.rating-text {
+﻿.answer-rating {
     vertical-align: top;
-    position: center;
     font-weight: bold;
     font-size: large;
-    text-align:center;
+    position: center;
 }
 
 .triangle-up {

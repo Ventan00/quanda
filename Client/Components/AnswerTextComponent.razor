@@ -4,10 +4,10 @@
     </div>
     <div class="row">
         <div>
-            <button @onclick="@(()=> SetText.InvokeAsync(Text))">Publish</button>
+            <button @onclick="@(()=> Publish.InvokeAsync(Text))">Publish</button>
         </div>
         <div>
-            <button @onclick="@(()=> SetEditMode.InvokeAsync())">Discard</button>
+            <button @onclick="@(()=> Discard.InvokeAsync())">Discard</button>
         </div>
     </div>
 </div>
@@ -16,9 +16,16 @@
 @code {
     [Parameter]
     public string Text { get; set; }
+    /// <summary>
+    /// Zatwierdzenie aktualnie wprowadzonego tekstu.
+    /// </summary>
     [Parameter]
-    public EventCallback SetEditMode { get; set; }
+    public EventCallback<string> Publish { get; set; }
+    /// <summary>
+    /// Odrzucanie aktualnie wprowadzonego tekstu.
+    /// </summary>
     [Parameter]
-    public EventCallback<string> SetText { get; set; }
+    public EventCallback Discard { get; set; }
+
 
 }

@@ -11,7 +11,7 @@ namespace Quanda.Server.Controllers
     public class AnswersController : ControllerBase
     {
         private readonly IAnswerRepository _repository;
-        private readonly int requestIdUser = 25; //future => Request.GetUser();
+        private readonly int requestIdUser = 25; //future => Request.GetUser(); które będzie pobierane przy konkretnych zapytaniach do serwera
 
         public AnswersController(IAnswerRepository repository)
         {

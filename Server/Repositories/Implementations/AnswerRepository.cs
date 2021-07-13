@@ -21,7 +21,6 @@ namespace Quanda.Server.Repositories.Implementations
 
         public async Task<List<AnswerResponseDTO>> GetAnswersAsync(int idQuestion, int idUserLogged)
         {
-            List<AnswerBoxResponseDto> answersBox = new();
             var answers = await _context.Answers.Where(a => a.IdQuestion == idQuestion).Select(a => new AnswerResponseDTO
             {
                 IdAnswer = a.IdAnswer,
@@ -47,7 +46,7 @@ namespace Quanda.Server.Repositories.Implementations
 
             return answers.Where(a => a.IdRootAnswer == null).ToList();
         }
-
+        
         public async Task<AnswerResult> AddAnswerAsync(AddAnswerDTO answerDTO, int idUserLogged)
         {
             var existsQuestion = await _context.Questions.AnyAsync(q => q.IdQuestion == answerDTO.IdQuestion);
@@ -76,7 +75,7 @@ namespace Quanda.Server.Repositories.Implementations
 
             return AnswerResult.SUCCESS;
         }
-
+        
         public async Task<AnswerResult> UpdateAnswerAsync(int idAnswer, UpdateAnswerDTO answerDTO)
         {
             var answer = await _context.Answers.SingleOrDefaultAsync(a => a.IdAnswer == idAnswer);
@@ -88,7 +87,7 @@ namespace Quanda.Server.Repositories.Implementations
                 return AnswerResult.UPDATE_DB_ERROR;
             return AnswerResult.SUCCESS;
         }
-
+        
         public async Task<AnswerResult> DeleteAnswerAsync(int idAnswer, int idUserLogged)
         {
             var answer = await _context.Answers.SingleOrDefaultAsync(a => a.IdAnswer == idAnswer);
@@ -102,7 +101,8 @@ namespace Quanda.Server.Repositories.Implementations
 
             return AnswerResult.SUCCESS;
         }
- 
+
+        
         public async Task<AnswerResult> UpdateRatingAnswerAsync(int idAnswer, int idUserLogged, UpdateRatingAnswerDTO updateRatingAnswer)
         {
             var answerRated = await _context.RatingAnswers.SingleOrDefaultAsync(ra => ra.IdAnswer == idAnswer && ra.IdUser == idUserLogged);

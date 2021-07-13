@@ -1,5 +1,4 @@
-﻿@page "/test"
-@inject IAnswerRepository answerRepository
+﻿@inject IAnswerRepository answerRepository
 @inject IJSRuntime js
 <div class="answers-container">
     @if (Answers == null)
@@ -12,39 +11,64 @@
             @foreach (var answer in Answers)
             {
                 
-                <div class="answer-Main">
-                    <SingleAnswerComponent Answer="answer" ReloadAnswers="OnInitializedAsync" OnSetReplyAnswer="setResponseAnswer" ActiveResponse="IdResponseAnswer"/>
+                <div class="answer-Main" >
+                    <SingleAnswerComponent Answer="answer" ReloadAnswers="GetAnswers" OnSetReplyAnswer="setResponseAnswer" ActiveResponse="IdResponseAnswer" ActiveUser="ActiveUser"/>
                 </div>
                 <div class="answer-Main_child">
-                    @foreach (var and in answer.ChildAnswers)
+                    @foreach (var childAnswer in answer.ChildAnswers)
                     {
                         <div class="answer-child" style="margin-left: 20px;">
-                            <SingleAnswerComponent Answer="and" ReloadAnswers="OnInitializedAsync" OnSetReplyAnswer="setResponseAnswer" ActiveResponse="IdResponseAnswer" />
+                            <SingleAnswerComponent Answer="childAnswer" ReloadAnswers="GetAnswers" OnSetReplyAnswer="setResponseAnswer" ActiveResponse="IdResponseAnswer" ActiveUser="ActiveUser" />
                         </div>
                     }
                 </div>
             }
         <div>
-            <AnswerTextComponent Text="@TextAdd" SetText="AddAnswer" SetEditMode="discard"></AnswerTextComponent>
+            <AnswerTextComponent Text="@TextAdd" Publish="AddAnswer" Discard="discard"></AnswerTextComponent>
         </div>
     }  
 </div>
 
 
 @code {
+    /// <summary>
+    /// Id pytania, do którego odnoszą się odpowiedzi.
+    /// </summary>
     [Parameter]
+    public int IdQuestion { get; set; }
     public List<AnswerResponseDTO> Answers { get; set; }
+    /// <summary>
+    /// Id odpowiedzi, do której odnosi się nowa odpowiedź.
+    /// </summary>
     public int IdResponseAnswer { get; set; }
     public string TextAdd { get; set; }
+    /// <summary>
+    /// Id aktywnie przeglądającego użytkownika.
+    /// </summary>
+    public int ActiveUser { get; set; }
 
+    /// <summary>
+    /// Pobranie Id aktualnie przeglądającego użytkownika oraz pobranie listy odpowiedzi.
+    /// </summary>
+    /// <returns></returns>
     protected async override Task OnInitializedAsync()
     {
+        ActiveUser = 25;
         await GetAnswers();
     }
+    /// <summary>
+    /// Pobranie listy odpowiedzi.
+    /// </summary>
+    /// <returns></returns>
     private async Task GetAnswers()
     {
-        Answers = await answerRepository.GetAnswersAsync(1);
+        Answers = await answerRepository.GetAnswersAsync(IdQuestion);
     }
+    /// <summary>
+    /// Metoda wysyłająca zapytanie do serwera z dodaniem nowej odpowiedzi.
+    /// </summary>
+    /// <param name="text"></param>
+    /// <returns></returns>
     private async Task AddAnswer(string text)
     {
         AnswerResponseDTO answer = null;
@@ -62,7 +86,7 @@
         {
             if (answer.IdRootAnswer != null)
             {
-                idRootAnswer = (int)answer.IdRootAnswer;
+                idRootAnswer = (int)answer.IdRootAnswer; //Skorygowane id odpowiedzi na jego nadrzędną odpowiedź.
             }
         }
         Tuple<bool, string> result = null;
@@ -85,6 +109,7 @@
             IdResponseAnswer = idAnswer;
 
     }
+
     private void discard()
     {
         TextAdd = null;
