@@ -6,8 +6,18 @@ using System.Text.Json;
 
 namespace Quanda.Client.Authentication
 {
+    /// <summary>
+    /// Klasa pomocnicza odpowiedzialna za parsowanie JWT
+    /// </summary>
     public class JwtParser
     {
+        /// <summary>
+        /// Metoda odkodowywujaca JWT oraz wyciagajaca z payload user claims
+        /// </summary>
+        /// <param name="jwt">Token (jwt)</param>
+        /// <returns>
+        /// Kolekcja (IEnumerable)<Claim> wyciagnietych z podanego tokenu
+        /// </returns>
         public static IEnumerable<Claim> ParseClaimsFromJwt(string jwt)
         {
             var claims = new List<Claim>();
@@ -29,6 +39,11 @@ namespace Quanda.Client.Authentication
             return claims;
         }
 
+        /// <summary>
+        /// Pomocnicza metoda wyciagajaca role z podanego slownika, zasilajaca podana liste claimsow
+        /// </summary>
+        /// <param name="claims">Lista wynikowa, do ktorej zostana dodane wyciagniete role</param>
+        /// <param name="keyValuePairs">Slownik (klucz-wartosc) zawierajace dane z payload jwt</param>
         private static void ExtractRolesFromJWT(List<Claim> claims, Dictionary<string, object> keyValuePairs)
         {
             keyValuePairs.TryGetValue(ClaimTypes.Role, out object roles);

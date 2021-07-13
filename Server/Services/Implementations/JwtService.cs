@@ -12,6 +12,9 @@ using Quanda.Shared.Models;
 
 namespace Quanda.Server.Services.Implementations
 {
+    /// <summary>
+    /// Pomocniczy serwis do JWT
+    /// </summary>
     public class JwtService : IJwtService
     {
         private readonly JwtConfigModel _jwtConfigModel;
@@ -21,11 +24,24 @@ namespace Quanda.Server.Services.Implementations
             _jwtConfigModel = optionsMonitor.CurrentValue;
         }
 
+        /// <summary>
+        /// Metoda parsująca SecruityToken do stringa
+        /// </summary>
+        /// <param name="securityToken"></param>
+        /// <returns>
+        /// JWT - w stringu
+        /// </returns>
         public string WriteToken(SecurityToken securityToken)
         {
             return new JwtSecurityTokenHandler().WriteToken(securityToken);
         }
 
+        /// <summary>
+        /// Metoda generująca refreshToken
+        /// </summary>
+        /// <returns>
+        /// Krotka zawierajaca refreshToken oraz jego date wygasniecia
+        /// </returns>
         public (string refreshToken, DateTime expirationDate) GenerateRefreshToken()
         {
             var refreshToken = Guid.NewGuid().ToString();
@@ -34,6 +50,11 @@ namespace Quanda.Server.Services.Implementations
             return (refreshToken, expirationDate);
         }
 
+        /// <summary>
+        /// Metoda generujaca accessToken dla podanego uzytkownika
+        /// </summary>
+        /// <param name="user">Uzytkownik wraz z dolaczonymi do niego rolami</param>
+        /// <returns>JwtSecurityToken</returns>
         public JwtSecurityToken GenerateAccessToken(User user)
         {
             var userClaims = new List<Claim>
@@ -56,6 +77,11 @@ namespace Quanda.Server.Services.Implementations
             );
         }
 
+        /// <summary>
+        /// Metoda generujaca token sluzacy do odzyskania hasla dla podanego uzytkownika
+        /// </summary>
+        /// <param name="user">Uzytkownik</param>
+        /// <returns>JwtSecruityToken</returns>
         public JwtSecurityToken GeneratePasswordRecoveryToken(User user)
         {
             var userClaims = new List<Claim>
@@ -72,6 +98,14 @@ namespace Quanda.Server.Services.Implementations
             );
         }
 
+        /// <summary>
+        /// Metoda wyciagajaca ClaimsPrinicpal z podanego JWT wydanego do odzyskania hasla
+        /// </summary>
+        /// <param name="jwt">JWT wydany do odzyskania hasla</param>
+        /// <param name="user">User dla którego wydany został token</param>
+        /// <returns>
+        /// Null lub ClaimsPrinipal danego tokena w zaleznosci od rezultatu metody 'ValidateAndGetPrincipalFromJwt'
+        /// </returns>
         public ClaimsPrincipal GetPrincipalFromPasswordRecoveryToken(string jwt, User user)
         {
             var tokenValidationParameters = new TokenValidationParameters
@@ -87,6 +121,13 @@ namespace Quanda.Server.Services.Implementations
             return ValidateAndGetPrincipalFromJwt(jwt, tokenValidationParameters);
         }
 
+        /// <summary>
+        /// Metoda wyciagajaca ClaimsPrinicpal z podanego JWT wydanego jako accessToken
+        /// </summary>
+        /// <param name="jwt">JWT wydany jako accessToken</param>
+        /// <returns>
+        /// Null lub ClaimsPrinipal danego tokena w zaleznosci od rezultatu metody 'ValidateAndGetPrincipalFromJwt'
+        /// </returns>
         public ClaimsPrincipal GetPrincipalFromExpiredToken(string jwt)
         {
             var tokenValidationParameters = new TokenValidationParameters
@@ -104,6 +145,15 @@ namespace Quanda.Server.Services.Implementations
             return ValidateAndGetPrincipalFromJwt(jwt, tokenValidationParameters);
         }
 
+        /// <summary>
+        /// Metoda pomocnicza walidująca oraz deszyfrujaca JWT wedlug podanych parametrow
+        /// </summary>
+        /// <param name="jwt">Token do walidacji oraz deszyfrowania</param>
+        /// <param name="tokenValidationParameters">Parametry wedlug ktorych ma byc walidowany token</param>
+        /// <returns>
+        /// ClaimsPrincipal - wyciagniete z podanego JWT, lub
+        /// Null - w przypadku gdy walidacja przebiegnie niepomyslnie
+        /// </returns>
         private ClaimsPrincipal ValidateAndGetPrincipalFromJwt(string jwt, TokenValidationParameters tokenValidationParameters)
         {
             try

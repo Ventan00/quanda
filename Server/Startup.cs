@@ -59,6 +59,8 @@ namespace Quanda.Server
 
                 jwtBearerOptions.Events = new JwtBearerEvents
                 {
+                    //Zdarzenie wykonywane po poprawnej validacji tokenu.
+                    //Dodaje id u¿ytkownika do rz¹dania http
                     OnTokenValidated = tokenValidatedContext =>
                     {
                         try

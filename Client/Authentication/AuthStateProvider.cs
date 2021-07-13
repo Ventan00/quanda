@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Components.Authorization;
 
 namespace Quanda.Client.Authentication
 {
+    /// <summary>
+    /// Klasa pozwalająca aplikacji uzyskać dane dotyczące stanu uwierzytelniania użytkownika, oraz pozwalająca nim zarządzać
+    /// </summary>
     public class AuthStateProvider : AuthenticationStateProvider
     {
         private readonly HttpClient _httpClient;
@@ -20,6 +23,12 @@ namespace Quanda.Client.Authentication
             _anonymous = new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
         }
 
+        /// <summary>
+        /// Metoda pozwalająca uzyskać stan uwierzytelnienia danego użytkownika
+        /// </summary>
+        /// <returns>
+        /// Stan uwierzytelnienia użytkownika wraz z 'user claims'
+        /// </returns>
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
             var accessToken = await _localStorageService.GetItemAsync<string>("access_token");
@@ -36,6 +45,12 @@ namespace Quanda.Client.Authentication
                         JwtParser.ParseClaimsFromJwt(accessToken), "jwtAuthType")));
         }
 
+        /// <summary>
+        /// Metoda zmieniajaca stan uwierzytelnienia użytkownika na uwierzytelniony (zalogowany), z uprawnieniami zgodnymi z podanym tokenem
+        /// </summary>
+        /// <param name="token">
+        /// jwt (accessToken)
+        /// </param>
         public void NotifyUserAuthentication(string token)
         {
             var authenticatedUser = new ClaimsPrincipal(new ClaimsIdentity(JwtParser.ParseClaimsFromJwt(token), "jwtAuthType"));
@@ -43,6 +58,9 @@ namespace Quanda.Client.Authentication
             NotifyAuthenticationStateChanged(authState);
         }
 
+        /// <summary>
+        /// Metoda zmieniajaca stan uwierzytelnienia użytkownika na nieuwierzytelniony (niezalogowany)
+        /// </summary>
         public void NotifyUserLogout()
         {
             var authState = Task.FromResult(_anonymous);

@@ -14,6 +14,9 @@ using Quanda.Shared.Enums;
 
 namespace Quanda.Client.Authentication
 {
+    /// <summary>
+    /// Serwis odpowiedzialny za operace Login/Logout/RefreshToken
+    /// </summary>
     public class AuthenticationService : IAuthenticationService
     {
         private readonly IHttpService _httpService;
@@ -42,6 +45,15 @@ namespace Quanda.Client.Authentication
             _toastService = toastService;
         }
 
+        /// <summary>
+        /// Metoda wywolywana w celu zalogowania uzytkownika, po poprawnym zalogowaniu zapisuje odpowiednio
+        /// w local storage accessToken oraz refreshToken uzytkownika dodajac accessToken do naglowkow zapytan
+        /// wykonwyach przy uzyciu http client oraz zmienia stan uwierzytelnienia uzytkownika
+        /// </summary>
+        /// <param name="loginDto"></param>
+        /// <returns>
+        /// LoginResponseDTO(RefreshToken,AccessToken)
+        /// </returns>
         public async Task<LoginResponseDTO> LoginAsync(LoginDTO loginDto)
         {
             var result = await _usersRepository.LoginAsync(loginDto);
@@ -59,6 +71,16 @@ namespace Quanda.Client.Authentication
             return result;
         }
 
+        /// <summary>
+        /// Metoda wywolywana w celu wylogwania uzytkownika, usuwa odpowiednio
+        /// z local storage accessToken oraz refreshToken uzytkownika usuwajac rowniez accessToken z naglowkow zapytan
+        /// wykonwyach przy uzyciu http client oraz zmienia stan uwierzytelnienia uzytkownika
+        /// </summary>
+        /// <param name="notifyServer">
+        /// parametr boolean decydujacy czy wylogowanie ma zostac wykonane tylko po stronie klienta
+        /// czy ma byc o nim powiadomiony rowniez serwer
+        /// </param>
+        /// <returns></returns>
         public async Task LogoutAsync(bool notifyServer = false)
         {
             if (notifyServer)
@@ -80,6 +102,15 @@ namespace Quanda.Client.Authentication
             _navManager.NavigateTo("/login");
         }
 
+        /// <summary>
+        /// Metoda wywolywana w celu odświeżenia tokenów uzytkownika, która w przypadku poprawnej odpowiedzi
+        /// od serwera (2xx) zapisuje otrzymane tokeny do localstorage oraz zmienia stan uwierzytelnienia uzytkownika.
+        /// Odpowiedz z grupy innej niz 2xx oznacza ze sesja uzytkownika się przedawniła więc użytkownik jest wylogowywany
+        /// </summary>
+        /// <returns>
+        /// Jeżeli serwer zwróci kod 2xx zwrócony zostaje RefreshResponseDto(accessToken, refreshToken),
+        /// jeżeli natomiast kod nie jest z grupy 2xx zwrócony zostaje null
+        /// </returns>
         public async Task<RefreshResponseDTO> RefreshTokenAsync()
         {
             var accessToken = await _localStorage.GetItemAsync<string>("access_token");

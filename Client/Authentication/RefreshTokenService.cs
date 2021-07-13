@@ -8,6 +8,9 @@ using Quanda.Shared.DTOs.Responses;
 
 namespace Quanda.Client.Authentication
 {
+    /// <summary>
+    /// Serwis umożliwiający odświeżnie tokenów
+    /// </summary>
     public class RefreshTokenService : IRefreshTokenService
     {
         private readonly AuthenticationStateProvider _authProvider;
@@ -24,6 +27,14 @@ namespace Quanda.Client.Authentication
             _localStorage = localStorage;
         }
 
+        /// <summary>
+        /// Metoda sprawdzająca czy wymagane i możliwe jest odświeżenie tokenów,
+        /// jezeli tak wywoływana jest metoda odświeżająca tokeny z AuthenticationService
+        /// </summary>
+        /// <returns>
+        /// Null - jezeli nie jest wymagane odświeżenie tokenów
+        /// RefreshResponseDto(AccessToken,RefreshToken) - jezeli tokeny zostają odświeżone
+        /// </returns>
         public async Task<RefreshResponseDTO> TryRefreshTokenAsync()
         {
             var authState = await _authProvider.GetAuthenticationStateAsync();

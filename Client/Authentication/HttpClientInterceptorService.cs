@@ -12,6 +12,7 @@ using Toolbelt.Blazor;
 
 namespace Quanda.Client.Authentication
 {
+    //Klasa pozwalająca zarządzać zdarzeniami wykonywanymi przed / po wysłaniu rządań przy uzyciu HTTP Client
     public class HttpClientInterceptorService
     {
         private readonly HttpClientInterceptor _interceptor;
@@ -24,16 +25,29 @@ namespace Quanda.Client.Authentication
             _refreshTokenService = refreshTokenService;
         }
 
+        /// <summary>
+        /// Dodaje zdarzenia wykonywane przed/po rządaniu http
+        /// </summary>
         public void RegisterEvents()
         {
             _interceptor.BeforeSendAsync += InterceptBeforeHttpAsync;
         }
 
+        /// <summary>
+        /// Usuwa zarejestrowane zdarzenia wykonywane przed/po rządaniu http
+        /// </summary>
         public void DisposeEvents()
         {
             _interceptor.BeforeSendAsync -= InterceptBeforeHttpAsync;
         }
 
+        /// <summary>
+        /// Zdarzenie wykonywane przed wysłaniem rzadania HTTP.
+        /// Ma na celu wykonanie próby odświezenia tokenów, jeżeli accessToken jest bliski wygaśnięcia
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e">Meta dane HTTP dostarczone przed lub po wykonaniu rządania HTTP</param>
+        /// <returns></returns>
         public async Task InterceptBeforeHttpAsync(object sender, HttpClientInterceptorEventArgs e)
         {
             var absPath = e.Request.RequestUri?.AbsolutePath;
@@ -56,7 +70,7 @@ namespace Quanda.Client.Authentication
                 if (absPath.Contains("/accounts/logout"))
                 {
                     e.Request.Content = new StringContent(
-                        JsonSerializer.Serialize(new LogoutDTO{RefreshToken = refreshResponse.RefreshToken}),
+                        JsonSerializer.Serialize(new LogoutDTO { RefreshToken = refreshResponse.RefreshToken }),
                         Encoding.UTF8,
                         "application/json");
                 }
