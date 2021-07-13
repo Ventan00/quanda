@@ -12,6 +12,5 @@ namespace Quanda.Client.Repositories.Interfaces
         public Task RecoverConfirmationEmailAsync(RecoverDTO recoverDto);
         public Task RecoverPasswordAsync(RecoverDTO recoverDto);
         public Task<bool> ResetPasswordAsync(PasswordResetDTO passwordResetDto);
-        public Task<GetUserForQuestionByIDDTO> GetDataForQuestionAsync(int questionIdUser);
     }
 }
