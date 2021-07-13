@@ -1,4 +1,4 @@
-﻿namespace Quanda.Shared.Enums
+﻿namespace Quanda.Server.Utils
 {
     public enum QuestionStatusResult
     {
