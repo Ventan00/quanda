@@ -10,7 +10,7 @@
                             <div class=".category-popup-text-expand" @onclick="@(() => OpenClose(category))"> > </div>
                             <div @onclick="@(() => InsideCategorySelectionChange(category))">@category.Name</div>
                         </div>
-                        <div class="category-popup-close">
+                        <div class="category-popup-close" @onclick="@(() => InsideCategorySelectionChange(category))">
                             @if (SelectedCategories.Contains(category.IdCategory))
                             {
                                 @:x
@@ -23,7 +23,7 @@
                         {
                             <div class="categories-second-level-category" @onclick="@(()=>InsideCategorySelectionChange(cat))">
                                 <div class="category-popup-text">@cat.Name</div>
-                                <div class="category-popup-close">
+                                <div class="category-popup-close" @onclick="@(() => InsideCategorySelectionChange(category))">
                                     @if (SelectedCategories.Contains(cat.IdCategory))
                                     {
                                         @:x
