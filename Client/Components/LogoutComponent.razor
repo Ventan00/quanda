@@ -1,0 +1,17 @@
+﻿@using Quanda.Client.Authentication
+@using Blazored.Toast.Configuration
+@inject IAuthenticationService _authenticationService
+@inject NavigationManager _navManager
+@inject IToastService _toastService
+
+<button class="btn btn-link" @onclick="@HandleLogout">
+    <span class="oi oi-account-logout" aria-hidden="true"></span> Logout
+</button>
+
+@code {
+    private async Task HandleLogout()
+    {
+        await _authenticationService.LogoutAsync(true);
+        _toastService.ShowSuccess("You have logged out.");
+    }
+}

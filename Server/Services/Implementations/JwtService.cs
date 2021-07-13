@@ -4,31 +4,57 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Quanda.Server.Models.Settings;
 using Quanda.Server.Services.Interfaces;
 using Quanda.Shared.Models;
 
 namespace Quanda.Server.Services.Implementations
 {
+    /// <summary>
+    /// Pomocniczy serwis do JWT
+    /// </summary>
     public class JwtService : IJwtService
     {
-        private readonly IConfigurationSection _jwtConfigurationSection;
+        private readonly JwtConfigModel _jwtConfigModel;
 
-        public JwtService(IConfiguration configuration)
+        public JwtService(IOptionsMonitor<JwtConfigModel> optionsMonitor)
         {
-            _jwtConfigurationSection = configuration.GetSection("JwtSettings");
+            _jwtConfigModel = optionsMonitor.CurrentValue;
         }
 
+        /// <summary>
+        /// Metoda parsująca SecruityToken do stringa
+        /// </summary>
+        /// <param name="securityToken"></param>
+        /// <returns>
+        /// JWT - w stringu
+        /// </returns>
+        public string WriteToken(SecurityToken securityToken)
+        {
+            return new JwtSecurityTokenHandler().WriteToken(securityToken);
+        }
+
+        /// <summary>
+        /// Metoda generująca refreshToken
+        /// </summary>
+        /// <returns>
+        /// Krotka zawierajaca refreshToken oraz jego date wygasniecia
+        /// </returns>
         public (string refreshToken, DateTime expirationDate) GenerateRefreshToken()
         {
             var refreshToken = Guid.NewGuid().ToString();
-            var expirationDate = DateTime.Now.AddMinutes(int.Parse(_jwtConfigurationSection["RefreshTokenValidityInMinutes"]));
+            var expirationDate = DateTime.UtcNow.AddMinutes(_jwtConfigModel.RefreshTokenValidityInMinutes);
 
             return (refreshToken, expirationDate);
         }
 
+        /// <summary>
+        /// Metoda generujaca accessToken dla podanego uzytkownika
+        /// </summary>
+        /// <param name="user">Uzytkownik wraz z dolaczonymi do niego rolami</param>
+        /// <returns>JwtSecurityToken</returns>
         public JwtSecurityToken GenerateAccessToken(User user)
         {
             var userClaims = new List<Claim>
@@ -40,29 +66,22 @@ namespace Quanda.Server.Services.Implementations
                 user.UserRoles.Select(ur => new Claim(ClaimTypes.Role, ur.IdRoleNavigation.Name))
                 );
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtConfigurationSection["SecretKey"]));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtConfigModel.SecretKey));
 
             return new JwtSecurityToken(
-                issuer: _jwtConfigurationSection["Issuer"],
-                audience: _jwtConfigurationSection["Audience"],
+                issuer: _jwtConfigModel.Issuer,
+                audience: _jwtConfigModel.Audience,
                 claims: userClaims,
-                expires: DateTime.Now.AddMinutes(int.Parse(_jwtConfigurationSection["AccessTokenValidityInMinutes"])),
+                expires: DateTime.UtcNow.AddMinutes(_jwtConfigModel.AccessTokenValidityInMinutes),
                 signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
             );
         }
 
-        public void AddTokensToCookies(string refreshToken, DateTime refreshTokenExpirationDate, JwtSecurityToken accessToken, IResponseCookies responseCookies)
-        {
-            var cookieOptions = new CookieOptions
-            {
-                HttpOnly = true,
-                Expires = DateTime.Now.AddMinutes(10),
-            };
-
-            responseCookies.Append("access_token", new JwtSecurityTokenHandler().WriteToken(accessToken), cookieOptions);
-            responseCookies.Append("refresh_token", refreshToken, cookieOptions);
-        }
-
+        /// <summary>
+        /// Metoda generujaca token sluzacy do odzyskania hasla dla podanego uzytkownika
+        /// </summary>
+        /// <param name="user">Uzytkownik</param>
+        /// <returns>JwtSecruityToken</returns>
         public JwtSecurityToken GeneratePasswordRecoveryToken(User user)
         {
             var userClaims = new List<Claim>
@@ -74,14 +93,21 @@ namespace Quanda.Server.Services.Implementations
 
             return new JwtSecurityToken(
                 claims: userClaims,
-                expires: DateTime.Now.AddMinutes(int.Parse(_jwtConfigurationSection["PasswordRecoveryTokenValidityInMinutes"])),
+                expires: DateTime.UtcNow.AddMinutes(_jwtConfigModel.PasswordRecoveryTokenValidityInMinutes),
                 signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
             );
         }
 
-        public int? DecryptPasswordRecoveryToken(string jwt, User user)
+        /// <summary>
+        /// Metoda wyciagajaca ClaimsPrinicpal z podanego JWT wydanego do odzyskania hasla
+        /// </summary>
+        /// <param name="jwt">JWT wydany do odzyskania hasla</param>
+        /// <param name="user">User dla którego wydany został token</param>
+        /// <returns>
+        /// Null lub ClaimsPrinipal danego tokena w zaleznosci od rezultatu metody 'ValidateAndGetPrincipalFromJwt'
+        /// </returns>
+        public ClaimsPrincipal GetPrincipalFromPasswordRecoveryToken(string jwt, User user)
         {
-
             var tokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuerSigningKey = true,
@@ -92,39 +118,62 @@ namespace Quanda.Server.Services.Implementations
                 ClockSkew = TimeSpan.Zero
             };
 
-            JwtSecurityToken jwtToken = null;
-            ClaimsPrincipal principal = null;
+            return ValidateAndGetPrincipalFromJwt(jwt, tokenValidationParameters);
+        }
 
+        /// <summary>
+        /// Metoda wyciagajaca ClaimsPrinicpal z podanego JWT wydanego jako accessToken
+        /// </summary>
+        /// <param name="jwt">JWT wydany jako accessToken</param>
+        /// <returns>
+        /// Null lub ClaimsPrinipal danego tokena w zaleznosci od rezultatu metody 'ValidateAndGetPrincipalFromJwt'
+        /// </returns>
+        public ClaimsPrincipal GetPrincipalFromExpiredToken(string jwt)
+        {
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateAudience = true,
+                ValidateIssuer = true,
+                ValidIssuer = _jwtConfigModel.Issuer,
+                ValidAudience = _jwtConfigModel.Audience,
+                ValidateLifetime = false,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(_jwtConfigModel.SecretKey))
+            };
+
+            return ValidateAndGetPrincipalFromJwt(jwt, tokenValidationParameters);
+        }
+
+        /// <summary>
+        /// Metoda pomocnicza walidująca oraz deszyfrujaca JWT wedlug podanych parametrow
+        /// </summary>
+        /// <param name="jwt">Token do walidacji oraz deszyfrowania</param>
+        /// <param name="tokenValidationParameters">Parametry wedlug ktorych ma byc walidowany token</param>
+        /// <returns>
+        /// ClaimsPrincipal - wyciagniete z podanego JWT, lub
+        /// Null - w przypadku gdy walidacja przebiegnie niepomyslnie
+        /// </returns>
+        private ClaimsPrincipal ValidateAndGetPrincipalFromJwt(string jwt, TokenValidationParameters tokenValidationParameters)
+        {
             try
             {
-                principal =
-                    new JwtSecurityTokenHandler().ValidateToken(jwt, tokenValidationParameters,
-                        out SecurityToken validatedToken);
+                ClaimsPrincipal principal = new JwtSecurityTokenHandler()
+                    .ValidateToken(jwt, tokenValidationParameters, out var securityToken);
 
-                jwtToken = (JwtSecurityToken)validatedToken;
+                var jwtSecurityToken = securityToken as JwtSecurityToken;
+                if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256,
+                    StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return null;
+                }
+
+                return principal;
             }
-            catch (Exception)
+            catch
             {
                 return null;
             }
-
-            if (jwtToken == null ||
-                !jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
-            {
-                return null;
-            }
-
-            var idUser = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(idUser))
-            {
-                return null;
-            }
-
-            var canParse = int.TryParse(idUser, out var parsedIdUser);
-            if (!canParse)
-                return null;
-
-            return parsedIdUser;
         }
     }
 }

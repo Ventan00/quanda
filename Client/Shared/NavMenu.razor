@@ -27,6 +27,13 @@
                 <span class="oi oi-list-rich" aria-hidden="true"></span> Questions
             </NavLink>
         </li>
+        <AuthorizeView>
+            <Authorized>
+                <li class="nav-item px-3">
+                    <LogoutComponent />
+                </li>
+            </Authorized>
+        </AuthorizeView>
     </ul>
 </div>
 

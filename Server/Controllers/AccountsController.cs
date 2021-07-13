@@ -1,19 +1,23 @@
 ﻿using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
+using System.Net.Http.Headers;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Quanda.Server.Extensions;
 using static Quanda.Server.Utils.UserStatus;
 using static Quanda.Server.Utils.TempUserResult;
 using Quanda.Server.Repositories.Interfaces;
 using Quanda.Server.Services.Interfaces;
-using Quanda.Server.Utils;
 using Quanda.Shared.DTOs.Requests;
 using Quanda.Shared.DTOs.Responses;
 using Quanda.Shared.Enums;
 
 namespace Quanda.Server.Controllers
 {
+    [AllowAnonymous]
     [ApiController]
     [Route("api/[controller]")]
     public class AccountsController : ControllerBase
@@ -102,9 +106,11 @@ namespace Quanda.Server.Controllers
             }
 
             var accessToken = _jwtService.GenerateAccessToken(user);
-            _jwtService.AddTokensToCookies(refreshToken, refreshTokenExpirationDate, accessToken, Response.Cookies);
 
+            response.RefreshToken = refreshToken;
+            response.AccessToken = _jwtService.WriteToken(accessToken);
             response.LoginStatus = LoginStatusEnum.LOGIN_ACCEPTED;
+
             return Ok(response);
         }
 
@@ -147,7 +153,7 @@ namespace Quanda.Server.Controllers
 
             var recoveryJwt = _jwtService.GeneratePasswordRecoveryToken(user);
             var base64UrlEncodedRecoveryJwt = Microsoft.IdentityModel.Tokens.Base64UrlEncoder
-                .Encode(new JwtSecurityTokenHandler().WriteToken(recoveryJwt));
+                .Encode(_jwtService.WriteToken(recoveryJwt));
 
             await _smtpService.SendPasswordRecoveryEmailAsync(recoverDto.Email, base64UrlEncodedRecoveryJwt, user.IdUser);
 
@@ -164,12 +170,66 @@ namespace Quanda.Server.Controllers
             var decodedRecoveryJwt = Microsoft.IdentityModel.Tokens.Base64UrlEncoder
                 .Decode(passwordResetDto.UrlEncodedRecoveryJwt);
 
-            var decryptedIdUser = _jwtService.DecryptPasswordRecoveryToken(decodedRecoveryJwt, providedUser);
-            if (decryptedIdUser == null || decryptedIdUser != providedUser.IdUser)
+            var principal = _jwtService.GetPrincipalFromPasswordRecoveryToken(decodedRecoveryJwt, providedUser);
+            if (principal is null)
+                return BadRequest();
+
+            var claimIdUser = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (claimIdUser is null || !int.TryParse(claimIdUser, out _))
+                return BadRequest();
+
+            if (providedUser.IdUser != int.Parse(claimIdUser))
                 return BadRequest();
 
             var isChanged = await _usersRepository.SetNewPasswordForUser(providedUser, passwordResetDto.RawPassword);
             if (!isChanged)
+                return StatusCode((int)HttpStatusCode.InternalServerError);
+
+            return NoContent();
+        }
+
+        [HttpPost("refresh")]
+        public async Task<IActionResult> Refresh([FromBody] RefreshRequestDTO refreshDto)
+        {
+            var principal = _jwtService.GetPrincipalFromExpiredToken(refreshDto.AccessToken);
+            if (principal is null)
+                return BadRequest();
+
+            var claimIdUser = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (claimIdUser is null || !int.TryParse(claimIdUser, out _))
+                return BadRequest();
+
+            var user = await _usersRepository.GetUserByRefreshTokenAsync(refreshDto.RefreshToken);
+            if (user is null || user.RefreshTokenExpirationDate <= DateTime.UtcNow || user.IdUser != int.Parse(claimIdUser))
+                return BadRequest();
+
+            var (refreshToken, expirationDate) = _jwtService.GenerateRefreshToken();
+            var updateStatus = await _usersRepository.UpdateRefreshTokenForUserAsync(user, refreshToken, expirationDate);
+            if (updateStatus != USER_REFRESH_TOKEN_UPDATED)
+                return StatusCode((int)HttpStatusCode.InternalServerError);
+
+            var accessToken = _jwtService.GenerateAccessToken(user);
+
+            return Ok(new RefreshResponseDTO
+            {
+                AccessToken = _jwtService.WriteToken(accessToken),
+                RefreshToken = refreshToken
+            });
+        }
+
+        [Authorize]
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout([FromBody] LogoutDTO logoutDto)
+        {
+            var user = await _usersRepository.GetUserByRefreshTokenAsync(logoutDto.RefreshToken);
+            if (user == null)
+                return NotFound();
+
+            if (user.IdUser != HttpContext.Request.GetUserId())
+                return NotFound();
+
+            var updateStatus = await _usersRepository.UpdateRefreshTokenForUserAsync(user, null, null);
+            if (updateStatus != USER_REFRESH_TOKEN_UPDATED)
                 return StatusCode((int)HttpStatusCode.InternalServerError);
 
             return NoContent();

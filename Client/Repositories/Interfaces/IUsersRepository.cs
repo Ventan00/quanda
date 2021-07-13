@@ -7,7 +7,7 @@ namespace Quanda.Client.Repositories.Interfaces
 {
     public interface IUsersRepository
     {
-        public Task<LoginStatusEnum> LoginAsync(LoginDTO loginDto);
+        public Task<LoginResponseDTO> LoginAsync(LoginDTO loginDto);
         public Task<RegisterStatusEnum> RegisterAsync(RegisterDTO registerDto);
         public Task RecoverConfirmationEmailAsync(RecoverDTO recoverDto);
         public Task RecoverPasswordAsync(RecoverDTO recoverDto);

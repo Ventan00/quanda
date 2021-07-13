@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -61,12 +62,10 @@ namespace Quanda.Server.Repositories.Implementations
 
         public async Task<User> GetUserByEmailAsync(string email)
         {
-            return await _context.Users.
-                Include(u => u.IdTempUserNavigation).
-                SingleOrDefaultAsync(u => u.Email == email);
+            return await GetUserWithDetailsByAsync(u => u.Email == email);
         }
 
-        public async Task<UserStatus> UpdateRefreshTokenForUserAsync(User user, string refreshToken, DateTime refreshTokenExpirationDate)
+        public async Task<UserStatus> UpdateRefreshTokenForUserAsync(User user, string refreshToken, DateTime? refreshTokenExpirationDate)
         {
             user.RefreshToken = refreshToken;
             user.RefreshTokenExpirationDate = refreshTokenExpirationDate;
@@ -76,15 +75,27 @@ namespace Quanda.Server.Repositories.Implementations
         
         public async Task<User> GetUserByIdAsync(int idUser)
         {
-            return await _context.Users.
-                Include(u => u.IdTempUserNavigation).
-                SingleOrDefaultAsync(u => u.IdUser == idUser);
+            return await GetUserWithDetailsByAsync(u => u.IdUser == idUser);
         }
         public async Task<bool> SetNewPasswordForUser(User user, string rawPassword)
         {
             user.HashedPassword = new PasswordHasher<User>().HashPassword(user, rawPassword);
             return await _context.SaveChangesAsync() > 0;
         }
-        
+
+        public async Task<User> GetUserByRefreshTokenAsync(string refreshToken)
+        {
+            return await GetUserWithDetailsByAsync(u => u.RefreshToken == refreshToken);
+        }
+
+        private async Task<User> GetUserWithDetailsByAsync(Expression<Func<User, bool>> predicate)
+        {
+            return await _context.Users.
+                Include(u => u.IdTempUserNavigation).
+                Include(u => u.UserRoles).
+                ThenInclude(ur => ur.IdRoleNavigation).
+                SingleOrDefaultAsync(predicate);
+        }
+
     }
 }

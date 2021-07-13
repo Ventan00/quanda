@@ -1,14 +1,19 @@
 using System;
+using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Quanda.Server.Data;
+using Quanda.Server.Extensions;
+using Quanda.Server.Models.Settings;
 using Quanda.Server.Repositories.Implementations;
 using Quanda.Server.Repositories.Interfaces;
 using Quanda.Server.Services.Implementations;
@@ -34,6 +39,46 @@ namespace Quanda.Server
                 options.UseMySql(Configuration.GetConnectionString("MySqlDbConnString"), new MySqlServerVersion(new Version(8, 0, 25)));
             });
 
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(jwtBearerOptions =>
+            {
+                var jwtSettings = Configuration.GetSection("JwtSettings");
+                jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidIssuer = jwtSettings["Issuer"],
+                    ValidateAudience = true,
+                    ValidAudience = jwtSettings["Audience"],
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]))
+                };
+
+                jwtBearerOptions.Events = new JwtBearerEvents
+                {
+                    //Zdarzenie wykonywane po poprawnej validacji tokenu.
+                    //Dodaje id u¿ytkownika do rz¹dania http
+                    OnTokenValidated = tokenValidatedContext =>
+                    {
+                        try
+                        {
+                            tokenValidatedContext.HttpContext.Request
+                                .SetUserId(tokenValidatedContext.Principal);
+                        }
+                        catch
+                        {
+                            tokenValidatedContext.Response.StatusCode = 401;
+                            tokenValidatedContext.Response.CompleteAsync();
+                        }
+
+                        return Task.CompletedTask;
+                    }
+                };
+            });
+
             services.AddControllersWithViews();
             services.AddRazorPages();
 
@@ -49,6 +94,10 @@ namespace Quanda.Server
             services.AddScoped<IJwtService, JwtService>();
             services.AddScoped<ISmtpService, SmtpService>();
             services.AddHttpContextAccessor();
+
+            //ConfigurationModels
+            services.Configure<JwtConfigModel>(Configuration.GetSection("JwtSettings"));
+            services.Configure<SmtpConfigModel>(Configuration.GetSection("SmtpSettings"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -71,6 +120,9 @@ namespace Quanda.Server
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

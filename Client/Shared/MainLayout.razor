@@ -1,4 +1,8 @@
-﻿@inherits LayoutComponentBase
+﻿@using Blazored.Toast.Configuration
+@using Quanda.Client.Authentication
+@inherits LayoutComponentBase
+@inject HttpClientInterceptorService _interceptorService
+@implements IDisposable
 
 <div class="page">
     <div class="sidebar">
@@ -15,3 +19,23 @@
         </div>
     </div>
 </div>
+
+
+<BlazoredToasts Position="ToastPosition.BottomRight" Timeout="3" IconType="IconType.FontAwesome"
+                SuccessClass="success-toast-override"
+                ShowProgressBar=true
+                SuccessIcon="fa fa-thumbs-up"
+                ErrorIcon="fa fa-bug" />
+
+@code
+{
+    protected override void OnInitialized()
+    {
+        _interceptorService.RegisterEvents();
+    }
+
+    public void Dispose()
+    {
+        _interceptorService.DisposeEvents();
+    }
+}
