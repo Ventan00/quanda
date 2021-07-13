@@ -8,6 +8,7 @@ using Quanda.Server.Data;
 using Quanda.Server.Repositories.Interfaces;
 using Quanda.Server.Utils;
 using Quanda.Shared.DTOs.Requests;
+using Quanda.Shared.DTOs.Responses;
 using Quanda.Shared.Enums;
 using Quanda.Shared.Models;
 
@@ -16,102 +17,193 @@ namespace Quanda.Server.Repositories.Implementations
     public class QuestionRepository: IQuestionRepository
     {
         private readonly AppDbContext _context;
+        private readonly int _takeAmount = 10;
         public QuestionRepository(AppDbContext context)
         {
             _context = context;
         }
 
-        public async Task<List<Question>> GetQuestions(GetQuestionsDTO getQuestionsDto)
+        public async Task<List<GetQuestionsDTO>> GetQuestions(int skip, SortOptionEnum sortOption, List<int>? categories)
         {
-            if (getQuestionsDto.Categories.Count() == 0)
+            if (categories.Count==0)
             {
-                switch (getQuestionsDto.SortingOption)
+                return sortOption switch
                 {
-                    case SORT_OPTION_ENUM.Date:
-                        return await _context.Questions
-                            .OrderBy(question => question.PublishDate)
-                            .Skip(getQuestionsDto.Skip)
-                            .Take(10)
-                            .ToListAsync();
-                    case SORT_OPTION_ENUM.Tags:
-                        return null;
-                    case SORT_OPTION_ENUM.Views:
-                        return await _context.Questions
-                            .OrderBy(question => question.Views)
-                            .Skip(getQuestionsDto.Skip)
-                            .Take(10)
-                            .ToListAsync();
-                    case SORT_OPTION_ENUM.Answers:
-                        return await _context.Questions
-                            .Include(question => question.Answers)
-                            .OrderBy(question => question.Views)
-                            .Skip(getQuestionsDto.Skip)
-                            .Take(10)
-                            .ToListAsync();
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
+                    SortOptionEnum.Views => await _context.Questions
+                        .Include(question => question.IdUserNavigation)
+                        .OrderBy(question => question.Views)
+                        .Skip(skip)
+                        .Take(_takeAmount)
+                        .Select(question => new GetQuestionsDTO()
+                        {
+                            IdQuestion = question.IdQuestion,
+                            AnswersCount = _context.Answers
+                                .Where(answer => answer.IdQuestion == question.IdQuestion)
+                                .Count(),
+                            Avatar = question.IdUserNavigation.Avatar,
+                            Categories = _context.QuestionCategories
+                                .Where(qc => qc.IdQuestion==question.IdQuestion)
+                                .Select(qc => qc.IdCategoryNavigation.Name).ToList(),
+                            Description = question.Description,
+                            Header = question.Header,
+                            IdUser = question.IdUser,
+                            IsFinished = question.IsFinished,
+                            IsModified = question.IsModified,
+                            Nickname = question.IdUserNavigation.Nickname,
+                            Views = question.Views,
+                            PublishDate = question.PublishDate
+                        })
+                        .ToListAsync(),
+                    SortOptionEnum.Answers => await _context.Questions
+                        .Include(question => question.IdUserNavigation)
+                        .OrderBy(question => question.Answers.Count)
+                        .Skip(skip)
+                        .Take(_takeAmount)
+                        .Select(question => new GetQuestionsDTO()
+                        {
+                            IdQuestion = question.IdQuestion,
+                            AnswersCount = _context.Answers
+                                .Where(answer => answer.IdQuestion == question.IdQuestion)
+                                .Count(),
+                            Avatar = question.IdUserNavigation.Avatar,
+                            Categories = _context.QuestionCategories
+                                .Where(qc => qc.IdQuestion == question.IdQuestion)
+                                .Select(qc => qc.IdCategoryNavigation.Name).ToList(),
+                            Description = question.Description,
+                            Header = question.Header,
+                            IdUser = question.IdUser,
+                            IsFinished = question.IsFinished,
+                            IsModified = question.IsModified,
+                            Nickname = question.IdUserNavigation.Nickname,
+                            Views = question.Views,
+                            PublishDate = question.PublishDate
+                        })
+                        .ToListAsync(),
+                    SortOptionEnum.Date => await _context.Questions
+                        .Include(question => question.IdUserNavigation)
+                        .OrderBy(question => question.PublishDate)
+                        .Skip(skip)
+                        .Take(_takeAmount)
+                        .Select(question => new GetQuestionsDTO()
+                        {
+                            IdQuestion = question.IdQuestion,
+                            AnswersCount = _context.Answers
+                                .Where(answer => answer.IdQuestion == question.IdQuestion)
+                                .Count(),
+                            Avatar = question.IdUserNavigation.Avatar,
+                            Categories = _context.QuestionCategories
+                                .Where(qc => qc.IdQuestion == question.IdQuestion)
+                                .Select(qc => qc.IdCategoryNavigation.Name).ToList(),
+                            Description = question.Description,
+                            Header = question.Header,
+                            IdUser = question.IdUser,
+                            IsFinished = question.IsFinished,
+                            IsModified = question.IsModified,
+                            Nickname = question.IdUserNavigation.Nickname,
+                            Views = question.Views,
+                            PublishDate = question.PublishDate
+                        })
+                        .ToListAsync(),
+                    _ => null
+                };
             }
-            else
+            return sortOption switch
             {
-                switch (getQuestionsDto.SortingOption)
-                {
-                    case SORT_OPTION_ENUM.Date:
-                        return await _context.Questions
-                            .Include(question => question.QuestionCategories)
-                            .Where(
-                                question => _context.QuestionCategories
-                                    .Include(qc => qc.IdCategoryNavigation)
-                                    .Where(qc => qc.IdQuestion==question.IdQuestion)
-                                    .Any(qc => getQuestionsDto.Categories.Any(cat => qc.IdCategoryNavigation==cat))
-                                                )
-                            .OrderBy(question => question.PublishDate)
-                            .Skip(getQuestionsDto.Skip)
-                            .Take(10)
-                            .ToListAsync();
-                    case SORT_OPTION_ENUM.Tags:
-                        return await _context.Questions
-                            .Include(question => question.QuestionCategories)
-                            .Where(
-                                question => _context.QuestionCategories
-                                    .Include(qc => qc.IdCategoryNavigation)
-                                    .Where(qc => qc.IdQuestion == question.IdQuestion)
-                                    .Any(qc => getQuestionsDto.Categories.Any(cat => qc.IdCategoryNavigation == cat))
-                                                )
-                            .Skip(getQuestionsDto.Skip)
-                            .Take(10)
-                            .ToListAsync();
-                    case SORT_OPTION_ENUM.Views:
-                        return await _context.Questions
-                            .Include(question => question.QuestionCategories)
-                            .Where(
-                                question => _context.QuestionCategories
-                                    .Include(qc => qc.IdCategoryNavigation)
-                                    .Where(qc => qc.IdQuestion == question.IdQuestion)
-                                    .Any(qc => getQuestionsDto.Categories.Any(cat => qc.IdCategoryNavigation == cat))
-                            )
-                            .OrderBy(question => question.Views)
-                            .Skip(getQuestionsDto.Skip)
-                            .Take(10)
-                            .ToListAsync();
-                    case SORT_OPTION_ENUM.Answers:
-                        return await _context.Questions
-                            .Include(question => question.QuestionCategories)
-                            .Include(question => question.Answers)
-                            .Where(
-                                question => _context.QuestionCategories
-                                    .Include(qc => qc.IdCategoryNavigation)
-                                    .Where(qc => qc.IdQuestion == question.IdQuestion)
-                                    .Any(qc => getQuestionsDto.Categories.Any(cat => qc.IdCategoryNavigation == cat))
-                            )
-                            .OrderBy(question => question.Answers.Count)
-                            .Skip(getQuestionsDto.Skip)
-                            .Take(10)
-                            .ToListAsync();
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
+                SortOptionEnum.Views => await _context.Questions
+                    .Include(question => question.QuestionCategories)
+                    .Include(question => question.IdUserNavigation)
+                    .Where(
+                        question => _context.QuestionCategories
+                            .Where(qc => qc.IdQuestion == question.IdQuestion)
+                            .Any(qc => categories.Any(cat => cat == qc.IdCategory))
+                    )
+                    .OrderBy(question => question.Views)
+                    .Skip(skip)
+                    .Take(_takeAmount)
+                    .Select(question => new GetQuestionsDTO()
+                    {
+                        IdQuestion = question.IdQuestion,
+                        AnswersCount = _context.Answers
+                            .Where(answer => answer.IdQuestion == question.IdQuestion)
+                            .Count(),
+                        Avatar = question.IdUserNavigation.Avatar,
+                        Categories = _context.QuestionCategories
+                            .Where(qc => qc.IdQuestion == question.IdQuestion)
+                            .Select(qc => qc.IdCategoryNavigation.Name).ToList(),
+                        Description = question.Description,
+                        Header = question.Header,
+                        IdUser = question.IdUser,
+                        IsFinished = question.IsFinished,
+                        IsModified = question.IsModified,
+                        Nickname = question.IdUserNavigation.Nickname,
+                        Views = question.Views,
+                        PublishDate = question.PublishDate
+                    })
+                    .ToListAsync(),
+                SortOptionEnum.Answers => await _context.Questions
+                    .Include(question => question.QuestionCategories)
+                    .Include(question => question.IdUserNavigation)
+                    .Where(
+                        question => _context.QuestionCategories
+                            .Where(qc => qc.IdQuestion == question.IdQuestion)
+                            .Any(qc => categories.Any(cat => cat == qc.IdCategory))
+                    )
+                    .OrderBy(question => question.Answers.Count)
+                    .Skip(skip)
+                    .Take(_takeAmount)
+                    .Select(question => new GetQuestionsDTO()
+                    {
+                        IdQuestion = question.IdQuestion,
+                        AnswersCount = _context.Answers
+                            .Where(answer => answer.IdQuestion == question.IdQuestion)
+                            .Count(),
+                        Avatar = question.IdUserNavigation.Avatar,
+                        Categories = _context.QuestionCategories
+                            .Where(qc => qc.IdQuestion == question.IdQuestion)
+                            .Select(qc => qc.IdCategoryNavigation.Name).ToList(),
+                        Description = question.Description,
+                        Header = question.Header,
+                        IdUser = question.IdUser,
+                        IsFinished = question.IsFinished,
+                        IsModified = question.IsModified,
+                        Nickname = question.IdUserNavigation.Nickname,
+                        Views = question.Views,
+                        PublishDate = question.PublishDate
+                    })
+                    .ToListAsync(),
+                SortOptionEnum.Date => await _context.Questions
+                    .Include(question => question.QuestionCategories)
+                    .Include(question => question.IdUserNavigation)
+                    .Where(
+                        question => _context.QuestionCategories
+                            .Where(qc => qc.IdQuestion == question.IdQuestion)
+                            .Any(qc => categories.Any(cat => cat == qc.IdCategory))
+                    )
+                    .OrderBy(question => question.PublishDate)
+                    .Skip(skip)
+                    .Take(_takeAmount)
+                    .Select(question => new GetQuestionsDTO()
+                    {
+                        IdQuestion = question.IdQuestion,
+                        AnswersCount = _context.Answers
+                            .Where(answer => answer.IdQuestion == question.IdQuestion)
+                            .Count(),
+                        Avatar = question.IdUserNavigation.Avatar,
+                        Categories = _context.QuestionCategories
+                            .Where(qc => qc.IdQuestion == question.IdQuestion)
+                            .Select(qc => qc.IdCategoryNavigation.Name).ToList(),
+                        Description = question.Description,
+                        Header = question.Header,
+                        IdUser = question.IdUser,
+                        IsFinished = question.IsFinished,
+                        IsModified = question.IsModified,
+                        Nickname = question.IdUserNavigation.Nickname,
+                        Views = question.Views,
+                        PublishDate = question.PublishDate
+                    })
+                    .ToListAsync(),
+                _ => null
+            };
         }
 
         public async Task<Question> GetQuestion(int questionId)
@@ -123,7 +215,7 @@ namespace Quanda.Server.Repositories.Implementations
             return Question;
         }
 
-        public async Task<QuestionResult> AddQuestion(AddQuestionDTO question)
+        public async Task<QuestionStatusResult> AddQuestion(AddQuestionDTO question)
         {
             var Question = new Question()
             {
@@ -137,43 +229,54 @@ namespace Quanda.Server.Repositories.Implementations
                 IdUser = question.IdUser
             };
             await _context.AddAsync(Question);
-            return await _context.SaveChangesAsync() == 1? QuestionResult.QUESTION_ADDED : QuestionResult.QUESTION_DATABASE_ERROR;
+            return await _context.SaveChangesAsync() == 1? QuestionStatusResult.QUESTION_ADDED : QuestionStatusResult.QUESTION_DATABASE_ERROR;
         }
 
-        public async Task<QuestionResult> UpdateQuestion(int questionId, UpdateQuestionDTO question)
+        public async Task<QuestionStatusResult> UpdateQuestion(int questionId, UpdateQuestionDTO question)
         {
             var Question = await _context.Questions.Where(question => question.IdQuestion == questionId).SingleAsync();
-            if (Question == null) return QuestionResult.QUESTION_NOT_FOUND;
+            if (Question == null) return QuestionStatusResult.QUESTION_NOT_FOUND;
             Question.Description = question.Description;
             Question.IsModified = true;
-            return await _context.SaveChangesAsync() == 1 ? QuestionResult.QUESTION_UPDATED: QuestionResult.QUESTION_DATABASE_ERROR;
+            return await _context.SaveChangesAsync() == 1 ? QuestionStatusResult.QUESTION_UPDATED: QuestionStatusResult.QUESTION_DATABASE_ERROR;
         }
 
-        public async Task<QuestionResult> RemoveQuestion(int questionId)
+        public async Task<QuestionStatusResult> RemoveQuestion(int questionId)
         {
             var Question = await _context.Questions.Where(question => question.IdQuestion == questionId).SingleAsync();
-            if(Question == null) return QuestionResult.QUESTION_NOT_FOUND;
+            if(Question == null) return QuestionStatusResult.QUESTION_NOT_FOUND;
             _context.Remove(Question);
             
-            return await _context.SaveChangesAsync() ==1 ? QuestionResult.QUESTION_DELETED: QuestionResult.QUESTION_DATABASE_ERROR;
+            return await _context.SaveChangesAsync() ==1 ? QuestionStatusResult.QUESTION_DELETED: QuestionStatusResult.QUESTION_DATABASE_ERROR;
         }
 
-        public async Task<QuestionResult> SetToCheck(int questionId, bool value)
+        public async Task<QuestionStatusResult> SetToCheck(int questionId, bool value)
         {
             var Question = await _context.Questions.Where(question => question.IdQuestion == questionId).SingleAsync();
-            if (Question == null) return QuestionResult.QUESTION_NOT_FOUND;
+            if (Question == null) return QuestionStatusResult.QUESTION_NOT_FOUND;
             Question.ToCheck = value;
             ;
-            return await _context.SaveChangesAsync() ==1 ? QuestionResult.QUESTION_CHANGED_TOCHECK_STATUS : QuestionResult.QUESTION_DATABASE_ERROR;
+            return await _context.SaveChangesAsync() ==1 ? QuestionStatusResult.QUESTION_CHANGED_TOCHECK_STATUS : QuestionStatusResult.QUESTION_DATABASE_ERROR;
 
         }
 
-        public async Task<QuestionResult> SetFinished(int questionId)
+        public async Task<QuestionStatusResult> SetFinished(int questionId)
         {
             var Question = await _context.Questions.Where(question => question.IdQuestion == questionId).SingleAsync();
-            if (Question == null) return QuestionResult.QUESTION_NOT_FOUND;
+            if (Question == null) return QuestionStatusResult.QUESTION_NOT_FOUND;
             Question.IsFinished = true;
-            return await _context.SaveChangesAsync() == 1 ? QuestionResult.QUESTION_SET_TO_FINISHED : QuestionResult.QUESTION_DATABASE_ERROR;
+            return await _context.SaveChangesAsync() == 1 ? QuestionStatusResult.QUESTION_SET_TO_FINISHED : QuestionStatusResult.QUESTION_DATABASE_ERROR;
+        }
+
+        public async Task<int> GetAmountOfQuestions(List<int> category)
+        {
+            if (category.Count==0)
+                return await _context.Questions.CountAsync();
+           return await _context.QuestionCategories
+                .Where(qc => category.Any(cat => qc.IdCategory == cat))
+                .GroupBy(qc => qc.IdQuestion)
+                .Select(qcg => qcg.Key)
+                .CountAsync();
         }
     }
 }
