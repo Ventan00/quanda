@@ -52,10 +52,5 @@ namespace Quanda.Client.Repositories.Implementations
             return response.Success;
         }
         
-        public async Task<GetUserForQuestionByIDDTO> GetDataForQuestionAsync(int questionIdUser)
-        {
-            var response = await _httpService.Get<GetUserForQuestionByIDDTO>($"{ApiUrl}/data/for-question/{questionIdUser}");
-            return response.Response;
-        }
     }
 }

@@ -80,23 +80,11 @@ namespace Quanda.Server.Repositories.Implementations
                 Include(u => u.IdTempUserNavigation).
                 SingleOrDefaultAsync(u => u.IdUser == idUser);
         }
-
         public async Task<bool> SetNewPasswordForUser(User user, string rawPassword)
         {
             user.HashedPassword = new PasswordHasher<User>().HashPassword(user, rawPassword);
             return await _context.SaveChangesAsync() > 0;
         }
         
-        public async Task<GetUserForQuestionByIDDTO> GetUserForQuestionByID(int idUser)
-        {
-            return await _context.Users
-                .Where(user => user.IdUser == idUser)
-                .Select(user => new GetUserForQuestionByIDDTO()
-                {
-                    Avatar = user.Avatar,
-                    Nick = user.Nickname
-                })
-                .SingleAsync();
-        }
     }
 }
