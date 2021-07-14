@@ -4,6 +4,7 @@ namespace Quanda.Server.Services.Interfaces
 {
     public interface ISmtpService
     {
-        public Task SendRegisterConfirmationEmailAsync(string registerDtoEmail, string confirmationCode);
+        public Task SendRegisterConfirmationEmailAsync(string email, string confirmationCode);
+        public Task SendPasswordRecoveryEmailAsync(string email, string recoveryJwt, int idUser);
     }
 }

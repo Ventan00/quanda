@@ -42,11 +42,13 @@ namespace Quanda.Server
             services.AddScoped<IAnswerRepository, AnswerRepository>();
             services.AddScoped<IUsersRepository, UsersRepository>();
             services.AddScoped<ITempUsersRepository, TempUsersRepository>();
+            services.AddScoped<ICategoryRepository, CategoryRepository>();
 
             //custom services
             services.AddScoped<IUserAuthService, UserAuthService>();
             services.AddScoped<IJwtService, JwtService>();
             services.AddScoped<ISmtpService, SmtpService>();
+            services.AddHttpContextAccessor();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

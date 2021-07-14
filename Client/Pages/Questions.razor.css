@@ -108,6 +108,10 @@
     border: #b9bbca dotted 1px;
 }
 
+.questions-pagination {
+    max-width: 100%
+}
+
 ::-webkit-scrollbar {
     width: 7px;
     height: 7px;
