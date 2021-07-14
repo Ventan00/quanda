@@ -19,67 +19,43 @@ namespace Quanda.Server.Repositories.Implementations
             _context = context;
         }
 
-        public async Task<List<AnswerBoxResponseDto>> GetAnswersAsync(int idQuestion)
+        public async Task<List<AnswerResponseDTO>> GetAnswersAsync(int idQuestion, int idUserLogged)
         {
-            List<AnswerBoxResponseDto> answersBox = new();
-            var answers = await _context.Answers.Where(a => a.IdQuestion == idQuestion).Select(a => new AnswerResponseDTO 
+            var answers = await _context.Answers.Where(a => a.IdQuestion == idQuestion).Select(a => new AnswerResponseDTO
             {
                 IdAnswer = a.IdAnswer,
                 Text = a.Text,
+                Rating = a.RatingAnswers.Select(ra => new { ValueAns = ra.Value == false ? -1 : 1 }).Sum(r => r.ValueAns),
                 IsModified = a.IsModified,
-                IdUser = a.IdUser,
-                IdRootAnswer = a.IdRootAnswer
+                UserResponseDTO =  new UserResponseDTO { 
+                    IdUser = a.IdUserNavigation.IdUser,
+                    Nickname = a.IdUserNavigation.Nickname,
+                    Avatar = a.IdUserNavigation.Avatar
+                },
+                IdRootAnswer = a.IdRootAnswer,
+                ChildAnswers = new List<AnswerResponseDTO>(),
+                Mark = 0
             }).ToListAsync();
-            var mainAnswers = answers.Where(a => a.IdRootAnswer == null).ToList();
-            foreach (var ans in mainAnswers)
+            foreach (var ans in answers)
             {
-                List<AnswerResponseDTO> leavesAnswer = new();
-                var nextAnswer = answers.Where(a => a.IdRootAnswer == ans.IdAnswer).Select(a => new AnswerResponseDTO
-                {
-                    IdAnswer = a.IdAnswer,
-                    Text = a.Text,
-                    Rating = a.Rating,
-                    IsModified = a.IsModified,
-                    IdUser = a.IdUser,
-                    IdRootAnswer = a.IdRootAnswer
-                }).SingleOrDefault();
-                if(nextAnswer != null)
-                {
-                    while(nextAnswer != null)
-                    {
-                        leavesAnswer.Add(nextAnswer);
-                        nextAnswer = answers.Where(a => a.IdRootAnswer == nextAnswer.IdAnswer).Select(a => new AnswerResponseDTO
-                        {
-                            IdAnswer = a.IdAnswer,
-                            Text = a.Text,
-                            Rating = a.Rating,
-                            IsModified = a.IsModified,
-                            IdUser = a.IdUser,
-                            IdRootAnswer = a.IdRootAnswer
-                        }).SingleOrDefault();
-                    }
-                    
-                }
-                answersBox.Add(new AnswerBoxResponseDto
-                {
-                    MainAnswer = ans,
-                    ChildAnswers = leavesAnswer.OrderBy(a => a.IdAnswer).ToList()
-                });
+                var ratingAnswer = await _context.RatingAnswers.SingleOrDefaultAsync(ra => ra.IdUser == idUserLogged && ra.IdAnswer == ans.IdAnswer);
+                if (ratingAnswer != null)
+                    ans.Mark = (ratingAnswer.Value == true ? 1 : -1);
+                ans.ChildAnswers = answers.Where(a => a.IdRootAnswer == ans.IdAnswer).ToList();
             }
-                
 
-            return answersBox;
+            return answers.Where(a => a.IdRootAnswer == null).ToList();
         }
-
-        public async Task<AnswerResult> AddAnswerAsync(AddAnswerDTO answerDTO)
+        
+        public async Task<AnswerResult> AddAnswerAsync(AddAnswerDTO answerDTO, int idUserLogged)
         {
             var existsQuestion = await _context.Questions.AnyAsync(q => q.IdQuestion == answerDTO.IdQuestion);
             if (!existsQuestion)
                 return AnswerResult.QUESTION_DELETED;
-            var existsUser = await _context.Users.AnyAsync(u => u.IdUser == answerDTO.IdUser);
+            var existsUser = await _context.Users.AnyAsync(u => u.IdUser == idUserLogged);
             if (!existsUser)
                 return AnswerResult.USER_DELETED;
-            if(answerDTO.IdRootAnswer != null)
+            if (answerDTO.IdRootAnswer != null)
             {
                 bool existsRootAnswer = await _context.Answers.AnyAsync(a => a.IdAnswer == answerDTO.IdRootAnswer);
                 if (!existsRootAnswer)
@@ -90,7 +66,7 @@ namespace Quanda.Server.Repositories.Implementations
             {
                 Text = answerDTO.Text,
                 IdQuestion = answerDTO.IdQuestion,
-                IdUser = answerDTO.IdUser,
+                IdUser = idUserLogged,
                 IdRootAnswer = answerDTO.IdRootAnswer
             }
             );
@@ -99,7 +75,7 @@ namespace Quanda.Server.Repositories.Implementations
 
             return AnswerResult.SUCCESS;
         }
-
+        
         public async Task<AnswerResult> UpdateAnswerAsync(int idAnswer, UpdateAnswerDTO answerDTO)
         {
             var answer = await _context.Answers.SingleOrDefaultAsync(a => a.IdAnswer == idAnswer);
@@ -111,16 +87,61 @@ namespace Quanda.Server.Repositories.Implementations
                 return AnswerResult.UPDATE_DB_ERROR;
             return AnswerResult.SUCCESS;
         }
-
-        public async Task<AnswerResult> DeleteAnswerAsync(int idAnswer)
+        
+        public async Task<AnswerResult> DeleteAnswerAsync(int idAnswer, int idUserLogged)
         {
             var answer = await _context.Answers.SingleOrDefaultAsync(a => a.IdAnswer == idAnswer);
             if (answer == null)
                 return AnswerResult.ANSWER_DELETED;
             _context.Answers.Remove(answer);
+            if (answer.IdUser != idUserLogged)
+                return AnswerResult.NOT_OWNER_OF_ANSWER;
             if (!(await _context.SaveChangesAsync() > 0))
                 return AnswerResult.DELETE_DB_ERROR;
 
+            return AnswerResult.SUCCESS;
+        }
+
+        
+        public async Task<AnswerResult> UpdateRatingAnswerAsync(int idAnswer, int idUserLogged, UpdateRatingAnswerDTO updateRatingAnswer)
+        {
+            var answerRated = await _context.RatingAnswers.SingleOrDefaultAsync(ra => ra.IdAnswer == idAnswer && ra.IdUser == idUserLogged);
+            if(answerRated == null)
+            {
+                var existsAnswer = await _context.Answers.AnyAsync(a => a.IdAnswer == idAnswer);
+                if (!existsAnswer)
+                    return AnswerResult.ANSWER_DELETED;
+                var existsUser = await _context.Users.AnyAsync(u => u.IdUser == idUserLogged);
+                if (!existsUser)
+                    return AnswerResult.USER_DELETED;
+                var ownerAnswer = await _context.Answers.AnyAsync(a => a.IdAnswer == idAnswer && a.IdUser == idUserLogged);
+                if (ownerAnswer)
+                {
+                    return AnswerResult.OWNER_OF_ANSWER;
+                }
+
+                await _context.AddAsync(new RatingAnswer
+                {
+                    IdAnswer = idAnswer,
+                    IdUser = idUserLogged,
+                    Value = updateRatingAnswer.Rating == 1
+                });
+                if (!(await _context.SaveChangesAsync() > 0))
+                    return AnswerResult.ADD_DB_ERROR;
+            }
+            else
+            {
+                var ownerAnswer = await _context.Answers.AnyAsync(a => a.IdAnswer == idAnswer && a.IdUser == idUserLogged);
+                if (!ownerAnswer)
+                {
+                        _context.RatingAnswers.Remove(answerRated);
+                        if (!(await _context.SaveChangesAsync() > 0))
+                            return AnswerResult.DELETE_DB_ERROR;
+                }
+                else
+                    return AnswerResult.OWNER_OF_ANSWER;
+
+            }
             return AnswerResult.SUCCESS;
         }
     }

@@ -1,0 +1,34 @@
+﻿<div class="column">
+    <div>
+        <input class="answer-text column" @bind-value="@Text" type="text" id="text" size="50">
+    </div>
+    <div class="row">
+        <div>
+            <button @onclick="@(()=> Publish.InvokeAsync(Text))">Publish</button>
+        </div>
+        <div>
+            <button @onclick="@(()=> Discard.InvokeAsync())">Discard</button>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    /// <summary>
+    /// Property zawierająca tekst odpowiedzi. W zależności od wykorzystania komponentu może być już zainicjowany pewnną wartością.
+    /// </summary>
+    [Parameter]
+    public string Text { get; set; }
+    /// <summary>
+    /// Zatwierdzenie aktualnie wprowadzonego tekstu.
+    /// </summary>
+    [Parameter]
+    public EventCallback<string> Publish { get; set; }
+    /// <summary>
+    /// Odrzucanie aktualnie wprowadzonego tekstu.
+    /// </summary>
+    [Parameter]
+    public EventCallback Discard { get; set; }
+
+
+}

@@ -8,9 +8,6 @@ namespace Quanda.Shared.DTOs.Requests
 
         [Required(ErrorMessage = "IdQuestion is required")]
         public int IdQuestion { get; set; }
-
-        [Required(ErrorMessage = "IdUser is required")]
-        public int IdUser { get; set; }
         public int? IdRootAnswer { get; set; }
     }
 }
