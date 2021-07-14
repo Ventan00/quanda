@@ -1,4 +1,6 @@
-﻿namespace Quanda.Shared.DTOs.Responses
+﻿using System.Collections.Generic;
+
+namespace Quanda.Shared.DTOs.Responses
 {
     public class AnswerResponseDTO
     {
@@ -6,7 +8,9 @@
         public string Text { get; set; }
         public int Rating { get; set; }
         public bool IsModified { get; set; }
-        public int IdUser { get; set; }
         public int? IdRootAnswer { get; set; }
+        public int Mark { get; set; }
+        public UserResponseDTO UserResponseDTO { get; set; }
+        public List<AnswerResponseDTO> ChildAnswers { get; set; }
     }
 }

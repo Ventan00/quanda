@@ -1,0 +1,215 @@
+﻿@inject IAnswerRepository answerRepository
+@inject IJSRuntime js
+<div class="row">
+    <div class="column" style="width:5%">
+        <div >
+            <div class="answer-rating"> 
+                <div>
+                    @if (Answer.Mark == 1)
+                    {
+                        <button class="triangle-up" style="color:orange" disabled="disabled" />
+                    }
+                    else
+                    {
+                        <button class="triangle-up" @onclick="@(async() => await IncreaseRating())" disabled="@DisableButton" />
+                    }
+                </div>
+                <div>
+                    @Answer.Rating
+                </div>
+                <div>
+                    @if (Answer.Mark == -1)
+                    {
+                        <button class="triangle-down" style="color:orange" disabled="disabled" />
+                    }
+                    else
+                    {
+                        <button class="triangle-down" @onclick="@(async() => await DecreaseRating())" disabled="@DisableButton" />
+                    }
+                </div>
+            </div>
+            <div style="flex-direction:row">
+                <div>
+                    @Answer.UserResponseDTO.Nickname
+                </div>
+                @if (Answer.IsModified)
+            {
+                <div>
+                    Modifed
+                </div>
+            }
+                
+            </div>
+        </div>
+    </div>
+
+
+    @if (EditMode)  
+    {
+        <AnswerTextComponent Text="@Answer.Text" Publish="UpdateAnswer" Discard="SetEditMode"></AnswerTextComponent>
+    }
+    else
+    {
+        <div class="answer-text">
+            @if (Answer.IdAnswer == ActiveResponse)
+            {
+                <div style="background-color:lightgoldenrodyellow; color: black">
+                    @Answer.Text
+                </div>
+            }
+            else
+            {
+                <div >
+                    @Answer.Text
+                </div>
+            }
+        </div>
+
+
+        <div class="edit-option-text">
+            @if (OwnerOfAnswer)
+            {
+                <div>
+                    <button @onclick="@SetEditMode">E</button>
+                </div>
+                <div>
+                    <button @onclick="@(async () =>await DeleteAnswer())">X</button>
+                </div>
+
+            }
+            <div>
+                <button @onclick="@(() => OnSetReplyAnswer.InvokeAsync(Answer.IdAnswer))">R</button>
+            </div>
+        </div>
+    }
+
+</div>
+
+@code {
+    [Parameter]
+    public AnswerResponseDTO Answer { get; set; }
+    /// <summary>
+    /// EventCallback odpowiedzialny za aktualizacje listy odpowiedzi.
+    /// </summary>
+    [Parameter]
+    public EventCallback ReloadAnswers { get; set; }
+    /// <summary>
+    /// EventCallback odpowiedzialny za ustawienie odpowiedzi, na którą użytkownik chce odpowiedzieć.
+    /// </summary>
+    [Parameter]
+    public EventCallback<int> OnSetReplyAnswer { get; set; }
+    /// <summary>
+    /// Id odpowiedzi, do którego odnosić się będzie nowa odpowiedź.
+    /// </summary>
+    [Parameter]
+    public int ActiveResponse { get; set; }
+    /// <summary>
+    /// Id użytkownika aktywnie przeglądającego pytania użytkownika.
+    /// </summary>
+    [Parameter]
+    public int ActiveUser { get; set; }
+    /// <summary>
+    /// Property informująca czy właścicielem odpowiedzi jest aktualnie przeglądajacy użytkownik. 
+    /// </summary>
+    public bool OwnerOfAnswer { get; set; }
+    /// <summary>
+    /// Property odpowiedzialny za zmianę trybu z wyświetlania treści odpowiedzi na jego edycję.
+    /// </summary>
+    public bool EditMode { get; set; }
+    /// <summary>
+    /// Property używany do zablokowania przycisków odpowiadających za zmianę oceny odpowiedzi w trakcie przetwarzania zapytania.
+    /// </summary>
+    public bool DisableButton { get; set; }
+
+
+    /// <summary>
+    /// Pobiera Id aktywnie przeglądającego pytanie z odpowiedziami. Ustawia zmienną na wartość 'true' w celu zablokowania funkcjonalności edycji i usuwania odpowiedzi.
+    /// </summary>
+    protected override void OnInitialized()
+    {
+        if (ActiveUser == Answer.UserResponseDTO.IdUser)
+            OwnerOfAnswer = true;
+    }
+    /// <summary>
+    /// Metoda aktulizająca ocenę odpowiedzi o 1 w górę.
+    /// </summary>
+    /// <returns></returns>
+    private async Task IncreaseRating()
+    {
+        DisableButton = true;
+        var result = await answerRepository.UpdateRatingAnswerAsync(Answer.IdAnswer, Answer.Mark + 1);
+        if (result.Item1)
+        {
+            Answer.Mark += 1;
+            Answer.Rating += 1;
+        }
+        else
+        {
+            await js.InvokeVoidAsync("alert", result.Item2);
+        }
+        DisableButton = false;
+    }
+    /// <summary>
+    /// Metoda aktulizająca ocenę odpowiedzi o 1 w dół.
+    /// </summary>
+    /// <returns></returns>
+    private async Task DecreaseRating()
+    {
+        DisableButton = true;
+        var result = await answerRepository.UpdateRatingAnswerAsync(Answer.IdAnswer, Answer.Mark - 1);
+        if (result.Item1)
+        {
+            Answer.Mark -= 1;
+            Answer.Rating -= 1;
+        }
+        else
+        {
+            await js.InvokeVoidAsync("alert", result.Item2);
+        }
+        DisableButton = false;
+    }
+    /// <summary>
+    /// Metoda odpowiedzialna za usunięcie odpowiedzi po wcześniejszym potwierdzeniu decyzji. W przypadku błędu wyświetlany zostaje komunikat.
+    /// </summary>
+    /// <returns></returns>
+    private async Task DeleteAnswer()
+    {
+        var confirmed = await js.InvokeAsync<bool>("confirm", "Do want to delete answer?");
+        if (confirmed)
+        {
+            var result = await answerRepository.DeleteAnswer(Answer.IdAnswer);
+            await ReloadAnswers.InvokeAsync();
+            if (!result.Item1)
+            {
+                await js.InvokeVoidAsync("alert", result.Item2);
+            }
+        }
+
+    }
+    /// <summary>
+    /// Metoda zmienia property EditMode na wartość przeciwną, w celu umożliwienia edycji tekstu lub powrotu do stanu wyświetlania tekstu.
+    /// </summary>
+    private void SetEditMode()
+    {
+        EditMode = !EditMode;
+    }
+    /// <summary>
+    /// Metoda odpowiedzialna za aktualizacje tekstu odpowiedzi.
+    /// </summary>
+    /// <param name="text"> Parametr zawierający nowy tekst odpowiedzi.</param>
+    /// <returns></returns>
+    private async Task UpdateAnswer(String text)
+    {
+        var tmpText = Answer.Text;
+        Answer.Text = text;
+        var result = await answerRepository.UpdateAnswer(Answer.IdAnswer, text);
+
+        if (!result.Item1)
+        {
+            Answer.Text = tmpText;
+            await js.InvokeVoidAsync("alert", result.Item2);
+        }
+        Answer.IsModified = true;
+        EditMode = !EditMode;
+    }
+}
