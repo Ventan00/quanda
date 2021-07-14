@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Quanda.Server.Data;
 using Quanda.Server.Repositories.Interfaces;
 using Quanda.Server.Utils;
+using Quanda.Shared;
 using Quanda.Shared.DTOs.Requests;
 using Quanda.Shared.DTOs.Responses;
 using Quanda.Shared.Enums;
@@ -14,19 +14,20 @@ using Quanda.Shared.Models;
 
 namespace Quanda.Server.Repositories.Implementations
 {
-    public class QuestionRepository: IQuestionRepository
+    public class QuestionRepository : IQuestionRepository
     {
         private readonly AppDbContext _context;
-        private readonly int _takeAmount = 10;
+        private readonly int _takeAmount = Config.QUESTIONS_PAGINATION_TAKE_SKIP;
+
         public QuestionRepository(AppDbContext context)
         {
             _context = context;
         }
 
-        public async Task<List<GetQuestionsDTO>> GetQuestions(int skip, SortOptionEnum sortOption, List<int>? categories)
+        public async Task<List<GetQuestionsDTO>> GetQuestions(int skip, SortOptionEnum sortOption,
+            List<int>? categories)
         {
-            if (categories.Count==0)
-            {
+            if (categories.Count == 0)
                 return sortOption switch
                 {
                     SortOptionEnum.Views => await _context.Questions
@@ -34,7 +35,7 @@ namespace Quanda.Server.Repositories.Implementations
                         .OrderBy(question => question.Views)
                         .Skip(skip)
                         .Take(_takeAmount)
-                        .Select(question => new GetQuestionsDTO()
+                        .Select(question => new GetQuestionsDTO
                         {
                             IdQuestion = question.IdQuestion,
                             AnswersCount = _context.Answers
@@ -42,7 +43,7 @@ namespace Quanda.Server.Repositories.Implementations
                                 .Count(),
                             Avatar = question.IdUserNavigation.Avatar,
                             Categories = _context.QuestionCategories
-                                .Where(qc => qc.IdQuestion==question.IdQuestion)
+                                .Where(qc => qc.IdQuestion == question.IdQuestion)
                                 .Select(qc => qc.IdCategoryNavigation.Name).ToList(),
                             Description = question.Description,
                             Header = question.Header,
@@ -59,7 +60,7 @@ namespace Quanda.Server.Repositories.Implementations
                         .OrderBy(question => question.Answers.Count)
                         .Skip(skip)
                         .Take(_takeAmount)
-                        .Select(question => new GetQuestionsDTO()
+                        .Select(question => new GetQuestionsDTO
                         {
                             IdQuestion = question.IdQuestion,
                             AnswersCount = _context.Answers
@@ -84,7 +85,7 @@ namespace Quanda.Server.Repositories.Implementations
                         .OrderBy(question => question.PublishDate)
                         .Skip(skip)
                         .Take(_takeAmount)
-                        .Select(question => new GetQuestionsDTO()
+                        .Select(question => new GetQuestionsDTO
                         {
                             IdQuestion = question.IdQuestion,
                             AnswersCount = _context.Answers
@@ -106,7 +107,6 @@ namespace Quanda.Server.Repositories.Implementations
                         .ToListAsync(),
                     _ => null
                 };
-            }
             return sortOption switch
             {
                 SortOptionEnum.Views => await _context.Questions
@@ -120,7 +120,7 @@ namespace Quanda.Server.Repositories.Implementations
                     .OrderBy(question => question.Views)
                     .Skip(skip)
                     .Take(_takeAmount)
-                    .Select(question => new GetQuestionsDTO()
+                    .Select(question => new GetQuestionsDTO
                     {
                         IdQuestion = question.IdQuestion,
                         AnswersCount = _context.Answers
@@ -151,7 +151,7 @@ namespace Quanda.Server.Repositories.Implementations
                     .OrderBy(question => question.Answers.Count)
                     .Skip(skip)
                     .Take(_takeAmount)
-                    .Select(question => new GetQuestionsDTO()
+                    .Select(question => new GetQuestionsDTO
                     {
                         IdQuestion = question.IdQuestion,
                         AnswersCount = _context.Answers
@@ -182,7 +182,7 @@ namespace Quanda.Server.Repositories.Implementations
                     .OrderBy(question => question.PublishDate)
                     .Skip(skip)
                     .Take(_takeAmount)
-                    .Select(question => new GetQuestionsDTO()
+                    .Select(question => new GetQuestionsDTO
                     {
                         IdQuestion = question.IdQuestion,
                         AnswersCount = _context.Answers
@@ -208,8 +208,8 @@ namespace Quanda.Server.Repositories.Implementations
 
         public async Task<Question> GetQuestion(int questionId)
         {
-            var Question =  await _context.Questions.Where(question => question.IdQuestion == questionId).SingleAsync();
-            if(Question != null)
+            var Question = await _context.Questions.Where(question => question.IdQuestion == questionId).SingleAsync();
+            if (Question != null)
                 Question.Views++;
             await _context.SaveChangesAsync();
             return Question;
@@ -217,7 +217,7 @@ namespace Quanda.Server.Repositories.Implementations
 
         public async Task<QuestionStatusResult> AddQuestion(AddQuestionDTO question)
         {
-            var Question = new Question()
+            var Question = new Question
             {
                 Header = question.Header,
                 Description = question.Description,
@@ -229,7 +229,9 @@ namespace Quanda.Server.Repositories.Implementations
                 IdUser = question.IdUser
             };
             await _context.AddAsync(Question);
-            return await _context.SaveChangesAsync() == 1? QuestionStatusResult.QUESTION_ADDED : QuestionStatusResult.QUESTION_DATABASE_ERROR;
+            return await _context.SaveChangesAsync() == 1
+                ? QuestionStatusResult.QUESTION_ADDED
+                : QuestionStatusResult.QUESTION_DATABASE_ERROR;
         }
 
         public async Task<QuestionStatusResult> UpdateQuestion(int questionId, UpdateQuestionDTO question)
@@ -238,16 +240,20 @@ namespace Quanda.Server.Repositories.Implementations
             if (Question == null) return QuestionStatusResult.QUESTION_NOT_FOUND;
             Question.Description = question.Description;
             Question.IsModified = true;
-            return await _context.SaveChangesAsync() == 1 ? QuestionStatusResult.QUESTION_UPDATED: QuestionStatusResult.QUESTION_DATABASE_ERROR;
+            return await _context.SaveChangesAsync() == 1
+                ? QuestionStatusResult.QUESTION_UPDATED
+                : QuestionStatusResult.QUESTION_DATABASE_ERROR;
         }
 
         public async Task<QuestionStatusResult> RemoveQuestion(int questionId)
         {
             var Question = await _context.Questions.Where(question => question.IdQuestion == questionId).SingleAsync();
-            if(Question == null) return QuestionStatusResult.QUESTION_NOT_FOUND;
+            if (Question == null) return QuestionStatusResult.QUESTION_NOT_FOUND;
             _context.Remove(Question);
-            
-            return await _context.SaveChangesAsync() ==1 ? QuestionStatusResult.QUESTION_DELETED: QuestionStatusResult.QUESTION_DATABASE_ERROR;
+
+            return await _context.SaveChangesAsync() == 1
+                ? QuestionStatusResult.QUESTION_DELETED
+                : QuestionStatusResult.QUESTION_DATABASE_ERROR;
         }
 
         public async Task<QuestionStatusResult> SetToCheck(int questionId, bool value)
@@ -256,8 +262,9 @@ namespace Quanda.Server.Repositories.Implementations
             if (Question == null) return QuestionStatusResult.QUESTION_NOT_FOUND;
             Question.ToCheck = value;
             ;
-            return await _context.SaveChangesAsync() ==1 ? QuestionStatusResult.QUESTION_CHANGED_TOCHECK_STATUS : QuestionStatusResult.QUESTION_DATABASE_ERROR;
-
+            return await _context.SaveChangesAsync() == 1
+                ? QuestionStatusResult.QUESTION_CHANGED_TOCHECK_STATUS
+                : QuestionStatusResult.QUESTION_DATABASE_ERROR;
         }
 
         public async Task<QuestionStatusResult> SetFinished(int questionId)
@@ -265,14 +272,16 @@ namespace Quanda.Server.Repositories.Implementations
             var Question = await _context.Questions.Where(question => question.IdQuestion == questionId).SingleAsync();
             if (Question == null) return QuestionStatusResult.QUESTION_NOT_FOUND;
             Question.IsFinished = true;
-            return await _context.SaveChangesAsync() == 1 ? QuestionStatusResult.QUESTION_SET_TO_FINISHED : QuestionStatusResult.QUESTION_DATABASE_ERROR;
+            return await _context.SaveChangesAsync() == 1
+                ? QuestionStatusResult.QUESTION_SET_TO_FINISHED
+                : QuestionStatusResult.QUESTION_DATABASE_ERROR;
         }
 
         public async Task<int> GetAmountOfQuestions(List<int> category)
         {
-            if (category.Count==0)
+            if (category.Count == 0)
                 return await _context.Questions.CountAsync();
-           return await _context.QuestionCategories
+            return await _context.QuestionCategories
                 .Where(qc => category.Any(cat => qc.IdCategory == cat))
                 .GroupBy(qc => qc.IdQuestion)
                 .Select(qcg => qcg.Key)
