@@ -10,17 +10,17 @@ namespace Quanda.Client.Repositories.Implementations
 {
     public class AnswerRepository : IAnswerRepository
     {
-        private readonly IHttpService httpService;
+        private readonly IHttpService _httpService;
         private readonly string url = "api/answers";
 
         public AnswerRepository(IHttpService httpService)
         {
-            this.httpService = httpService;
+            this._httpService = httpService;
         }
 
         public async Task<List<AnswerResponseDTO>> GetAnswersAsync(int idQuestion)
         {
-            return (await httpService.Get<List<AnswerResponseDTO>>($"{url}/{idQuestion}")).Response;
+            return (await _httpService.Get<List<AnswerResponseDTO>>($"{url}/{idQuestion}")).Response;
         }
 
         public async Task<Tuple<bool, string>> UpdateRatingAnswerAsync(int idAnswer, int rating)
@@ -29,7 +29,7 @@ namespace Quanda.Client.Repositories.Implementations
             {
                 Rating = rating
             };
-            var response = await httpService.Post<UpdateRatingAnswerDTO>($"{url}/{idAnswer}/rating", updateRatingDto);
+            var response = await _httpService.Post<UpdateRatingAnswerDTO>($"{url}/{idAnswer}/rating", updateRatingDto);
             if (!response.Success)
             {
                 return new(false, await response.GetBody());
@@ -40,7 +40,7 @@ namespace Quanda.Client.Repositories.Implementations
 
         public async Task<Tuple<bool, string>> DeleteAnswer(int idAnswer)
         {
-            var response = await httpService.Delete($"{url}/{idAnswer}");
+            var response = await _httpService.Delete($"{url}/{idAnswer}");
             if (!response.Success)
                 return new(false,await response.GetBody());
             return new(true,null);
@@ -53,7 +53,7 @@ namespace Quanda.Client.Repositories.Implementations
                 Text = text
             };
 
-            var response = await httpService.Put<UpdateAnswerDTO>($"{url}/{idAnswer}", updateAnswerDTO);
+            var response = await _httpService.Put<UpdateAnswerDTO>($"{url}/{idAnswer}", updateAnswerDTO);
             if (!response.Success)
                 return new(false,await response.GetBody());
             return new(true,null);
@@ -67,7 +67,7 @@ namespace Quanda.Client.Repositories.Implementations
                 IdQuestion = idQuestion,
                 IdRootAnswer = idRootAnswer == 0 ? null : idRootAnswer
             };
-            var response = await httpService.Post<AddAnswerDTO>($"{url}", addAnswerDTO);
+            var response = await _httpService.Post<AddAnswerDTO>($"{url}", addAnswerDTO);
             if (!response.Success)
                 return new(false, await response.GetBody());
             return new(true, null);
