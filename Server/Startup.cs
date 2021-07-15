@@ -94,6 +94,7 @@ namespace Quanda.Server
             services.AddScoped<IJwtService, JwtService>();
             services.AddScoped<ISmtpService, SmtpService>();
             services.AddHttpContextAccessor();
+            services.AddScoped<ICaptchaService, CaptchaService>();
 
             //ConfigurationModels
             services.Configure<JwtConfigModel>(Configuration.GetSection("JwtSettings"));
