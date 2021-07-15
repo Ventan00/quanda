@@ -1,0 +1,42 @@
+﻿@inject IJSRuntime _js
+
+<div @ref="_captchaElement"></div>
+
+@code {
+    private ElementReference _captchaElement;
+
+    private int _widgetUniqueId;
+
+    //todo - should come from configuration
+    private const string SiteKey = "6LcAdJYbAAAAAPKLVRM3QTVqqv05ylLQO03sgX3w";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _widgetUniqueId = await _js.InvokeAsync<int>("grecaptcha.render",
+                _captchaElement, new
+                {
+                    sitekey = SiteKey
+                });
+        }
+    }
+
+    public async Task<string> GetCaptchaResponseAsync()
+    {
+        try
+        {
+            var responseToken = await _js.InvokeAsync<string>("grecaptcha.getResponse", _widgetUniqueId);
+            return responseToken.Length <= 0 ? null : responseToken;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    public async Task ResetCaptchaAsync()
+    {
+        await _js.InvokeAsync<object>("grecaptcha.reset", _widgetUniqueId);
+    }
+}
