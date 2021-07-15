@@ -21,36 +21,70 @@
         <InputText id="password-input" @bind-Value="_loginDto.RawPassword" />
         <ValidationMessage For="() => _loginDto.RawPassword" />
     </div>
-    @switch (_loginStatus)
+
+    @if (_loginStatus == LoginStatusEnum.EMAIL_NOT_CONFIRMED)
     {
-        case LoginStatusEnum.SERVER_ERROR:
-            <label class="text-danger">An unexpected error has occurred. PLease try again.</label>
-            break;
-        case LoginStatusEnum.INVALID_CREDENTIALS:
-            <label class="text-danger">Invalid credentials. Please try again.</label>
-            break;
-        case LoginStatusEnum.EMAIL_NOT_CONFIRMED:
-            <label class="text-danger d-block">Email address is not confirmed.</label>
-            <label>Don't see an email?</label><a class="btn btn-link pl-1" href="recover/email-confirmation">Click here</a>
-            break;
+        <label class="text-danger d-block">Email address is not confirmed.</label>
+        <label>Don't see an email?</label><a class="btn btn-link pl-1" href="recover/email-confirmation">Click here</a>
     }
-    <button type="submit" class="btn btn-success d-block">Log In</button>
+
+    <CaptchaComponent @ref="_captchaComponent" />
+
+    @if (_isPending)
+    {
+        <button type="submit" class="btn btn-dark d-block mt-3" disabled>Logging in...</button>
+    }
+    else
+    {
+        <button type="submit" class="btn btn-success d-block mt-3">Log In</button>
+    }
 </EditForm>
 
 @code {
     private readonly LoginDTO _loginDto = new();
     private LoginStatusEnum? _loginStatus;
+    private CaptchaComponent _captchaComponent;
+    private bool _isPending;
 
     private async Task HandleValidSubmit()
     {
-        var loginResponseDto = await _authenticationService.LoginAsync(_loginDto);
-
-        _loginStatus = loginResponseDto.LoginStatus;
-
-        if (_loginStatus == LoginStatusEnum.LOGIN_ACCEPTED)
+        var captchaResponseToken = await _captchaComponent.GetCaptchaResponseAsync();
+        if (captchaResponseToken is null)
         {
-            _toastService.ShowSuccess("You have logged in.");
-            _navManager.NavigateTo("");
+            _toastService.ShowError("reCaptcha must be completed");
+            return;
         }
+        _loginDto.CaptchaResponseToken = captchaResponseToken;
+
+        _isPending = true;
+        StateHasChanged();
+
+        var loginResponseDto = await _authenticationService.LoginAsync(_loginDto);
+        _loginStatus = loginResponseDto.LoginStatus;
+        await HandleLoginResponse(loginResponseDto.LoginStatus);
+
+        _isPending = false;
+    }
+
+    private async Task HandleLoginResponse(LoginStatusEnum loginStatusEnum)
+    {
+        switch (loginStatusEnum)
+        {
+            case LoginStatusEnum.LOGIN_ACCEPTED:
+                _toastService.ShowSuccess("You have logged in.");
+                _navManager.NavigateTo("");
+                return;
+            case LoginStatusEnum.INVALID_CREDENTIALS:
+                _toastService.ShowError("Invalid credentials. Please try again.");
+                break;
+            case LoginStatusEnum.INVALID_CAPTCHA:
+                _toastService.ShowError("reCaptcha must be completed");
+                break;
+            case LoginStatusEnum.SERVER_ERROR:
+                _toastService.ShowError("An unexpected error has occurred. Please try again.");
+                break;
+        }
+
+        await _captchaComponent.ResetCaptchaAsync();
     }
 }

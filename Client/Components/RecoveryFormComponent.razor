@@ -8,19 +8,21 @@
         <ValidationMessage For="() => _recoverDto.Email" />
     </div>
 
+    <CaptchaComponent @ref="CaptchaComponent" />
 
     @if (IsPending)
     {
-        <button type="submit" class="btn btn-dark d-block" disabled>Sending ...</button>
+        <button type="submit" class="btn btn-dark d-block mt-3" disabled>Sending ...</button>
     }
     else
     {
-        <button type="submit" class="btn btn-success d-block">@SubmitText</button>
+        <button type="submit" class="btn btn-success d-block mt-3">@SubmitText</button>
     }
 </EditForm>
 
 @code {
-    private readonly RecoverDTO _recoverDto = new();
+    private RecoverDTO _recoverDto = new();
+    public CaptchaComponent CaptchaComponent;
 
     [Parameter]
     public string SubmitText { get; set; }
@@ -30,4 +32,14 @@
 
     [Parameter]
     public EventCallback<RecoverDTO> OnValidSubmit { get; set; }
+
+    public void ClearForm()
+    {
+        _recoverDto = new();
+    }
+
+    public void SetFormCaptchaToken(string captchaResponseToken)
+    {
+        _recoverDto.CaptchaResponseToken = captchaResponseToken;
+    }
 }
