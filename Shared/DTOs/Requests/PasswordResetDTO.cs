@@ -14,5 +14,7 @@ namespace Quanda.Shared.DTOs.Requests
 
         [Required]
         public string UrlEncodedRecoveryJwt { get; set; }
+
+        public string CaptchaResponseToken { get; set; }
     }
 }

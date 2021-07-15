@@ -12,5 +12,7 @@ namespace Quanda.Shared.DTOs.Requests
         [MaxLength(30)]
         [MinLength(6)]
         public string RawPassword { get; set; }
+
+        public string CaptchaResponseToken { get; set; }
     }
 }
