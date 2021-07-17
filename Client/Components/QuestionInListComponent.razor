@@ -1,7 +1,6 @@
-﻿@using Quanda.Shared.Models
-@using System.Text.RegularExpressions
-@using Microsoft.AspNetCore.Components
-@if(question != null) {
+﻿@using System.Text.RegularExpressions
+@if (question != null)
+{
     <div class="question-container">
         <a href="@questionURL">
 
@@ -19,11 +18,11 @@
                 </div>
                 <div class="question-categories-containter">
                     @foreach (var category in question.Categories)
-                        {
-                            <div class="question-category">
-                                @category
-                            </div>
-                        }
+                    {
+                        <div class="question-category">
+                            @category
+                        </div>
+                    }
                 </div>
             </div>
             <div class="question-description">
@@ -33,7 +32,7 @@
                 <a href="@userURL">
                     <div class="question-user-info">
                         <div class="question-user-image">
-                            <img src="@question.Avatar" />
+                            <img src="@question.Avatar"/>
                         </div>
                         <div class="question-user-nick">
                             @question.Nickname
@@ -52,20 +51,41 @@
         </a>
     </div>
 }
+
 @code {
+
+    /// <summary>
+    ///     Parametr opisujący pytanie
+    /// </summary>
     [Parameter]
     public GetQuestionsDTO question { get; set; }
-    
+
+    /// <summary>
+    ///     Wyliczalny parametr mówiący czy pytanie jest zakończone
+    /// </summary>
     private string finished = string.Empty;
+
+    /// <summary>
+    ///     Wyliczalny parametr który opisuje ściezkę do pytania
+    /// </summary>
     private string questionURL = string.Empty;
+
+    /// <summary>
+    ///     Wyliczalny parametr który opisuje ściezkę do użytkownika tworzącego pytanie
+    /// </summary>
     private string userURL = string.Empty;
+
+    /// <summary>
+    ///     Wyliczalny parametr opisujący tekst pytania bez zdjęć
+    /// </summary>
     private MarkupString description;
 
-    protected async override Task OnParametersSetAsync()
+    protected override async Task OnParametersSetAsync()
     {
-        description = (MarkupString)Regex.Replace(question.Description, "<img [^>]* />", "");
+        description = (MarkupString) Regex.Replace(question.Description, "<img [^>]* />", "");
         questionURL = $"questions/{question.IdQuestion}";
         userURL = $"users/{question.IdUser}";
         finished = question.IsFinished ? "#closed" : "";
     }
+
 }

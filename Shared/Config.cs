@@ -9,5 +9,9 @@
         ///     Wartość która opisuje ile pytań ma załadować klient na jednej stronie z pytaniami
         /// </summary>
         public static readonly int QUESTIONS_PAGINATION_TAKE_SKIP = 10;
+        /// <summary>
+        ///     Wartość która opisuje ile stron może maksymalnie być wyświetlana na komponencie pagination
+        /// </summary>
+        public static readonly int MAX_ITEMS_AVILABLE_ON_PAGINATION_PAGE = 6;
     }
 }
