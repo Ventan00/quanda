@@ -21,23 +21,46 @@
 </EditForm>
 
 @code {
+    /// <summary>
+    /// Model formularza
+    /// </summary>
     private RecoverDTO _recoverDto = new();
+
+    /// <summary>
+    /// Komponent captcha
+    /// </summary>
     public CaptchaComponent CaptchaComponent;
 
+    /// <summary>
+    /// Tekst wyświetlany na przycisku potwierdzającym formularz (submit)
+    /// </summary>
     [Parameter]
     public string SubmitText { get; set; }
 
+    /// <summary>
+    /// Zmienna mowiąca o tym, czy rządanie jest w trakcie realizacji
+    /// </summary>
     [Parameter]
     public bool IsPending { get; set; }
 
+    /// <summary>
+    /// Callback wywoływany po zatwierdzeniu poprawnie wypełnionego formularza
+    /// </summary>
     [Parameter]
     public EventCallback<RecoverDTO> OnValidSubmit { get; set; }
 
+    /// <summary>
+    /// Metoda resetująca/czyszcząca model formularza
+    /// </summary>
     public void ClearForm()
     {
         _recoverDto = new();
     }
 
+    /// <summary>
+    /// Metoda przypisująca podany captcha token do wymaganego pola CaptchaResponseToken formularza
+    /// </summary>
+    /// <param name="captchaResponseToken"></param>
     public void SetFormCaptchaToken(string captchaResponseToken)
     {
         _recoverDto.CaptchaResponseToken = captchaResponseToken;

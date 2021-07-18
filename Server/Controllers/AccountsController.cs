@@ -43,6 +43,11 @@ namespace Quanda.Server.Controllers
             _captchaService = captchaService;
         }
 
+        /// <summary>
+        /// Rejestracja nowego użytkownika
+        /// </summary>
+        /// <param name="registerDto"></param>
+        /// <returns></returns>
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDTO registerDto)
         {
@@ -85,6 +90,11 @@ namespace Quanda.Server.Controllers
             }
         }
 
+        /// <summary>
+        /// Logowanie użytkownika
+        /// </summary>
+        /// <param name="loginDto"></param>
+        /// <returns></returns>
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDTO loginDto)
         {
@@ -133,6 +143,11 @@ namespace Quanda.Server.Controllers
             return Ok(response);
         }
 
+        /// <summary>
+        /// Potwierdzenie konta nowo-zarejestrowanego użytkownika poprzez email
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
         [HttpGet("confirm-email/{code}")]
         public async Task<IActionResult> ConfirmEmail(string code)
         {
@@ -147,6 +162,11 @@ namespace Quanda.Server.Controllers
             };
         }
 
+        /// <summary>
+        /// Odzyskanie emailu sluzacego potwierdzeniu konta nowo-zarejestrowanego uzytkownika
+        /// </summary>
+        /// <param name="recoverDto"></param>
+        /// <returns></returns>
         [HttpPost("recover-confirmation-email")]
         public async Task<IActionResult> RecoverConfirmationEmail([FromBody] RecoverDTO recoverDto)
         {
@@ -169,6 +189,11 @@ namespace Quanda.Server.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Odzyskanie hasła poprzez wysłany email
+        /// </summary>
+        /// <param name="recoverDto"></param>
+        /// <returns></returns>
         [HttpPost("recover-password")]
         public async Task<IActionResult> RecoverPassword([FromBody] RecoverDTO recoverDto)
         {
@@ -191,6 +216,11 @@ namespace Quanda.Server.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Ustawienie nowego hasła możliwe po jego odzyskaniu
+        /// </summary>
+        /// <param name="passwordResetDto"></param>
+        /// <returns></returns>
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] PasswordResetDTO passwordResetDto)
         {
@@ -225,6 +255,11 @@ namespace Quanda.Server.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Odświerzenie tokenów zalogowanego użytkownika
+        /// </summary>
+        /// <param name="refreshDto"></param>
+        /// <returns></returns>
         [HttpPost("refresh")]
         public async Task<IActionResult> Refresh([FromBody] RefreshRequestDTO refreshDto)
         {
@@ -254,6 +289,11 @@ namespace Quanda.Server.Controllers
             });
         }
 
+        /// <summary>
+        /// Wylogowanie zalogowanego użytkownika
+        /// </summary>
+        /// <param name="logoutDto"></param>
+        /// <returns></returns>
         [Authorize]
         [HttpPost("logout")]
         public async Task<IActionResult> Logout([FromBody] LogoutDTO logoutDto)

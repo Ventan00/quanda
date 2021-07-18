@@ -3,13 +3,27 @@
 <div @ref="_captchaElement"></div>
 
 @code {
+    /// <summary>
+    /// Referencja do <div></div> będącego captchą
+    /// </summary>
     private ElementReference _captchaElement;
 
+    /// <summary>
+    /// Id captchy wygenerowane po jej wyrenderowaniu
+    /// </summary>
     private int _widgetUniqueId;
 
     //todo - should come from configuration
+    /// <summary>
+    /// Google API - publiczny klucz captcha
+    /// </summary>
     private const string SiteKey = "6LcAdJYbAAAAAPKLVRM3QTVqqv05ylLQO03sgX3w";
 
+    /// <summary>
+    /// Metoda renderująca captche
+    /// </summary>
+    /// <param name="firstRender"></param>
+    /// <returns></returns>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -22,6 +36,10 @@
         }
     }
 
+    /// <summary>
+    /// Metoda pobierająca rezultat z captchy
+    /// </summary>
+    /// <returns></returns>
     public async Task<string> GetCaptchaResponseAsync()
     {
         try
@@ -35,6 +53,10 @@
         }
     }
 
+    /// <summary>
+    /// Metoda resetująca captche
+    /// </summary>
+    /// <returns></returns>
     public async Task ResetCaptchaAsync()
     {
         await _js.InvokeAsync<object>("grecaptcha.reset", _widgetUniqueId);

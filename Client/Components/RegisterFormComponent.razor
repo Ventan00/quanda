@@ -36,10 +36,25 @@
 </EditForm>
 
 @code {
+    /// <summary>
+    /// Model formularza
+    /// </summary>
     private RegisterDTO _registerDto = new();
+
+    /// <summary>
+    /// Komponent captcha
+    /// </summary>
     private CaptchaComponent _captchaComponent;
+
+    /// <summary>
+    /// Zmienna mowiąca o tym, czy rządanie jest w trakcie realizacji
+    /// </summary>
     private bool _isPending;
 
+    /// <summary>
+    /// Metoda wywoływana przy potwierdzeniu prawidłowo wypełnionego formularza rejestracji
+    /// </summary>
+    /// <returns></returns>
     private async Task HandleValidSubmit()
     {
         var captchaResponseToken = await _captchaComponent.GetCaptchaResponseAsync();
@@ -59,6 +74,11 @@
         _isPending = false;
     }
 
+    /// <summary>
+    /// Metoda obsługująca odpowiedz od serwera na wysłany formularz
+    /// </summary>
+    /// <param name="registerStatusEnum"></param>
+    /// <returns></returns>
     private async Task HandleRegisterResponse(RegisterStatusEnum registerStatusEnum)
     {
         switch (registerStatusEnum)

@@ -41,11 +41,30 @@
 </EditForm>
 
 @code {
+    /// <summary>
+    /// Model formularza
+    /// </summary>
     private readonly LoginDTO _loginDto = new();
+
+    /// <summary>
+    /// Enum zawierający się w odpowiedzi od serwera na próbe zalogowania
+    /// </summary>
     private LoginStatusEnum? _loginStatus;
+
+    /// <summary>
+    /// Komponent captcha
+    /// </summary>
     private CaptchaComponent _captchaComponent;
+
+    /// <summary>
+    /// Zmienna mowiąca o tym, czy rządanie jest w trakcie realizacji
+    /// </summary>
     private bool _isPending;
 
+    /// <summary>
+    /// Metoda wywoływana przy potwierdzeniu prawidłowo wypełnionego formularza logowania
+    /// </summary>
+    /// <returns></returns>
     private async Task HandleValidSubmit()
     {
         var captchaResponseToken = await _captchaComponent.GetCaptchaResponseAsync();
@@ -56,18 +75,25 @@
         }
         _loginDto.CaptchaResponseToken = captchaResponseToken;
 
+        _loginStatus = null;
         _isPending = true;
         StateHasChanged();
 
         var loginResponseDto = await _authenticationService.LoginAsync(_loginDto);
-        _loginStatus = loginResponseDto.LoginStatus;
         await HandleLoginResponse(loginResponseDto.LoginStatus);
 
         _isPending = false;
     }
 
+    /// <summary>
+    /// Metoda obsługująca odpowiedz od serwera na wysłany formularz
+    /// </summary>
+    /// <param name="loginStatusEnum"></param>
+    /// <returns></returns>
     private async Task HandleLoginResponse(LoginStatusEnum loginStatusEnum)
     {
+        _loginStatus = loginStatusEnum;
+
         switch (loginStatusEnum)
         {
             case LoginStatusEnum.LOGIN_ACCEPTED:
