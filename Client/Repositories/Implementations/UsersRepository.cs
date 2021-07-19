@@ -1,7 +1,4 @@
-﻿using System;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Text.Json;
+﻿using System.Net;
 using System.Threading.Tasks;
 using Quanda.Client.Helpers;
 using Quanda.Client.Repositories.Interfaces;
@@ -15,6 +12,7 @@ namespace Quanda.Client.Repositories.Implementations
     {
         private const string ApiUrl = "/api/accounts";
         private readonly IHttpService _httpService;
+
         public UsersRepository(IHttpService httpService)
         {
             _httpService = httpService;
@@ -29,27 +27,30 @@ namespace Quanda.Client.Repositories.Implementations
 
         public async Task<RegisterStatusEnum> RegisterAsync(RegisterDTO registerDto)
         {
-            var response = await _httpService.PostWithResponse<RegisterDTO, RegisterResponseDTO>($"{ApiUrl}/register", registerDto);
+            var response =
+                await _httpService.PostWithResponse<RegisterDTO, RegisterResponseDTO>($"{ApiUrl}/register",
+                    registerDto);
             var registerResponseDto = response.Response;
 
             return registerResponseDto?.RegisterStatus ?? RegisterStatusEnum.SERVER_ERROR;
         }
 
-        public async Task RecoverConfirmationEmailAsync(RecoverDTO recoverDto)
+        public async Task<bool> RecoverConfirmationEmailAsync(RecoverDTO recoverDto)
         {
-            await _httpService.Post($"{ApiUrl}/recover-confirmation-email", recoverDto);
-        }
-
-        public async Task RecoverPasswordAsync(RecoverDTO recoverDto)
-        {
-            await _httpService.Post($"{ApiUrl}/recover-password", recoverDto);
-        }
-
-        public async Task<bool> ResetPasswordAsync(PasswordResetDTO passwordResetDto)
-        {
-            var response = await _httpService.Post($"{ApiUrl}/reset-password", passwordResetDto);
+            var response = await _httpService.Post($"{ApiUrl}/recover-confirmation-email", recoverDto);
             return response.Success;
         }
-        
+
+        public async Task<bool> RecoverPasswordAsync(RecoverDTO recoverDto)
+        {
+            var response = await _httpService.Post($"{ApiUrl}/recover-password", recoverDto);
+            return response.Success;
+        }
+
+        public async Task<HttpStatusCode> ResetPasswordAsync(PasswordResetDTO passwordResetDto)
+        {
+            var response = await _httpService.Post($"{ApiUrl}/reset-password", passwordResetDto);
+            return response.HttpResponseMessage.StatusCode;
+        }
     }
 }
