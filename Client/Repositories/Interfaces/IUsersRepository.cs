@@ -9,35 +9,35 @@ namespace Quanda.Client.Repositories.Interfaces
     public interface IUsersRepository
     {
         /// <summary>
-        /// Wysłanie do api rządania o zalogowanie
+        ///     Wysłanie do api rządania o zalogowanie
         /// </summary>
         /// <param name="loginDto"></param>
         /// <returns></returns>
         public Task<LoginResponseDTO> LoginAsync(LoginDTO loginDto);
 
         /// <summary>
-        /// Wysłanie do api rządania o rejestracje
+        ///     Wysłanie do api rządania o rejestracje
         /// </summary>
         /// <param name="registerDto"></param>
         /// <returns></returns>
         public Task<RegisterStatusEnum> RegisterAsync(RegisterDTO registerDto);
 
         /// <summary>
-        /// Wysłanie do api rządania o odzyskanie emailu potwierdzającego nowo-zarejestrowane konto
+        ///     Wysłanie do api rządania o odzyskanie emailu potwierdzającego nowo-zarejestrowane konto
         /// </summary>
         /// <param name="recoverDto"></param>
         /// <returns></returns>
         public Task<bool> RecoverConfirmationEmailAsync(RecoverDTO recoverDto);
 
         /// <summary>
-        /// Wysłanie do api rządania o odzyskanie hasła
+        ///     Wysłanie do api rządania o odzyskanie hasła
         /// </summary>
         /// <param name="recoverDto"></param>
         /// <returns></returns>
         public Task<bool> RecoverPasswordAsync(RecoverDTO recoverDto);
 
         /// <summary>
-        /// Wysłanie do api rządania o ustawienie nowego hasła
+        ///     Wysłanie do api rządania o ustawienie nowego hasła
         /// </summary>
         /// <param name="passwordResetDto"></param>
         /// <returns></returns>

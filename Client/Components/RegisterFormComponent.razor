@@ -1,29 +1,28 @@
 ﻿@using Quanda.Shared.DTOs.Requests
-@using Quanda.Client.Repositories.Interfaces
 @using Quanda.Shared.Enums
 @inject IUsersRepository _usersRepository
 @inject IToastService _toastService
 @inject NavigationManager _navManager
 
 <EditForm Model="@_registerDto" OnValidSubmit="@HandleValidSubmit" autocomplete="off">
-    <DataAnnotationsValidator />
+    <DataAnnotationsValidator/>
     <div class="form-group">
         <label for="email-input" class="d-block">Email Address</label>
-        <InputText id="email-input" @bind-Value="_registerDto.Email" />
-        <ValidationMessage For="() => _registerDto.Email" />
+        <InputText id="email-input" @bind-Value="_registerDto.Email"/>
+        <ValidationMessage For="() => _registerDto.Email"/>
     </div>
     <div class="form-group">
         <label for="nickname-input" class="d-block">Nickname</label>
-        <InputText id="nickname-input" @bind-Value="_registerDto.Nickname" />
-        <ValidationMessage For="() => _registerDto.Nickname" />
+        <InputText id="nickname-input" @bind-Value="_registerDto.Nickname"/>
+        <ValidationMessage For="() => _registerDto.Nickname"/>
     </div>
     <div class="form-group">
         <label for="password-input" class="d-block">Password</label>
-        <InputText id="password-input" @bind-Value="_registerDto.RawPassword" />
-        <ValidationMessage For="() => _registerDto.RawPassword" />
+        <InputText id="password-input" @bind-Value="_registerDto.RawPassword"/>
+        <ValidationMessage For="() => _registerDto.RawPassword"/>
     </div>
 
-    <CaptchaComponent @ref="_captchaComponent" />
+    <CaptchaComponent @ref="_captchaComponent"/>
 
     @if (_isPending)
     {
@@ -36,23 +35,24 @@
 </EditForm>
 
 @code {
+
     /// <summary>
-    /// Model formularza
+    ///     Model formularza
     /// </summary>
     private RegisterDTO _registerDto = new();
 
     /// <summary>
-    /// Komponent captcha
+    ///     Komponent captcha
     /// </summary>
     private CaptchaComponent _captchaComponent;
 
     /// <summary>
-    /// Zmienna mowiąca o tym, czy rządanie jest w trakcie realizacji
+    ///     Zmienna mowiąca o tym, czy rządanie jest w trakcie realizacji
     /// </summary>
     private bool _isPending;
 
     /// <summary>
-    /// Metoda wywoływana przy potwierdzeniu prawidłowo wypełnionego formularza rejestracji
+    ///     Metoda wywoływana przy potwierdzeniu prawidłowo wypełnionego formularza rejestracji
     /// </summary>
     /// <returns></returns>
     private async Task HandleValidSubmit()
@@ -75,7 +75,7 @@
     }
 
     /// <summary>
-    /// Metoda obsługująca odpowiedz od serwera na wysłany formularz
+    ///     Metoda obsługująca odpowiedz od serwera na wysłany formularz
     /// </summary>
     /// <param name="registerStatusEnum"></param>
     /// <returns></returns>
@@ -86,7 +86,8 @@
             case RegisterStatusEnum.REGISTER_FINISHED:
                 _toastService.ShowSuccess("Confirm your email to finish registration", "Register Complete");
                 _navManager.NavigateTo("/login");
-                return; ;
+                return;
+                ;
             case RegisterStatusEnum.EMAIL_IS_TAKEN:
                 _toastService.ShowError("Email address has already been taken.");
                 break;
@@ -103,4 +104,5 @@
 
         await _captchaComponent.ResetCaptchaAsync();
     }
+
 }

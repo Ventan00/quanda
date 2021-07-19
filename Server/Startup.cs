@@ -1,15 +1,13 @@
 using System;
-using System.IdentityModel.Tokens.Jwt;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Quanda.Server.Data;
 using Quanda.Server.Extensions;
@@ -36,7 +34,8 @@ namespace Quanda.Server
         {
             services.AddDbContext<AppDbContext>(options =>
             {
-                options.UseMySql(Configuration.GetConnectionString("MySqlDbConnString"), new MySqlServerVersion(new Version(8, 0, 25)));
+                options.UseMySql(Configuration.GetConnectionString("MySqlDbConnString"),
+                    new MySqlServerVersion(new Version(8, 0, 25)));
             });
 
             services.AddAuthentication(options =>

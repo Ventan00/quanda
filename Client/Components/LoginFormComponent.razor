@@ -1,34 +1,33 @@
-﻿@using Microsoft.AspNetCore.Components
-@using Quanda.Client.Repositories.Interfaces
+﻿@using Quanda.Client.Authentication
 @using Quanda.Shared.DTOs.Requests
 @using Quanda.Shared.Enums
 @using Blazored.LocalStorage
-@using Quanda.Client.Authentication
 @inject IAuthenticationService _authenticationService
 @inject NavigationManager _navManager
 @inject ILocalStorageService _localStorageService
 @inject IToastService _toastService
 
 <EditForm Model="@_loginDto" OnValidSubmit="@HandleValidSubmit" autocomplete="off">
-    <DataAnnotationsValidator />
+    <DataAnnotationsValidator/>
     <div class="form-group">
         <label for="email-input" class="d-block">Email Address</label>
-        <InputText id="email-input" @bind-Value="_loginDto.Email" />
-        <ValidationMessage For="() => _loginDto.Email" />
+        <InputText id="email-input" @bind-Value="_loginDto.Email"/>
+        <ValidationMessage For="() => _loginDto.Email"/>
     </div>
     <div class="form-group">
         <label for="password-input" class="d-block">Password</label>
-        <InputText id="password-input" @bind-Value="_loginDto.RawPassword" />
-        <ValidationMessage For="() => _loginDto.RawPassword" />
+        <InputText id="password-input" @bind-Value="_loginDto.RawPassword"/>
+        <ValidationMessage For="() => _loginDto.RawPassword"/>
     </div>
 
     @if (_loginStatus == LoginStatusEnum.EMAIL_NOT_CONFIRMED)
     {
         <label class="text-danger d-block">Email address is not confirmed.</label>
-        <label>Don't see an email?</label><a class="btn btn-link pl-1" href="recover/email-confirmation">Click here</a>
+        <label>Don't see an email?</label>
+        <a class="btn btn-link pl-1" href="recover/email-confirmation">Click here</a>
     }
 
-    <CaptchaComponent @ref="_captchaComponent" />
+    <CaptchaComponent @ref="_captchaComponent"/>
 
     @if (_isPending)
     {
@@ -41,28 +40,29 @@
 </EditForm>
 
 @code {
+
     /// <summary>
-    /// Model formularza
+    ///     Model formularza
     /// </summary>
     private readonly LoginDTO _loginDto = new();
 
     /// <summary>
-    /// Enum zawierający się w odpowiedzi od serwera na próbe zalogowania
+    ///     Enum zawierający się w odpowiedzi od serwera na próbe zalogowania
     /// </summary>
     private LoginStatusEnum? _loginStatus;
 
     /// <summary>
-    /// Komponent captcha
+    ///     Komponent captcha
     /// </summary>
     private CaptchaComponent _captchaComponent;
 
     /// <summary>
-    /// Zmienna mowiąca o tym, czy rządanie jest w trakcie realizacji
+    ///     Zmienna mowiąca o tym, czy rządanie jest w trakcie realizacji
     /// </summary>
     private bool _isPending;
 
     /// <summary>
-    /// Metoda wywoływana przy potwierdzeniu prawidłowo wypełnionego formularza logowania
+    ///     Metoda wywoływana przy potwierdzeniu prawidłowo wypełnionego formularza logowania
     /// </summary>
     /// <returns></returns>
     private async Task HandleValidSubmit()
@@ -86,7 +86,7 @@
     }
 
     /// <summary>
-    /// Metoda obsługująca odpowiedz od serwera na wysłany formularz
+    ///     Metoda obsługująca odpowiedz od serwera na wysłany formularz
     /// </summary>
     /// <param name="loginStatusEnum"></param>
     /// <returns></returns>
@@ -113,4 +113,5 @@
 
         await _captchaComponent.ResetCaptchaAsync();
     }
+
 }

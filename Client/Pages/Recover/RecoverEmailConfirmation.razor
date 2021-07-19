@@ -4,21 +4,22 @@
 @inject IToastService _toastService
 
 <label class="d-block text-muted">Please fill in fields bellow with the data you provided during registration </label>
-<RecoveryFormComponent @ref="_recoveryFormComponent" OnValidSubmit="@HandleValidSubmit" IsPending="@_isPending" SubmitText="Resend confirmation email" />
+<RecoveryFormComponent @ref="_recoveryFormComponent" OnValidSubmit="@HandleValidSubmit" IsPending="@_isPending" SubmitText="Resend confirmation email"/>
 
 @code {
+
     /// <summary>
-    /// Zmienna mowiąca o tym, czy rządanie formularza (RecoveryFormComponent) jest w trakcie realizacji
+    ///     Zmienna mowiąca o tym, czy rządanie formularza (RecoveryFormComponent) jest w trakcie realizacji
     /// </summary>
     private bool _isPending;
 
     /// <summary>
-    /// Komponent <RecoveryFormComponent/>
+    ///     Komponent <RecoveryFormComponent />
     /// </summary>
     private RecoveryFormComponent _recoveryFormComponent;
 
     /// <summary>
-    /// Metoda wywoływana przy potwierdzeniu prawidłowo wypełnionego formularza odzyskania (RecoveryFormComponent)
+    ///     Metoda wywoływana przy potwierdzeniu prawidłowo wypełnionego formularza odzyskania (RecoveryFormComponent)
     /// </summary>
     /// <param name="recoverDto"></param>
     /// <returns></returns>
@@ -49,4 +50,5 @@
         _isPending = false;
         await _recoveryFormComponent.CaptchaComponent.ResetCaptchaAsync();
     }
+
 }

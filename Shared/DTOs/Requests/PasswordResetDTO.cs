@@ -9,11 +9,9 @@ namespace Quanda.Shared.DTOs.Requests
         [MinLength(6)]
         public string RawPassword { get; set; }
 
-        [Required]
-        public int? IdUser { get; set; }
+        [Required] public int? IdUser { get; set; }
 
-        [Required]
-        public string UrlEncodedRecoveryJwt { get; set; }
+        [Required] public string UrlEncodedRecoveryJwt { get; set; }
 
         public string CaptchaResponseToken { get; set; }
     }

@@ -5,7 +5,7 @@ namespace Quanda.Server.Services.Interfaces
     public interface ICaptchaService
     {
         /// <summary>
-        /// Metoda weryfikująca rezultat captchy za pomocą api google
+        ///     Metoda weryfikująca rezultat captchy za pomocą api google
         /// </summary>
         /// <param name="responseToken">Token odpowiedzi captchy przesłany przez klienta</param>
         /// <returns></returns>

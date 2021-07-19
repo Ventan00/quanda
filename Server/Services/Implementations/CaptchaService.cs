@@ -17,26 +17,27 @@ namespace Quanda.Server.Services.Implementations
             _secret = configuration["CaptchaSecret"];
         }
 
-        private struct GoogleResponse
-        {
-            public bool Success { get; set; }
-        }
-
         public async Task<bool> VerifyCaptchaAsync(string responseToken)
         {
             using (var httpClient = new HttpClient())
             {
-                var dict = new Dictionary<string, string> { { "secret", _secret }, { "response", responseToken } };
+                var dict = new Dictionary<string, string> {{"secret", _secret}, {"response", responseToken}};
 
                 var response = await httpClient.PostAsync(GoogleApiUrl, new FormUrlEncodedContent(dict));
                 var stringResponse = await response.Content.ReadAsStringAsync();
-                var googleResponse = JsonSerializer.Deserialize<GoogleResponse>(stringResponse, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                });
+                var googleResponse = JsonSerializer.Deserialize<GoogleResponse>(stringResponse,
+                    new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
 
                 return googleResponse.Success;
             }
+        }
+
+        private struct GoogleResponse
+        {
+            public bool Success { get; set; }
         }
     }
 }

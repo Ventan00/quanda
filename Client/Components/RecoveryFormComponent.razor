@@ -1,14 +1,13 @@
 ﻿@using Quanda.Shared.DTOs.Requests
-
 <EditForm Model="_recoverDto" OnValidSubmit="() => OnValidSubmit.InvokeAsync(_recoverDto)">
-    <DataAnnotationsValidator />
+    <DataAnnotationsValidator/>
     <div class="form-group">
         <label for="email-input" class="d-block">Email Address</label>
-        <InputText id="email-input" @bind-Value="_recoverDto.Email" />
-        <ValidationMessage For="() => _recoverDto.Email" />
+        <InputText id="email-input" @bind-Value="_recoverDto.Email"/>
+        <ValidationMessage For="() => _recoverDto.Email"/>
     </div>
 
-    <CaptchaComponent @ref="CaptchaComponent" />
+    <CaptchaComponent @ref="CaptchaComponent"/>
 
     @if (IsPending)
     {
@@ -21,48 +20,50 @@
 </EditForm>
 
 @code {
+
     /// <summary>
-    /// Model formularza
+    ///     Model formularza
     /// </summary>
     private RecoverDTO _recoverDto = new();
 
     /// <summary>
-    /// Komponent captcha
+    ///     Komponent captcha
     /// </summary>
     public CaptchaComponent CaptchaComponent;
 
     /// <summary>
-    /// Tekst wyświetlany na przycisku potwierdzającym formularz (submit)
+    ///     Tekst wyświetlany na przycisku potwierdzającym formularz (submit)
     /// </summary>
     [Parameter]
     public string SubmitText { get; set; }
 
     /// <summary>
-    /// Zmienna mowiąca o tym, czy rządanie jest w trakcie realizacji
+    ///     Zmienna mowiąca o tym, czy rządanie jest w trakcie realizacji
     /// </summary>
     [Parameter]
     public bool IsPending { get; set; }
 
     /// <summary>
-    /// Callback wywoływany po zatwierdzeniu poprawnie wypełnionego formularza
+    ///     Callback wywoływany po zatwierdzeniu poprawnie wypełnionego formularza
     /// </summary>
     [Parameter]
     public EventCallback<RecoverDTO> OnValidSubmit { get; set; }
 
     /// <summary>
-    /// Metoda resetująca/czyszcząca model formularza
+    ///     Metoda resetująca/czyszcząca model formularza
     /// </summary>
     public void ClearForm()
     {
-        _recoverDto = new();
+        _recoverDto = new RecoverDTO();
     }
 
     /// <summary>
-    /// Metoda przypisująca podany captcha token do wymaganego pola CaptchaResponseToken formularza
+    ///     Metoda przypisująca podany captcha token do wymaganego pola CaptchaResponseToken formularza
     /// </summary>
     /// <param name="captchaResponseToken"></param>
     public void SetFormCaptchaToken(string captchaResponseToken)
     {
         _recoverDto.CaptchaResponseToken = captchaResponseToken;
     }
+
 }

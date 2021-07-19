@@ -12,6 +12,7 @@ namespace Quanda.Client.Repositories.Implementations
     {
         private const string ApiUrl = "/api/accounts";
         private readonly IHttpService _httpService;
+
         public UsersRepository(IHttpService httpService)
         {
             _httpService = httpService;
@@ -26,7 +27,9 @@ namespace Quanda.Client.Repositories.Implementations
 
         public async Task<RegisterStatusEnum> RegisterAsync(RegisterDTO registerDto)
         {
-            var response = await _httpService.PostWithResponse<RegisterDTO, RegisterResponseDTO>($"{ApiUrl}/register", registerDto);
+            var response =
+                await _httpService.PostWithResponse<RegisterDTO, RegisterResponseDTO>($"{ApiUrl}/register",
+                    registerDto);
             var registerResponseDto = response.Response;
 
             return registerResponseDto?.RegisterStatus ?? RegisterStatusEnum.SERVER_ERROR;
@@ -49,6 +52,5 @@ namespace Quanda.Client.Repositories.Implementations
             var response = await _httpService.Post($"{ApiUrl}/reset-password", passwordResetDto);
             return response.HttpResponseMessage.StatusCode;
         }
-
     }
 }
