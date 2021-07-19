@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Quanda.Shared.Enums
+﻿namespace Quanda.Shared.Enums
 {
+    /// <summary>
+    ///     Enum określający opcje sortowania pytań
+    /// </summary>
     public enum SortOptionEnum
     {
         Date,
