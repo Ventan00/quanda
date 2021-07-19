@@ -1,7 +1,5 @@
-﻿@using Quanda.Shared.Models
-@using Quanda.Client.Components
+﻿@page "/questions"
 @using Quanda.Shared.Enums
-@page "/questions"
 @inject IQuestionsReposiotry _questionsReposiotry
 @inject ICategoriesReposiotry _categoriesReposiotry
 <div class="questions-list-container">
@@ -66,9 +64,9 @@
             {
                 <div class="questions-tag">
                     <div class="questions-tag-val">
-                        @categories.Where(cate=>cate.IdCategory==cat).First().Name
+                        @categories.Where(cate => cate.IdCategory == cat).First().Name
                     </div>
-                    <div class="questions-tag-close" @onclick="(() => CategoryDeSelected(cat))">
+                    <div class="questions-tag-close" @onclick="() => CategoryDeSelected(cat)">
                         x
                     </div>
                 </div>
@@ -82,7 +80,7 @@
     {
         @foreach (var que in questions)
         {
-            <QuestionInListComponent question="que" />
+            <QuestionInListComponent question="que"/>
         }
     }
 </div>
@@ -95,25 +93,60 @@
 
 @if (categoriesPopUpOpen)
 {
-    <CategoriesPopUpComponent Categories="categories" CategorySelected="CategorySelected" CategoryDeSelected="CategoryDeSelected" PopUpClosed="ChangePopUpStatus" SelectedCategories="selectedCategories" />
+    <CategoriesPopUpComponent Categories="categories" CategorySelected="CategorySelected" CategoryDeSelected="CategoryDeSelected" PopUpClosed="ChangePopUpStatus" SelectedCategories="selectedCategories"/>
 }
 
 @code {
-    private int questionAmount = 0;
-    private int activeSorting = 0;
-    public int activePage = 0;
-    private List<int> selectedCategories = new List<int>();
 
+    /// <summary>
+    ///     Wyliczalny parametr opisujący ile jest pytań według wybranych kategorii
+    /// </summary>
+    private int questionAmount;
+
+    /// <summary>
+    ///     Int opisujący aktualnie wybraną opcję sortowania:
+    ///     0 => SortOptionEnum.Date,
+    ///     1 => SortOptionEnum.Views,
+    ///     2 => SortOptionEnum.Answers
+    /// </summary>
+    private int activeSorting;
+
+    /// <summary>
+    ///     Numer aktualnie przeglądanej strony
+    /// </summary>
+    public int activePage;
+
+    /// <summary>
+    ///     Lista id aktualnie wybranych kategorii
+    /// </summary>
+    private readonly List<int> selectedCategories = new();
+
+    /// <summary>
+    ///     Lista wszystkich kategorii w BD
+    /// </summary>
     private List<CategoriesResponseDTO> categories { get; set; }
+
+    /// <summary>
+    ///     Lista pytań na danej stronie posortowana według wybranej opcji opisanej po przez zmienną activeSorting
+    /// </summary>
     public List<GetQuestionsDTO> questions { get; set; }
 
-    private bool categoriesPopUpOpen = false;
-    protected async override Task OnInitializedAsync()
+    /// <summary>
+    ///     Zmienna informuje czy okno z listą kategorii jest wyświetlone
+    /// </summary>
+    private bool categoriesPopUpOpen;
+
+    protected override async Task OnInitializedAsync()
     {
         await GetQuestions();
         categories = await _categoriesReposiotry.GetCategories();
         await GetQuestionsAmount();
     }
+
+    /// <summary>
+    ///     Funkcja która pobiera z BD listę pytań uwzględniając aktualną stronę, wybrane sortowanie oraz wybrane kategorie
+    /// </summary>
+    /// <returns></returns>
     private async Task GetQuestions()
     {
         questions = await _questionsReposiotry.GetQuestions(activePage, activeSorting switch
@@ -121,14 +154,28 @@
             0 => SortOptionEnum.Date,
             1 => SortOptionEnum.Views,
             2 => SortOptionEnum.Answers
-        }, selectedCategories);
-
+            }, selectedCategories);
     }
 
+    /// <summary>
+    ///     Funkcja która pobiera z bazy danych ilość pytań która posiadają wybrane tagi
+    /// </summary>
+    /// <returns></returns>
     private async Task GetQuestionsAmount()
     {
         questionAmount = await _questionsReposiotry.GetQuestionsAmount(selectedCategories);
     }
+
+    /// <summary>
+    ///     Funkcja która zmienia aktualny tryb sortowania
+    /// </summary>
+    /// <param name="i">
+    ///     Opisuje tryb sortowania
+    ///     0 => SortOptionEnum.Date,
+    ///     1 => SortOptionEnum.Views,
+    ///     2 => SortOptionEnum.Answers
+    /// </param>
+    /// <returns></returns>
     private async Task SetSorting(int i)
     {
         activeSorting = i;
@@ -136,6 +183,11 @@
         StateHasChanged();
     }
 
+    /// <summary>
+    ///     Funkcja dodaje Id kategorii listy wybranych kategorii
+    /// </summary>
+    /// <param name="i">Id wybranej kategorii</param>
+    /// <returns></returns>
     private async Task CategorySelected(int i)
     {
         activePage = 0;
@@ -144,6 +196,12 @@
         await GetQuestionsAmount();
         StateHasChanged();
     }
+
+    /// <summary>
+    ///     Funkcja usuwa Id kategorii listy wybranych kategorii
+    /// </summary>
+    /// <param name="i">Id wybranej kategorii</param>
+    /// <returns></returns>
     private async Task CategoryDeSelected(int i)
     {
         activePage = 0;
@@ -153,16 +211,25 @@
         StateHasChanged();
     }
 
+    /// <summary>
+    ///     Funkcja która zmienia stan widoczności komponentu z listą wszystkich kategorii
+    /// </summary>
     private void ChangePopUpStatus()
     {
         categoriesPopUpOpen = !categoriesPopUpOpen;
         StateHasChanged();
     }
 
+    /// <summary>
+    ///     Funkcja która zmienia aktualnie wyświetlaną stronę
+    /// </summary>
+    /// <param name="i">Numer wyświetlanej strony</param>
+    /// <returns></returns>
     private async Task ChangeActivePage(int i)
     {
         activePage = i;
         await GetQuestions();
         StateHasChanged();
     }
+
 }

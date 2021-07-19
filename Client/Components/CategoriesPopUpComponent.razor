@@ -1,5 +1,5 @@
-﻿@using Quanda.Shared.Models
-@if (Categories != null) {
+﻿@if (Categories != null)
+{
     <div class="categories-popup">
         <div class="categories-popup-up">
             <div class="categories-popup-up-list">
@@ -21,7 +21,7 @@
                     {
                         @foreach (var cat in Categories.Where(cate => cate.IdMainCategory == category.IdCategory))
                         {
-                            <div class="categories-second-level-category" @onclick="@(()=>InsideCategorySelectionChange(cat))">
+                            <div class="categories-second-level-category" @onclick="@(() => InsideCategorySelectionChange(cat))">
                                 <div class="category-popup-text">@cat.Name</div>
                                 <div class="category-popup-close" @onclick="@(() => InsideCategorySelectionChange(category))">
                                     @if (SelectedCategories.Contains(cat.IdCategory))
@@ -31,44 +31,71 @@
                                 </div>
                             </div>
                         }
-
                     }
                 }
             </div>
         </div>
         <div class="categories-popup-down">
-            <input type="text" placeholder="Enter tag..." class="categories-popup-input" />
+            <input type="text" placeholder="Enter tag..." class="categories-popup-input"/>
             <button class="categories-popup-close-btn" @onclick="PopUpClosed">Close</button>
         </div>
     </div>
 }
+
 @code {
+
+    /// <summary>
+    ///     Lista wszystkich kategorii zapisanych w BD
+    /// </summary>
     [Parameter]
     public List<CategoriesResponseDTO> Categories { get; set; }
+
+    /// <summary>
+    ///     Callback który przyjmuje inta opisującego ID kategorii wybranej w komponencie
+    /// </summary>
     [Parameter]
     public EventCallback<int> CategorySelected { get; set; }
+
+    /// <summary>
+    ///     Callback który przyjmuje inta opisującego ID kategorii odznaczonej w komponencie
+    /// </summary>
     [Parameter]
     public EventCallback<int> CategoryDeSelected { get; set; }
+
+    /// <summary>
+    ///     Callback który reaguje na wyłączenie listy wewnątrz komponentu
+    /// </summary>
     [Parameter]
     public EventCallback PopUpClosed { get; set; }
+
+    /// <summary>
+    ///     Lista wybranych kategorii w momencie wywołania komponentu
+    /// </summary>
     [Parameter]
     public List<int> SelectedCategories { get; set; }
 
+    /// <summary>
+    ///     Słownik opisujący jakie komponenty zotały rozwinięte
+    /// </summary>
     Dictionary<int, bool> OpenedCategories;
 
-    protected async override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
         OpenedCategories = new Dictionary<int, bool>();
         foreach (var category in Categories.Where(category => category.IdMainCategory == null))
         {
             OpenedCategories.Add(category.IdCategory, false);
         }
-
     }
 
+    /// <summary>
+    ///     Funkcja która reaguje gdy wewnątrz komponentu zmienią się wybrane kategorie
+    /// </summary>
+    /// <param name="category">Kategoria która zmieniła swój stan na wybrany bądź odznaczony</param>
+    /// <returns></returns>
     private async Task InsideCategorySelectionChange(CategoriesResponseDTO category)
     {
-        int IdCategory = category.IdCategory;
+        var IdCategory = category.IdCategory;
         if (SelectedCategories.Contains(IdCategory))
         {
             await CategoryDeSelected.InvokeAsync(IdCategory);
@@ -80,6 +107,10 @@
         StateHasChanged();
     }
 
+    /// <summary>
+    ///     Funkcja która reaguje na rządanie rozwinięcia listy podkategorii kategorii pierwszego poziomu
+    /// </summary>
+    /// <param name="category">Kategoria pierwszego poiomu która zmienia stan z rozwiniętego w zwinięty bądź w drugą stronę</param>
     private void OpenClose(CategoriesResponseDTO category)
     {
         OpenedCategories[category.IdCategory] = !OpenedCategories[category.IdCategory];

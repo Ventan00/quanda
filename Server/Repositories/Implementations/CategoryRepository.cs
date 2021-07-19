@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -20,10 +19,11 @@ namespace Quanda.Server.Repositories.Implementations
         {
             _context = context;
         }
+
         public async Task<List<CategoriesResponseDTO>> GetCategoriesAsync()
         {
             return await _context.Categories
-                .Select(category => new CategoriesResponseDTO()
+                .Select(category => new CategoriesResponseDTO
                 {
                     IdCategory = category.IdCategory,
                     IdMainCategory = category.IdMainCategory,
@@ -38,7 +38,7 @@ namespace Quanda.Server.Repositories.Implementations
                 .Include(qc => qc.IdCategoryNavigation)
                 .Where(qc => qc.IdQuestion == idQuestion)
                 .Select(qc => qc.IdCategoryNavigation)
-                .Select(category => new CategoriesResponseDTO()
+                .Select(category => new CategoriesResponseDTO
                 {
                     IdCategory = category.IdCategory,
                     IdMainCategory = category.IdMainCategory,
@@ -54,12 +54,14 @@ namespace Quanda.Server.Repositories.Implementations
                 return CategoryResultEnum.CATEGORY_NOT_FOUND;
             Cat.IdMainCategory = category.IdMainCategory;
             Cat.Name = category.Name;
-            return await _context.SaveChangesAsync() == 1 ? CategoryResultEnum.CATEGORY_UPDATED : CategoryResultEnum.CATEGORY_DATABASE_ERROR;
+            return await _context.SaveChangesAsync() == 1
+                ? CategoryResultEnum.CATEGORY_UPDATED
+                : CategoryResultEnum.CATEGORY_DATABASE_ERROR;
         }
 
         public async Task<CategoryResultEnum> AddCategoryAsync(AddCategoryDTO category)
         {
-            Category cat = new Category
+            var cat = new Category
             {
                 IdMainCategory = category.IdMainCategory,
                 Name = category.Name

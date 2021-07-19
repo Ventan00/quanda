@@ -1,4 +1,6 @@
-﻿@if (ElementsSize != 0) { 
+﻿@using Quanda.Shared
+@if (ElementsSize != 0)
+{
     <nav aria-label="Pagination" class="pagination-element">
         <ul class="pagination">
             @if (ActualPage == 0)
@@ -21,79 +23,109 @@
             }
             @if (MaxPage < MaxComponents) //przypadek 1 2 3 4 5 6
             {
-                @for (int i = 0; i < MaxPage; i++)
+                @for (var i = 0; i < MaxPage; i++)
                 {
                     var temp = i;
                     if (i == ActualPage)
                     {
-                        <li class="page-item active"><a class="page-link" @onclick="(() => ChangePage(temp))">@(i + 1)</a></li>
+                        <li class="page-item active">
+                            <a class="page-link" @onclick="() => ChangePage(temp)">@(i + 1)</a>
+                        </li>
                     }
                     else
                     {
-                        <li class="page-item"><a class="page-link" @onclick="(() => ChangePage(temp))">@(i + 1)</a></li>
+                        <li class="page-item">
+                            <a class="page-link" @onclick="() => ChangePage(temp)">@(i + 1)</a>
+                        </li>
                     }
-
                 }
-
             }
             else //przypadek 1..25
             {
                 if (ActualPage - 1 < 4) //przypadek | 1 2 3 4 5 6| ... 25
                 {
-                    @for (int i = 0; i < MaxComponents; i++)
+                    @for (var i = 0; i < MaxComponents; i++)
                     {
                         var temp = i;
                         if (i == ActualPage)
                         {
-                            <li class="page-item active"><a class="page-link">@(i + 1)</a></li>
+                            <li class="page-item active">
+                                <a class="page-link">@(i + 1)</a>
+                            </li>
                         }
                         else
                         {
-                            <li class="page-item"><a class="page-link" @onclick="(() => ChangePage(temp))">@(i + 1)</a></li>
+                            <li class="page-item">
+                                <a class="page-link" @onclick="() => ChangePage(temp)">@(i + 1)</a>
+                            </li>
                         }
                     }
-                    <li class="page-item disabled"><a class="page-link">...</a></li>
-                    <li class="page-item"><a class="page-link" @onclick="(() => ChangePage(MaxPage-1))">@MaxPage</a></li>
+                    <li class="page-item disabled">
+                        <a class="page-link">...</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" @onclick="() => ChangePage(MaxPage - 1)">@MaxPage</a>
+                    </li>
                 }
                 else if (MaxPage - ActualPage < 4) //przypadek 1 ... |20 21 22 23 24 25|
                 {
-                    <li class="page-item"><a class="page-link" @onclick="(() => PageSelectedListener.InvokeAsync(0))">1</a></li>
-                    <li class="page-item disabled"><a class="page-link">...</a></li>
-                    for (int i = MaxPage - MaxComponents; i < MaxPage; i++)
+                    <li class="page-item">
+                        <a class="page-link" @onclick="() => PageSelectedListener.InvokeAsync(0)">1</a>
+                    </li>
+                    <li class="page-item disabled">
+                        <a class="page-link">...</a>
+                    </li>
+                    for (var i = MaxPage - MaxComponents; i < MaxPage; i++)
                     {
                         var temp = i;
                         if (i == ActualPage)
                         {
-                            <li class="page-item active"><a class="page-link" @onclick="(() => ChangePage(temp))">@(i + 1)</a></li>
+                            <li class="page-item active">
+                                <a class="page-link" @onclick="() => ChangePage(temp)">@(i + 1)</a>
+                            </li>
                         }
                         else
                         {
-                            <li class="page-item"><a class="page-link" @onclick="(() => ChangePage(temp))">@(i + 1)</a></li>
+                            <li class="page-item">
+                                <a class="page-link" @onclick="() => ChangePage(temp)">@(i + 1)</a>
+                            </li>
                         }
                     }
                 }
                 else //przypadek 1... |5 6 7 8 9 10| ... 25
                 {
-                    <li class="page-item"><a class="page-link" @onclick="(() => ChangePage(0))">1</a></li>
-                    <li class="page-item disabled"><a class="page-link">...</a></li>
-                    @for (int i = ActualPage - (MaxComponents / 2); i < ActualPage + (MaxComponents / 2); i++)
+                    <li class="page-item">
+                        <a class="page-link" @onclick="() => ChangePage(0)">1</a>
+                    </li>
+                    <li class="page-item disabled">
+                        <a class="page-link">...</a>
+                    </li>
+                    @for (var i = ActualPage - MaxComponents / 2; i < ActualPage + MaxComponents / 2; i++)
                     {
                         var temp = i;
                         if (i == ActualPage)
                         {
-                            <li class="page-item active"><a class="page-link" @onclick="(() => ChangePage(temp))">@(i + 1)</a></li>
+                            <li class="page-item active">
+                                <a class="page-link" @onclick="() => ChangePage(temp)">@(i + 1)</a>
+                            </li>
                         }
                         else
                         {
-                            <li class="page-item"><a class="page-link" @onclick="(() => ChangePage(temp))">@(i + 1)</a></li>
+                            <li class="page-item">
+                                <a class="page-link" @onclick="() => ChangePage(temp)">@(i + 1)</a>
+                            </li>
                         }
                     }
-                    <li class="page-item disabled"><a class="page-link">...</a></li>
-                    <li class="page-item"><a class="page-link" @onclick="(() => ChangePage(MaxPage-1))">@MaxPage</a></li>
+                    <li class="page-item disabled">
+                        <a class="page-link">...</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" @onclick="() => ChangePage(MaxPage - 1)">@MaxPage</a>
+                    </li>
                 }
             }
 
-            @if (ActualPage+1 == MaxPage)
+            @if (ActualPage + 1 == MaxPage)
             {
                 <li class="page-item disabled">
                     <a class="page-link" aria-label="Next" @onclick="NextPage">
@@ -116,20 +148,42 @@
 }
 
 @code {
+
+    /// <summary>
+    ///     Parametr który opisuje ile jest wszystkich elementów w zbiorze
+    /// </summary>
     [Parameter]
     public int ElementsSize { get; set; }
+
+    /// <summary>
+    ///     Parametr który opisuje ile elementów ma być na stronie
+    /// </summary>
     [Parameter]
     public int PageSize { get; set; }
+
+    /// <summary>
+    ///     Callback który jest wywoływany w momencie wybrania strony. Przyjmuje int który opisuje wybraną stronę
+    /// </summary>
     [Parameter]
     public EventCallback<int> PageSelectedListener { get; set; }
+
+    /// <summary>
+    ///     Parametr który opisuje aktualnie wyświetlaną stronę
+    /// </summary>
     [Parameter]
     public int ActualPage { get; set; }
 
+    /// <summary>
+    ///     Wyliczalna zmienna opisująca ile jest stron w danym paginatorze
+    /// </summary>
     int MaxPage;
 
-    private readonly int MaxComponents = 6;
+    /// <summary>
+    ///     Zmienna wczytywana z configu. Opisuje ile stron może maksymalnie być wyświetlanych.
+    /// </summary>
+    private readonly int MaxComponents = Config.MAX_ITEMS_AVILABLE_ON_PAGINATION_PAGE;
 
-    protected async override Task OnParametersSetAsync()
+    protected override async Task OnParametersSetAsync()
     {
         if (ElementsSize % PageSize == 0)
             MaxPage = ElementsSize / PageSize;
@@ -137,6 +191,10 @@
             MaxPage = ElementsSize / PageSize + 1;
     }
 
+    /// <summary>
+    ///     Funkcja która zmienia stronę na poprzednią
+    /// </summary>
+    /// <returns></returns>
     private async Task PrevPage()
     {
         if (ActualPage != 0)
@@ -145,6 +203,11 @@
             await PageSelectedListener.InvokeAsync(ActualPage);
         }
     }
+
+    /// <summary>
+    ///     Funkcja która zmienia stronę na następną
+    /// </summary>
+    /// <returns></returns>
     private async Task NextPage()
     {
         if (ActualPage != MaxPage)
@@ -154,11 +217,16 @@
         }
     }
 
+    /// <summary>
+    ///     Funkcja która zmienia stronę na wybraną
+    /// </summary>
+    /// <param name="i">Numer wybranej strony</param>
+    /// <returns></returns>
     private async Task ChangePage(int i)
     {
         ActualPage = i;
         await PageSelectedListener.InvokeAsync(ActualPage);
         StateHasChanged();
     }
-}
 
+}
