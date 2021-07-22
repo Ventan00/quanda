@@ -8,13 +8,15 @@ namespace Quanda.Server.Repositories.Interfaces
 {
     public interface IAnswerRepository
     {
+
         /// <summary>
-        /// Metoda zwraca listę odpowiedzi na dane pytanie.
+        /// Metoda zwraca listę odpowiedzi na pytanie z podanego przedziału.
         /// </summary>
         /// <param name="idQuestion">Id pytania, do którego odnoszą się odpowiedzi.</param>
         /// <param name="idUserLogged">Id użytkownika przeglądającego pytanie. Używane w celu wyznaczenia informacji o głosach oddanych na odpowiedzi.</param>
-        /// <returns>Lista odpowiedzi.</returns>
-        Task<List<AnswerResponseDTO>> GetAnswersAsync(int idQuestion, int idUserLogged);
+        /// <param name="answersParams">Zawiera parametry dotyczące ilości elementów na stronie oraz początkowy indeks do pobrania nowej listy odpowiedzi.</param>
+        /// <returns>Lista odpowiedzi z podanego przedziału.</returns>
+        Task<List<AnswerResponseDTO>> GetAnswersAsync(int idQuestion, int idUserLogged, AnswersPageDTO answersParams);
 
         /// <summary>
         /// Metoda odpowiedzialna za dodanie odpowiedzi do bazy. Przed dodaniem sprawdzone zostaje: czy pytanie oraz konto użytkownika nadal istnieje. W przypadku usunięcia odpowiedzi do którego odnosiła się odpowiedź, odpowiedź staję się z kategorii główną.

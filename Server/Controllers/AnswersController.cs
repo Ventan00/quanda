@@ -19,9 +19,9 @@ namespace Quanda.Server.Controllers
         }
 
         [HttpGet("{idQuestion}")]
-        public async Task<IActionResult> GetAnswers(int idQuestion)
+        public async Task<IActionResult> GetAnswers(int idQuestion, [FromQuery] AnswersPageDTO answersPage)
         {
-            var result = await _repository.GetAnswersAsync(idQuestion, requestIdUser);
+            var result = await _repository.GetAnswersAsync(idQuestion, requestIdUser, answersPage);
             return Ok(result);
         }
 
@@ -37,7 +37,7 @@ namespace Quanda.Server.Controllers
         }
 
         [HttpPut("{idAnswer}")]
-        public async Task<IActionResult> UpdateAnswer(int idAnswer,[FromBody] UpdateAnswerDTO answerDTO)
+        public async Task<IActionResult> UpdateAnswer(int idAnswer, [FromBody] UpdateAnswerDTO answerDTO)
         {
             var result = await _repository.UpdateAnswerAsync(idAnswer, answerDTO);
             if (result == AnswerResult.ANSWER_DELETED)
@@ -73,6 +73,6 @@ namespace Quanda.Server.Controllers
 
             return NoContent();
         }
-       
+
     }
 }
