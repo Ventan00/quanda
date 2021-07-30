@@ -21,7 +21,15 @@
                     </div>
                 }
             </div>
-        }
+            @if (answer.AmountOfChildAnswers > answer.ChildAnswers.Count)
+                    {
+                        <div class="answer-child" style="margin-left: 20px;">
+                            <button @onclick="() => GetChildAnswers(answer.IdAnswer)">
+                                Show @(answer.AmountOfChildAnswers - 3) more answers
+                            </button>
+                        </div>
+                    }
+}
 
         <div id="list-end" class="mt-5 mb-5 p-5">
             @if (IsLoading)
@@ -189,6 +197,20 @@
 
         var answers = await answerRepository.GetAnswersAsync(IdQuestion, answersParams);
         Answers = answers;
+    }
+
+    /// <summary>
+    /// Metoda odpowiedzialna za pobranie konkretnej odpowiedzi wraz z listą pododpowiedzi.
+    /// </summary>
+    /// <param name="idRootAnswer">Id konkrentej odpowiedzi.</param>
+    private async Task GetChildAnswers(int idRootAnswer)
+    {
+        var updatedAnswer = await answerRepository.GetAnswerAsync(idRootAnswer);
+        var answer = Answers.SingleOrDefault(a => a.IdAnswer == idRootAnswer);
+        answer.Text = updatedAnswer.Text;
+        answer.Rating = updatedAnswer.Rating;
+        answer.ChildAnswers = updatedAnswer.ChildAnswers;
+        answer.AmountOfChildAnswers = updatedAnswer.AmountOfChildAnswers;
     }
 
 }

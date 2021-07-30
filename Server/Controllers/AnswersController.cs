@@ -24,6 +24,12 @@ namespace Quanda.Server.Controllers
             var result = await _repository.GetAnswersAsync(idQuestion, requestIdUser, answersPage);
             return Ok(result);
         }
+        [HttpGet("{idAnswer}/details")]
+        public async Task<IActionResult> GetAnswer(int idAnswer)
+        {
+            var result = await _repository.GetAnswerAsync(idAnswer, requestIdUser);
+            return Ok(result);
+        }
 
         [HttpPost]
         public async Task<IActionResult> AddAnswer([FromBody] AddAnswerDTO answerDTO)

@@ -146,8 +146,6 @@
             Answer.Mark += 1;
             Answer.Rating += 1;
         }
-        else
-            await js.InvokeVoidAsync("alert", result.Item2);
         isNonInteractive = false;
     }
     /// <summary>
@@ -163,8 +161,6 @@
             Answer.Mark -= 1;
             Answer.Rating -= 1;
         }
-        else
-            await js.InvokeVoidAsync("alert", result.Item2);
         isNonInteractive = false;
     }
     /// <summary>

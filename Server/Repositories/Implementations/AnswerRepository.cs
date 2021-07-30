@@ -48,11 +48,48 @@ namespace Quanda.Server.Repositories.Implementations
                     },
                     IdRootAnswer = a.IdRootAnswer,
                     Mark = a.RatingAnswers.Any(ra => ra.IdUser == idUserLogged) == false ? 0 : a.RatingAnswers.SingleOrDefault(ra => ra.IdUser == idUserLogged).Value ? 1 : -1
-                }).ToList(),
-                Mark = a.RatingAnswers.Any(ra => ra.IdUser == idUserLogged) == false ? 0 : a.RatingAnswers.SingleOrDefault(ra => ra.IdUser == idUserLogged).Value ? 1 : -1
+                }).OrderByDescending(a => a.Rating).ThenBy(a => a.IdAnswer).Skip(0).Take(3).ToList(),
+                Mark = a.RatingAnswers.Any(ra => ra.IdUser == idUserLogged) == false ? 0 : a.RatingAnswers.SingleOrDefault(ra => ra.IdUser == idUserLogged).Value ? 1 : -1,
+                AmountOfChildAnswers = a.InverseIdRootAnswersNavigation.Count
             }).OrderByDescending(a => a.Rating).ThenBy(a => a.IdAnswer).ToListAsync();
 
             return answers.Skip(answersParams.StartIndex).Take(answersParams.PageSize).ToList();
+        }
+
+        public async Task<AnswerResponseDTO> GetAnswerAsync(int idAnswer, int idUserLogged)
+        {
+            var answer = await _context.Answers.Where(a => a.IdAnswer == idAnswer).Select(a => new AnswerResponseDTO
+            {
+                IdAnswer = a.IdAnswer,
+                Text = a.Text,
+                Rating = a.RatingAnswers.Select(ra => new { ValueAns = ra.Value == false ? -1 : 1 }).Sum(r => r.ValueAns),
+                IsModified = a.IsModified,
+                UserResponseDTO = new UserResponseDTO
+                {
+                    IdUser = a.IdUserNavigation.IdUser,
+                    Nickname = a.IdUserNavigation.Nickname,
+                    Avatar = a.IdUserNavigation.Avatar
+                },
+                IdRootAnswer = a.IdRootAnswer,
+                ChildAnswers = a.InverseIdRootAnswersNavigation.Select(a => new AnswerResponseDTO
+                {
+                    IdAnswer = a.IdAnswer,
+                    Text = a.Text,
+                    Rating = a.RatingAnswers.Select(ra => new { ValueAns = ra.Value == false ? -1 : 1 }).Sum(r => r.ValueAns),
+                    IsModified = a.IsModified,
+                    UserResponseDTO = new UserResponseDTO
+                    {
+                        IdUser = a.IdUserNavigation.IdUser,
+                        Nickname = a.IdUserNavigation.Nickname,
+                        Avatar = a.IdUserNavigation.Avatar
+                    },
+                    IdRootAnswer = a.IdRootAnswer,
+                    Mark = a.RatingAnswers.Any(ra => ra.IdUser == idUserLogged) == false ? 0 : a.RatingAnswers.SingleOrDefault(ra => ra.IdUser == idUserLogged).Value ? 1 : -1
+                }).OrderByDescending(a => a.Rating).ThenBy(a => a.IdAnswer).ToList(),
+                Mark = a.RatingAnswers.Any(ra => ra.IdUser == idUserLogged) == false ? 0 : a.RatingAnswers.SingleOrDefault(ra => ra.IdUser == idUserLogged).Value ? 1 : -1,
+                AmountOfChildAnswers = a.InverseIdRootAnswersNavigation.Count
+            }).SingleOrDefaultAsync();
+            return answer;
         }
 
         public async Task<AnswerResult> AddAnswerAsync(AddAnswerDTO answerDTO, int idUserLogged)

@@ -10,6 +10,8 @@ namespace Quanda.Client.Repositories.Interfaces
     {
         Task<List<AnswerResponseDTO>> GetAnswersAsync(int idQuestion, AnswersPageDTO productParams);
 
+        Task<AnswerResponseDTO> GetAnswerAsync(int idAnswer);
+
         Task<Tuple<bool, string>> UpdateRatingAnswerAsync(int idAnswer, int rating);
 
         Task<Tuple<bool, string>> DeleteAnswer(int idAnswer);

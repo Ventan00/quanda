@@ -30,6 +30,12 @@ namespace Quanda.Client.Repositories.Implementations
             return response.Response;
         }
 
+        public async Task<AnswerResponseDTO> GetAnswerAsync(int idAnswer)
+        {
+            var response = await _httpService.Get<AnswerResponseDTO>($"{url}/{idAnswer}/details");
+            return response.Response;
+        }
+
         public async Task<Tuple<bool, string>> UpdateRatingAnswerAsync(int idAnswer, int rating)
         {
             UpdateRatingAnswerDTO updateRatingDto = new()
@@ -79,5 +85,6 @@ namespace Quanda.Client.Repositories.Implementations
                 return new(false, await response.GetBody());
             return new(true, null);
         }
+
     }
 }

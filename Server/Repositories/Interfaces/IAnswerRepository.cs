@@ -19,6 +19,14 @@ namespace Quanda.Server.Repositories.Interfaces
         Task<List<AnswerResponseDTO>> GetAnswersAsync(int idQuestion, int idUserLogged, AnswersPageDTO answersParams);
 
         /// <summary>
+        /// Metoda zwraca konkretną odpowiedź.
+        /// </summary>
+        /// <param name="idAnswer">Id odpowiedzi pobieranej.</param>
+        /// <param name="idUserLogged">Id użytkownika przeglądającego pytanie. Używane w celu wyznaczenia informacji o głosach oddanych na odpowiedzi.</param>
+        /// <returns>Konkretna odpowiedź.</returns>
+        Task<AnswerResponseDTO> GetAnswerAsync(int idAnswer, int idUserLogged);
+
+        /// <summary>
         /// Metoda odpowiedzialna za dodanie odpowiedzi do bazy. Przed dodaniem sprawdzone zostaje: czy pytanie oraz konto użytkownika nadal istnieje. W przypadku usunięcia odpowiedzi do którego odnosiła się odpowiedź, odpowiedź staję się z kategorii główną.
         /// </summary>
         /// <param name="answerDTO"></param>
@@ -50,5 +58,6 @@ namespace Quanda.Server.Repositories.Interfaces
         /// <param name="updateRatingAnswer">Zawiera nową ocenę odpowiedzi.</param>
         /// <returns>Informacja o sukcesie akcji edycji oceny odpowiedzi.</returns>
         Task<AnswerResult> UpdateRatingAnswerAsync(int idAnswer, int idUserLogged, UpdateRatingAnswerDTO updateRatingAnswer);
+
     }
 }
