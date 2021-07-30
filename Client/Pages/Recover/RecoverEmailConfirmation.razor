@@ -1,45 +1,54 @@
 ﻿@page "/recover/email-confirmation"
-
-@using Quanda.Client.Components
 @using Quanda.Shared.DTOs.Requests
 @inject IUsersRepository _usersRepository
+@inject IToastService _toastService
 
 <label class="d-block text-muted">Please fill in fields bellow with the data you provided during registration </label>
-<RecoveryFormComponent OnValidSubmit="@HandleValidSubmit" IsPending="@_isPending" SubmitText="Resend confirmation email" />
-
-@if (_isEmailSend == true)
-{
-    <label class="d-block text-success">Confirmation email for connected account has been resend, please check your inbox</label>
-}
-else if (_isEmailSend == false)
-{
-    <label class="d-block text-danger">Confirmation email has already been resend for the given email, please check your inbox</label>
-}
-
+<RecoveryFormComponent @ref="_recoveryFormComponent" OnValidSubmit="@HandleValidSubmit" IsPending="@_isPending" SubmitText="Resend confirmation email"/>
 
 @code {
-    private static readonly List<string> EmailsProvided = new();
 
+    /// <summary>
+    ///     Zmienna mowiąca o tym, czy rządanie formularza (RecoveryFormComponent) jest w trakcie realizacji
+    /// </summary>
     private bool _isPending;
 
-    private bool? _isEmailSend;
+    /// <summary>
+    ///     Komponent <RecoveryFormComponent />
+    /// </summary>
+    private RecoveryFormComponent _recoveryFormComponent;
 
+    /// <summary>
+    ///     Metoda wywoływana przy potwierdzeniu prawidłowo wypełnionego formularza odzyskania (RecoveryFormComponent)
+    /// </summary>
+    /// <param name="recoverDto"></param>
+    /// <returns></returns>
     public async Task HandleValidSubmit(RecoverDTO recoverDto)
     {
-        _isEmailSend = null;
-        _isPending = true;
-
-        if (EmailsProvided.Contains(recoverDto.Email))
+        var captchaResponseToken = await _recoveryFormComponent.CaptchaComponent.GetCaptchaResponseAsync();
+        if (captchaResponseToken is null)
         {
-            _isEmailSend = false;
+            _toastService.ShowError("reCaptcha must be completed.");
+            return;
+        }
+        _recoveryFormComponent.SetFormCaptchaToken(captchaResponseToken);
+
+        _isPending = true;
+        StateHasChanged();
+
+        var isCaptchaCorrect = await _usersRepository.RecoverConfirmationEmailAsync(recoverDto);
+        if (!isCaptchaCorrect)
+        {
+            _toastService.ShowError("reCaptcha must be completed.");
         }
         else
         {
-            await _usersRepository.RecoverConfirmationEmailAsync(recoverDto);
-            EmailsProvided.Add(recoverDto.Email);
-            _isEmailSend = true;
+            _toastService.ShowSuccess("Account confirmation email has been resend.");
+            _recoveryFormComponent.ClearForm();
         }
 
         _isPending = false;
+        await _recoveryFormComponent.CaptchaComponent.ResetCaptchaAsync();
     }
+
 }

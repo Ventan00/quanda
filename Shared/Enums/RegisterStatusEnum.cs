@@ -5,6 +5,7 @@
         EMAIL_IS_TAKEN,
         NICKNAME_IS_TAKEN,
         REGISTER_FINISHED,
-        SERVER_ERROR
+        SERVER_ERROR,
+        INVALID_CAPTCHA
     }
 }

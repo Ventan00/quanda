@@ -1,52 +1,108 @@
 ﻿@using Quanda.Shared.DTOs.Requests
-@using Quanda.Client.Repositories.Interfaces
 @using Quanda.Shared.Enums
 @inject IUsersRepository _usersRepository
+@inject IToastService _toastService
+@inject NavigationManager _navManager
 
 <EditForm Model="@_registerDto" OnValidSubmit="@HandleValidSubmit" autocomplete="off">
-    <DataAnnotationsValidator />
+    <DataAnnotationsValidator/>
     <div class="form-group">
         <label for="email-input" class="d-block">Email Address</label>
-        <InputText id="email-input" @bind-Value="_registerDto.Email" />
-        <ValidationMessage For="() => _registerDto.Email" />
+        <InputText id="email-input" @bind-Value="_registerDto.Email"/>
+        <ValidationMessage For="() => _registerDto.Email"/>
     </div>
     <div class="form-group">
         <label for="nickname-input" class="d-block">Nickname</label>
-        <InputText id="nickname-input" @bind-Value="_registerDto.Nickname" />
-        <ValidationMessage For="() => _registerDto.Nickname" />
+        <InputText id="nickname-input" @bind-Value="_registerDto.Nickname"/>
+        <ValidationMessage For="() => _registerDto.Nickname"/>
     </div>
     <div class="form-group">
         <label for="password-input" class="d-block">Password</label>
-        <InputText id="password-input" @bind-Value="_registerDto.RawPassword" />
-        <ValidationMessage For="() => _registerDto.RawPassword" />
+        <InputText id="password-input" @bind-Value="_registerDto.RawPassword"/>
+        <ValidationMessage For="() => _registerDto.RawPassword"/>
     </div>
-    @switch (_registerStatus)
+
+    <CaptchaComponent @ref="_captchaComponent"/>
+
+    @if (_isPending)
     {
-
-        case RegisterStatusEnum.SERVER_ERROR:
-            <label class="text-danger d-block">An unexpected error has occurred. Please try again.</label>
-            break;
-        case RegisterStatusEnum.EMAIL_IS_TAKEN:
-            <label class="text-danger d-block">Email address has already been taken.</label>
-            break;
-        case RegisterStatusEnum.NICKNAME_IS_TAKEN:
-            <label class="text-danger d-block">Nickname has already been taken.</label>
-            break;
-        case RegisterStatusEnum.REGISTER_FINISHED:
-            <label class="text-success d-block">Your account has been created and awaits confirmation. Check your email to complete registration.</label>
-            break;
+        <button type="submit" class="btn btn-dark mt-3" disabled>Signing Up...</button>
     }
-
-    <button type="submit" class="btn btn-success">Sign Up</button>
+    else
+    {
+        <button type="submit" class="btn btn-success mt-3">Sign Up</button>
+    }
 </EditForm>
 
 @code {
+
+    /// <summary>
+    ///     Model formularza
+    /// </summary>
     private RegisterDTO _registerDto = new();
 
-    private RegisterStatusEnum? _registerStatus;
+    /// <summary>
+    ///     Komponent captcha
+    /// </summary>
+    private CaptchaComponent _captchaComponent;
 
+    /// <summary>
+    ///     Zmienna mowiąca o tym, czy rządanie jest w trakcie realizacji
+    /// </summary>
+    private bool _isPending;
+
+    /// <summary>
+    ///     Metoda wywoływana przy potwierdzeniu prawidłowo wypełnionego formularza rejestracji
+    /// </summary>
+    /// <returns></returns>
     private async Task HandleValidSubmit()
     {
-        _registerStatus = await _usersRepository.RegisterAsync(_registerDto);
+        var captchaResponseToken = await _captchaComponent.GetCaptchaResponseAsync();
+        if (captchaResponseToken is null)
+        {
+            _toastService.ShowError("reCaptcha must be completed");
+            return;
+        }
+        _registerDto.CaptchaResponseToken = captchaResponseToken;
+
+        _isPending = true;
+        StateHasChanged();
+
+        var registerStatus = await _usersRepository.RegisterAsync(_registerDto);
+        await HandleRegisterResponse(registerStatus);
+
+        _isPending = false;
     }
+
+    /// <summary>
+    ///     Metoda obsługująca odpowiedz od serwera na wysłany formularz
+    /// </summary>
+    /// <param name="registerStatusEnum"></param>
+    /// <returns></returns>
+    private async Task HandleRegisterResponse(RegisterStatusEnum registerStatusEnum)
+    {
+        switch (registerStatusEnum)
+        {
+            case RegisterStatusEnum.REGISTER_FINISHED:
+                _toastService.ShowSuccess("Confirm your email to finish registration", "Register Complete");
+                _navManager.NavigateTo("/login");
+                return;
+                ;
+            case RegisterStatusEnum.EMAIL_IS_TAKEN:
+                _toastService.ShowError("Email address has already been taken.");
+                break;
+            case RegisterStatusEnum.NICKNAME_IS_TAKEN:
+                _toastService.ShowError("Nickname has already been taken.");
+                break;
+            case RegisterStatusEnum.INVALID_CAPTCHA:
+                _toastService.ShowError("reCaptcha must be completed");
+                break;
+            case RegisterStatusEnum.SERVER_ERROR:
+                _toastService.ShowError("An unexpected error has occurred. Please try again.");
+                break;
+        }
+
+        await _captchaComponent.ResetCaptchaAsync();
+    }
+
 }

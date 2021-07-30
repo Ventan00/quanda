@@ -7,5 +7,7 @@ namespace Quanda.Shared.DTOs.Requests
         [Required]
         [EmailAddress]
         public string Email { get; set; }
+
+        public string CaptchaResponseToken { get; set; }
     }
 }

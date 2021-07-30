@@ -1,7 +1,5 @@
 ﻿using System;
-using System.IdentityModel.Tokens.Jwt;
 using System.Net;
-using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -27,24 +25,41 @@ namespace Quanda.Server.Controllers
         private readonly IJwtService _jwtService;
         private readonly IUserAuthService _userAuthService;
         private readonly ISmtpService _smtpService;
+        private readonly ICaptchaService _captchaService;
 
         public AccountsController(
             IUsersRepository usersRepository,
             ITempUsersRepository tempUsersRepository,
             IJwtService jwtService,
             IUserAuthService userAuthService,
-            ISmtpService smtpService)
+            ISmtpService smtpService,
+            ICaptchaService captchaService)
         {
             _usersRepository = usersRepository;
             _tempUsersRepository = tempUsersRepository;
             _jwtService = jwtService;
             _userAuthService = userAuthService;
             _smtpService = smtpService;
+            _captchaService = captchaService;
         }
 
+        /// <summary>
+        /// Rejestracja nowego użytkownika
+        /// </summary>
+        /// <param name="registerDto"></param>
+        /// <returns></returns>
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDTO registerDto)
         {
+            var isCaptchaCorrect = await _captchaService.VerifyCaptchaAsync(registerDto.CaptchaResponseToken);
+            if (!isCaptchaCorrect)
+            {
+                return Unauthorized(new RegisterResponseDTO
+                {
+                    RegisterStatus = RegisterStatusEnum.INVALID_CAPTCHA
+                });
+            }
+
             var confirmationCode = Guid.NewGuid().ToString();
 
             var registerStatus = await _usersRepository.AddNewUserAsync(registerDto, confirmationCode);
@@ -75,9 +90,23 @@ namespace Quanda.Server.Controllers
             }
         }
 
+        /// <summary>
+        /// Logowanie użytkownika
+        /// </summary>
+        /// <param name="loginDto"></param>
+        /// <returns></returns>
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDTO loginDto)
         {
+            var isCaptchaCorrect = await _captchaService.VerifyCaptchaAsync(loginDto.CaptchaResponseToken);
+            if (!isCaptchaCorrect)
+            {
+                return Unauthorized(new LoginResponseDTO
+                {
+                    LoginStatus = LoginStatusEnum.INVALID_CAPTCHA
+                });
+            }
+
             var response = new LoginResponseDTO
             {
                 LoginStatus = LoginStatusEnum.INVALID_CREDENTIALS
@@ -114,6 +143,11 @@ namespace Quanda.Server.Controllers
             return Ok(response);
         }
 
+        /// <summary>
+        /// Potwierdzenie konta nowo-zarejestrowanego użytkownika poprzez email
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
         [HttpGet("confirm-email/{code}")]
         public async Task<IActionResult> ConfirmEmail(string code)
         {
@@ -128,9 +162,20 @@ namespace Quanda.Server.Controllers
             };
         }
 
+        /// <summary>
+        /// Odzyskanie emailu sluzacego potwierdzeniu konta nowo-zarejestrowanego uzytkownika
+        /// </summary>
+        /// <param name="recoverDto"></param>
+        /// <returns></returns>
         [HttpPost("recover-confirmation-email")]
         public async Task<IActionResult> RecoverConfirmationEmail([FromBody] RecoverDTO recoverDto)
         {
+            var isCaptchaCorrect = await _captchaService.VerifyCaptchaAsync(recoverDto.CaptchaResponseToken);
+            if (!isCaptchaCorrect)
+            {
+                return Unauthorized();
+            }
+
             var code = await _tempUsersRepository.GetConfirmationCodeForUserAsync(recoverDto.Email);
             if (code == null)
                 return NoContent();
@@ -144,9 +189,20 @@ namespace Quanda.Server.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Odzyskanie hasła poprzez wysłany email
+        /// </summary>
+        /// <param name="recoverDto"></param>
+        /// <returns></returns>
         [HttpPost("recover-password")]
         public async Task<IActionResult> RecoverPassword([FromBody] RecoverDTO recoverDto)
         {
+            var isCaptchaCorrect = await _captchaService.VerifyCaptchaAsync(recoverDto.CaptchaResponseToken);
+            if (!isCaptchaCorrect)
+            {
+                return Unauthorized();
+            }
+
             var user = await _usersRepository.GetUserByEmailAsync(recoverDto.Email);
             if (user is null || user.IdTempUserNavigation is not null)
                 return NoContent();
@@ -160,26 +216,37 @@ namespace Quanda.Server.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Ustawienie nowego hasła możliwe po jego odzyskaniu
+        /// </summary>
+        /// <param name="passwordResetDto"></param>
+        /// <returns></returns>
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] PasswordResetDTO passwordResetDto)
         {
+            var isCaptchaCorrect = await _captchaService.VerifyCaptchaAsync(passwordResetDto.CaptchaResponseToken);
+            if (!isCaptchaCorrect)
+            {
+                return Unauthorized();
+            }
+
             var providedUser = await _usersRepository.GetUserByIdAsync((int)passwordResetDto.IdUser);
             if (providedUser is null || providedUser.IdTempUserNavigation is not null)
-                return BadRequest();
+                return Forbid();
 
             var decodedRecoveryJwt = Microsoft.IdentityModel.Tokens.Base64UrlEncoder
                 .Decode(passwordResetDto.UrlEncodedRecoveryJwt);
 
             var principal = _jwtService.GetPrincipalFromPasswordRecoveryToken(decodedRecoveryJwt, providedUser);
             if (principal is null)
-                return BadRequest();
+                return Forbid();
 
             var claimIdUser = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (claimIdUser is null || !int.TryParse(claimIdUser, out _))
-                return BadRequest();
+                return Forbid();
 
             if (providedUser.IdUser != int.Parse(claimIdUser))
-                return BadRequest();
+                return Forbid();
 
             var isChanged = await _usersRepository.SetNewPasswordForUser(providedUser, passwordResetDto.RawPassword);
             if (!isChanged)
@@ -188,6 +255,11 @@ namespace Quanda.Server.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Odświerzenie tokenów zalogowanego użytkownika
+        /// </summary>
+        /// <param name="refreshDto"></param>
+        /// <returns></returns>
         [HttpPost("refresh")]
         public async Task<IActionResult> Refresh([FromBody] RefreshRequestDTO refreshDto)
         {
@@ -217,6 +289,11 @@ namespace Quanda.Server.Controllers
             });
         }
 
+        /// <summary>
+        /// Wylogowanie zalogowanego użytkownika
+        /// </summary>
+        /// <param name="logoutDto"></param>
+        /// <returns></returns>
         [Authorize]
         [HttpPost("logout")]
         public async Task<IActionResult> Logout([FromBody] LogoutDTO logoutDto)
