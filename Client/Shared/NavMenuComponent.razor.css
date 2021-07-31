@@ -1,0 +1,38 @@
+.logo {
+    padding: 15px;
+}
+.side-menu-item {
+    width: 100%;
+    display: flex;
+}
+.quanda-icon {
+    font-size: 40px;
+    color: #F6F6F6;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    padding-top: 15px;
+    transition: color 0.5s;
+}
+.quanda-icon:hover {
+    color: #fff;
+}
+.active {
+    color: #fff;
+}
+.navbar-label {
+    color: #F6F6F6;
+    text-align: center;
+    padding-bottom: 15px;
+    transition: color 0.5s;
+}
+.navbar-label:hover {
+    color: #fff;
+}
+.menu-divider {
+    width: 25px;
+    margin-left: auto;
+    margin-right: auto;
+    height: 1px;
+    background: #fff;
+}

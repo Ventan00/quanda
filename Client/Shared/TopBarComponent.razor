@@ -1,0 +1,35 @@
+﻿<div class="search-bar-container">
+    <div class="bar-content">
+        <img src="img/magnifing-glass.svg" />
+        <input type="text" class="search-bar" placeholder="Search..." />
+    </div>
+</div>
+<AuthorizeView>
+    <NotAuthorized>
+        <NavLink href="login">
+            <div class="login-btn">
+                Log in
+            </div>
+        </NavLink>
+        <NavLink href="register" class="sign-up-btn">
+            <div class="sign-up-btn">
+                Sign up
+            </div>
+        </NavLink>
+    </NotAuthorized>
+    <Authorized>
+        <NavLink href="ask-question">
+            <div class="ask-question-btn">
+                Ask question
+            </div>
+        </NavLink>
+        <div class="icon icon-mail"/>
+        <div class="icon icon-notification"/>
+        <img src="missing" class="profile-logo"/>
+    </Authorized>
+</AuthorizeView>
+
+
+@code {
+
+}

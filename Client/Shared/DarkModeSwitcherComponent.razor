@@ -1,0 +1,41 @@
+﻿<div class="background">
+    <img class="@style toggle" src="img/@img" @onclick="changeMode"/>
+</div>
+
+@code {
+    /// <summary>
+    /// 
+    /// </summary>
+    [Parameter]
+    public EventCallback<bool> EventCallback { get; set; } = default(EventCallback<bool>);
+    /// <summary>
+    ///     Zmienna która mówi jaki tryb jest włączony
+    /// </summary>
+    bool isWhite = true;
+    /// <summary>
+    ///     Aktualna klasa obrazka
+    /// </summary>
+    private string style = "toggle-white";
+
+    private string img = "sun.svg";
+
+    /// <summary>
+    /// Funkcja która zmienia mode z black na white
+    /// </summary>
+    public async void changeMode()
+    {
+        isWhite = !isWhite;
+        if (isWhite) {
+            style = "toggle-white";
+            img = "sun.svg";
+        }
+        else { 
+            style = "toggle-black";
+            img = "moon.svg";
+        }
+        if (!object.Equals(EventCallback, default(EventCallback<bool>)))
+        {
+            await EventCallback.InvokeAsync(isWhite);
+        }
+    }
+}

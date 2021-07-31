@@ -1,0 +1,45 @@
+﻿@using Quanda.Client.Authentication
+@using Blazored.Toast.Configuration
+@inject IAuthenticationService _authenticationService
+@inject NavigationManager _navManager
+@inject IToastService _toastService
+<div>
+    <img class="logo" aria-hidden="true" src="img/logo_lightbg_wthtext.svg" />
+</div>
+<NavLink href="" Match="NavLinkMatch.All" class="side-menu-item">
+    <div class="quanda-icon icon-home" aria-hidden="true"></div>
+    <div class="navbar-label">Home</div>
+</NavLink>
+<div class="menu-divider"></div>
+<NavLink href="tags" class="side-menu-item">
+    <div class="quanda-icon icon-tag" aria-hidden="true"></div>
+    <div class="navbar-label">All tags</div>
+</NavLink>
+<div class="menu-divider"></div>
+<NavLink href="users" class="side-menu-item">
+    <div class="quanda-icon icon-user" aria-hidden="true"></div>
+    <div class="navbar-label">Users</div>
+</NavLink>
+<div class="menu-divider"></div>
+<AuthorizeView>
+    <Authorized>
+        <div class="quanda-icon icon-logout" aria-hidden="true" @onclick="@HandleLogout"></div>
+        <div class="navbar-label" @onclick="@HandleLogout">Log out</div>
+    </Authorized>
+    <NotAuthorized>
+        <NavLink href="login" class="side-menu-item">
+            <div class="quanda-icon icon-login" aria-hidden="true"></div>
+            <div class="navbar-label">Log in</div>
+        </NavLink>
+    </NotAuthorized>
+</AuthorizeView>
+
+<DarkModeSwitcherComponent />
+
+@code {
+    private async Task HandleLogout()
+    {
+        await _authenticationService.LogoutAsync(true);
+        _toastService.ShowSuccess("You have logged out.");
+    }
+}

@@ -4,19 +4,29 @@
 @inject HttpClientInterceptorService _interceptorService
 @implements IDisposable
 
+<div class="sidebar">
+    <NavMenuComponent/>
+</div>
 <div class="page">
-    <div class="sidebar">
-        <NavMenu />
+    <div class="topbar">
+        <TopBarComponent/>
+    </div>
+    <div class="page-content">
+        @Body
+    </div>
+    <footer class="page-footer">
+
+    </footer>
+</div>
+
+
+<div class="main">
+    <div class="top-row px-4">
+        <a href="http://blazor.net" target="_blank" class="ml-md-auto">About</a>
     </div>
 
-    <div class="main">
-        <div class="top-row px-4">
-            <a href="http://blazor.net" target="_blank" class="ml-md-auto">About</a>
-        </div>
-
-        <div class="content px-4">
-            @Body
-        </div>
+    <div class="content px-4">
+            
     </div>
 </div>
 

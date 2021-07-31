@@ -1,0 +1,138 @@
+@font-face {
+    font-display: block;
+    font-family: 'Quanda';
+    font-style: normal;
+    font-weight: normal;
+    src: url('fonts/Quanda.eot?6pcmsz');
+    src: url('fonts/Quanda.eot?6pcmsz#iefix') format('embedded-opentype'), url('fonts/Quanda.ttf?6pcmsz') format('truetype'), url('fonts/Quanda.woff?6pcmsz') format('woff'), url('fonts/Quanda.svg?6pcmsz#Quanda') format('svg');
+}
+
+[class^="icon-"], [class*=" icon-"] {
+    -moz-osx-font-smoothing: grayscale;
+    /* Better Font Rendering =========== */
+    -webkit-font-smoothing: antialiased;
+    /* use !important to prevent issues with browser extensions that change fonts */
+    font-family: 'Quanda' !important;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: normal;
+    line-height: 1;
+    speak: never;
+    text-transform: none;
+}
+
+.icon-arrowdown:before {
+    content: "\e900";
+}
+
+.icon-arrowup:before {
+    content: "\e901";
+}
+
+.icon-bold:before {
+    content: "\e902";
+}
+
+.icon-check:before {
+    content: "\e903";
+}
+
+.icon-cup:before {
+    content: "\e904";
+}
+
+.icon-delete:before {
+    content: "\e905";
+}
+
+.icon-edit:before {
+    content: "\e906";
+}
+
+.icon-facebook:before {
+    content: "\e907";
+}
+
+.icon-home:before {
+    content: "\e908";
+}
+
+.icon-instagram:before {
+    content: "\e909";
+}
+
+.icon-italic:before {
+    content: "\e90a";
+}
+
+.icon-link:before {
+    content: "\e90b";
+}
+
+.icon-list:before {
+    content: "\e90c";
+}
+
+.icon-listnr:before {
+    content: "\e90d";
+}
+
+.icon-location:before {
+    content: "\e90e";
+}
+
+.icon-login:before {
+    content: "\e90f";
+}
+
+.icon-logout:before {
+    content: "\e910";
+}
+
+.icon-mail:before {
+    content: "\e911";
+}
+
+.icon-notification:before {
+    content: "\e912";
+}
+
+.icon-picture:before {
+    content: "\e913";
+}
+
+.icon-quote:before {
+    content: "\e914";
+}
+
+.icon-redo:before {
+    content: "\e915";
+}
+
+.icon-report:before {
+    content: "\e916";
+}
+
+.icon-tag:before {
+    content: "\e917";
+}
+
+.icon-time:before {
+    content: "\e918";
+}
+
+.icon-underline:before {
+    content: "\e919";
+}
+
+.icon-undo:before {
+    content: "\e91a";
+}
+
+.icon-user:before {
+    content: "\e91b";
+}
+
+.icon-views:before {
+    content: "\e91c";
+}
