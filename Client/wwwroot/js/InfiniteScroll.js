@@ -1,4 +1,7 @@
-﻿class InfiniteScroll {
+﻿/// <summary>
+/// Klasa odpowiedzialna za obsługiwanie przewijania strony wraz z wyłowaniem akcji w momencie zjechania na pewną wysokość.
+/// </summary>
+class InfiniteScroll {
     constructor() {
         this.Init = function (elementId, dotNetHelper) {
             this.element = document.getElementById(elementId);

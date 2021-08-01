@@ -50,7 +50,9 @@
     /// </summary>
     [Parameter]
     public int IdQuestion { get; set; }
-    [Parameter]
+    /// <summary>
+    /// Lista odpowiedzi do pytania.
+    /// </summary>
     public List<AnswerResponseDTO> Answers { get; set; }
     /// <summary>
     /// Id odpowiedzi, do której odnosi się nowa odpowiedź.
@@ -166,8 +168,7 @@
             var TotalSize = PageNumber * PageSize;
             var answersParams = new AnswersPageDTO
             {
-                StartIndex = Answers.Count != TotalSize ? TotalSize - 1: TotalSize,
-                PageSize = PageSize
+                StartIndex = Answers.Count != TotalSize ? TotalSize - 1: TotalSize
             };
             var newAnswers = await answerRepository.GetAnswersAsync(IdQuestion, answersParams);
             newAnswers.RemoveAll(a => Answers.Any(an => an.IdAnswer == a.IdAnswer));

@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Quanda.Server.Repositories.Interfaces
 {
+    /// <summary>
+    /// Repozytorium odpowiedzialne za odpowiedzi.
+    /// </summary>
     public interface IAnswerRepository
     {
 

@@ -2,6 +2,7 @@
 using Quanda.Server.Data;
 using Quanda.Server.Repositories.Interfaces;
 using Quanda.Server.Utils;
+using Quanda.Shared;
 using Quanda.Shared.DTOs.Requests;
 using Quanda.Shared.DTOs.Responses;
 using Quanda.Shared.Models;
@@ -52,8 +53,8 @@ namespace Quanda.Server.Repositories.Implementations
                 Mark = a.RatingAnswers.Any(ra => ra.IdUser == idUserLogged) == false ? 0 : a.RatingAnswers.SingleOrDefault(ra => ra.IdUser == idUserLogged).Value ? 1 : -1,
                 AmountOfChildAnswers = a.InverseIdRootAnswersNavigation.Count
             }).OrderByDescending(a => a.Rating).ThenBy(a => a.IdAnswer).ToListAsync();
-
-            return answers.Skip(answersParams.StartIndex).Take(answersParams.PageSize).ToList();
+            var pageSize = answersParams.PageSize == 0 ? Config.ANSWERS_PAGE_SIZE : answersParams.PageSize;
+            return answers.Skip(answersParams.StartIndex).Take(pageSize).ToList();
         }
 
         public async Task<AnswerResponseDTO> GetAnswerAsync(int idAnswer, int idUserLogged)

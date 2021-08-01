@@ -1,0 +1,8 @@
+﻿@page "/question/{IdQuestion:int}"
+<AnswersToQuestionsComponent IdQuestion="IdQuestion">
+
+</AnswersToQuestionsComponent>
+@code {
+    [Parameter]
+    public int IdQuestion { get; set; }
+}
