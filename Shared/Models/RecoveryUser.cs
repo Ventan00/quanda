@@ -2,7 +2,7 @@
 
 namespace Quanda.Shared.Models
 {
-    public class TempUser
+    public class RecoveryUser
     {
         public int IdUser { get; set; }
         public string Code { get; set; }

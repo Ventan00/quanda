@@ -1,11 +1,11 @@
 ﻿namespace Quanda.Shared.Models
 {
-    public class QuestionCategory
+    public class QuestionTag
     {
         public int IdQuestion { get; set; }
-        public int IdCategory { get; set; }
+        public int IdTag { get; set; }
 
-        public virtual Category IdCategoryNavigation { get; set; }
+        public virtual Tag IdTagNavigation { get; set; }
         public virtual Question IdQuestionNavigation { get; set; }
     }
 }

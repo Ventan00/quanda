@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Quanda.Server.Data;
 using Quanda.Server.Repositories.Interfaces;
 using Quanda.Server.Utils;
@@ -11,6 +7,10 @@ using Quanda.Shared.DTOs.Requests;
 using Quanda.Shared.DTOs.Responses;
 using Quanda.Shared.Enums;
 using Quanda.Shared.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Quanda.Server.Repositories.Implementations
 {
@@ -42,9 +42,9 @@ namespace Quanda.Server.Repositories.Implementations
                                 .Where(answer => answer.IdQuestion == question.IdQuestion)
                                 .Count(),
                             Avatar = question.IdUserNavigation.Avatar,
-                            Categories = _context.QuestionCategories
+                            Categories = _context.QuestionTags
                                 .Where(qc => qc.IdQuestion == question.IdQuestion)
-                                .Select(qc => qc.IdCategoryNavigation.Name).ToList(),
+                                .Select(qc => qc.IdTagNavigation.Name).ToList(),
                             Description = question.Description,
                             Header = question.Header,
                             IdUser = question.IdUser,
@@ -67,9 +67,9 @@ namespace Quanda.Server.Repositories.Implementations
                                 .Where(answer => answer.IdQuestion == question.IdQuestion)
                                 .Count(),
                             Avatar = question.IdUserNavigation.Avatar,
-                            Categories = _context.QuestionCategories
+                            Categories = _context.QuestionTags
                                 .Where(qc => qc.IdQuestion == question.IdQuestion)
-                                .Select(qc => qc.IdCategoryNavigation.Name).ToList(),
+                                .Select(qc => qc.IdTagNavigation.Name).ToList(),
                             Description = question.Description,
                             Header = question.Header,
                             IdUser = question.IdUser,
@@ -92,9 +92,9 @@ namespace Quanda.Server.Repositories.Implementations
                                 .Where(answer => answer.IdQuestion == question.IdQuestion)
                                 .Count(),
                             Avatar = question.IdUserNavigation.Avatar,
-                            Categories = _context.QuestionCategories
+                            Categories = _context.QuestionTags
                                 .Where(qc => qc.IdQuestion == question.IdQuestion)
-                                .Select(qc => qc.IdCategoryNavigation.Name).ToList(),
+                                .Select(qc => qc.IdTagNavigation.Name).ToList(),
                             Description = question.Description,
                             Header = question.Header,
                             IdUser = question.IdUser,
@@ -110,12 +110,12 @@ namespace Quanda.Server.Repositories.Implementations
             return sortOption switch
             {
                 SortOptionEnum.Views => await _context.Questions
-                    .Include(question => question.QuestionCategories)
+                    .Include(question => question.QuestionTags)
                     .Include(question => question.IdUserNavigation)
                     .Where(
-                        question => _context.QuestionCategories
+                        question => _context.QuestionTags
                             .Where(qc => qc.IdQuestion == question.IdQuestion)
-                            .Any(qc => categories.Any(cat => cat == qc.IdCategory))
+                            .Any(qc => categories.Any(cat => cat == qc.IdTag))
                     )
                     .OrderBy(question => question.Views)
                     .Skip(skip)
@@ -127,9 +127,9 @@ namespace Quanda.Server.Repositories.Implementations
                             .Where(answer => answer.IdQuestion == question.IdQuestion)
                             .Count(),
                         Avatar = question.IdUserNavigation.Avatar,
-                        Categories = _context.QuestionCategories
+                        Categories = _context.QuestionTags
                             .Where(qc => qc.IdQuestion == question.IdQuestion)
-                            .Select(qc => qc.IdCategoryNavigation.Name).ToList(),
+                            .Select(qc => qc.IdTagNavigation.Name).ToList(),
                         Description = question.Description,
                         Header = question.Header,
                         IdUser = question.IdUser,
@@ -141,12 +141,12 @@ namespace Quanda.Server.Repositories.Implementations
                     })
                     .ToListAsync(),
                 SortOptionEnum.Answers => await _context.Questions
-                    .Include(question => question.QuestionCategories)
+                    .Include(question => question.QuestionTags)
                     .Include(question => question.IdUserNavigation)
                     .Where(
-                        question => _context.QuestionCategories
+                        question => _context.QuestionTags
                             .Where(qc => qc.IdQuestion == question.IdQuestion)
-                            .Any(qc => categories.Any(cat => cat == qc.IdCategory))
+                            .Any(qc => categories.Any(cat => cat == qc.IdTag))
                     )
                     .OrderBy(question => question.Answers.Count)
                     .Skip(skip)
@@ -158,9 +158,9 @@ namespace Quanda.Server.Repositories.Implementations
                             .Where(answer => answer.IdQuestion == question.IdQuestion)
                             .Count(),
                         Avatar = question.IdUserNavigation.Avatar,
-                        Categories = _context.QuestionCategories
+                        Categories = _context.QuestionTags
                             .Where(qc => qc.IdQuestion == question.IdQuestion)
-                            .Select(qc => qc.IdCategoryNavigation.Name).ToList(),
+                            .Select(qc => qc.IdTagNavigation.Name).ToList(),
                         Description = question.Description,
                         Header = question.Header,
                         IdUser = question.IdUser,
@@ -172,12 +172,12 @@ namespace Quanda.Server.Repositories.Implementations
                     })
                     .ToListAsync(),
                 SortOptionEnum.Date => await _context.Questions
-                    .Include(question => question.QuestionCategories)
+                    .Include(question => question.QuestionTags)
                     .Include(question => question.IdUserNavigation)
                     .Where(
-                        question => _context.QuestionCategories
+                        question => _context.QuestionTags
                             .Where(qc => qc.IdQuestion == question.IdQuestion)
-                            .Any(qc => categories.Any(cat => cat == qc.IdCategory))
+                            .Any(qc => categories.Any(cat => cat == qc.IdTag))
                     )
                     .OrderBy(question => question.PublishDate)
                     .Skip(skip)
@@ -189,9 +189,9 @@ namespace Quanda.Server.Repositories.Implementations
                             .Where(answer => answer.IdQuestion == question.IdQuestion)
                             .Count(),
                         Avatar = question.IdUserNavigation.Avatar,
-                        Categories = _context.QuestionCategories
+                        Categories = _context.QuestionTags
                             .Where(qc => qc.IdQuestion == question.IdQuestion)
-                            .Select(qc => qc.IdCategoryNavigation.Name).ToList(),
+                            .Select(qc => qc.IdTagNavigation.Name).ToList(),
                         Description = question.Description,
                         Header = question.Header,
                         IdUser = question.IdUser,
@@ -281,8 +281,8 @@ namespace Quanda.Server.Repositories.Implementations
         {
             if (category.Count == 0)
                 return await _context.Questions.CountAsync();
-            return await _context.QuestionCategories
-                .Where(qc => category.Any(cat => qc.IdCategory == cat))
+            return await _context.QuestionTags
+                .Where(qc => category.Any(cat => qc.IdTag == cat))
                 .GroupBy(qc => qc.IdQuestion)
                 .Select(qcg => qcg.Key)
                 .CountAsync();

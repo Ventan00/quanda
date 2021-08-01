@@ -31,6 +31,12 @@ namespace Quanda.Server.EfConfigurations
             builder.Property(q => q.ToCheck).IsRequired().HasDefaultValue(false);
 
             builder.Property(q => q.IsModified).IsRequired().HasDefaultValue(false);
+
+            builder.HasOne(q => q.IdUserNavigation)
+                .WithMany(u => u.Questions)
+                .HasForeignKey(q => q.IdUser)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("Question_User");
         }
     }
 }

@@ -7,9 +7,9 @@ namespace Quanda.Shared.Models
     {
         public Question()
         {
-            QuestionCategories = new HashSet<QuestionCategory>();
-            Notifications = new HashSet<Notification>();
+            QuestionTags = new HashSet<QuestionTag>();
             Answers = new HashSet<Answer>();
+            Reports = new HashSet<Report>();
         }
 
         public int IdQuestion { get; set; }
@@ -22,9 +22,10 @@ namespace Quanda.Shared.Models
         public bool ToCheck { get; set; }
         public int IdUser { get; set; }
 
-        public virtual ICollection<QuestionCategory> QuestionCategories { get; set; }
-        public virtual ICollection<Notification> Notifications { get; set; }
-        public virtual ICollection<Answer> Answers { get; set; }
         public virtual User IdUserNavigation { get; set; }
+
+        public virtual ICollection<QuestionTag> QuestionTags { get; set; }
+        public virtual ICollection<Answer> Answers { get; set; }
+        public virtual ICollection<Report> Reports { get; set; }
     }
 }
