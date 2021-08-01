@@ -4,9 +4,10 @@
 @inject NavigationManager _navManager
 @inject IToastService _toastService
 
-<button class="btn btn-link" @onclick="@HandleLogout">
-    <span class="oi oi-account-logout" aria-hidden="true"></span> Logout
-</button>
+<a class="side-menu-item" @onclick="@HandleLogout" >
+    <div class="quanda-icon icon-logout" aria-hidden="true"></div>
+    <div class="navbar-label">Log out</div>
+</a>
 
 @code {
     private async Task HandleLogout()
