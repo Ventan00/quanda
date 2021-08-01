@@ -1,24 +1,27 @@
 ﻿.background {
     background-color: #54656E;
     border-radius: 19px;
-    width: 75px;
-    height: 37px;
-    padding: 4px;
     display: flex;
+    height: 37px;
+    margin-bottom: 20px;
     margin-left: auto;
     margin-right: auto;
-    margin-bottom: 20px;
     margin-top: auto;
+    padding: 4px;
+    width: 75px;
 }
+
 .toggle {
-    transition: all 0.4s linear;
     cursor: pointer;
+    transition: all 0.2s linear;
 }
+
 .toggle-white {
     background: white;
     border-radius: 100%;
     padding: 3px;
 }
+
 .toggle-black {
     background: #333F44;
     border-radius: 100%;

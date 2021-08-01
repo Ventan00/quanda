@@ -1,35 +1,48 @@
 .page {
+    background-color: #f6f6f6;
+    color: black;
+    height: 100vh;
     margin-left: 90px;
     width: calc(100% - 90px);
-    background-color: #f6f6f6;
-    height: 100vh;
+}
+
+.page-dark {
+    background-color: #49555C;
+    color: #F6F6F6;
 }
 
 .sidebar {
     background-color: #3F4D54;
-    width: 90px;
-    position: fixed;
-    height: 100%;
     display: flex;
     flex-direction: column;
+    height: 100%;
+    position: fixed;
+    width: 90px;
     z-index: 2;
 }
+
 .topbar {
-    height: 90px;
-    width: calc(100% - 90px);
     background: white;
-    position: fixed;
+    box-shadow: -3px -13px 15px 13px #ccc;
     display: flex;
-    box-shadow: 4px 0px 9px 2px #ccc;
+    height: 90px;
+    position: fixed;
+    width: calc(100% - 90px);
 }
+
+.topbar-dark {
+    background: #3F4D54;
+    box-shadow: -3px -13px 15px 13px #333F44;
+}
+
 .page-content {
-    padding-top: 90px;
-    width: 100%;
     min-height: 100vh;
-}
-.page-footer {
-    height: 300px;
-    background-color: #3F4D54;
+    padding-top: 90px;
     width: 100%;
 }
 
+.page-footer {
+    background-color: #3F4D54;
+    height: 300px;
+    width: 100%;
+}

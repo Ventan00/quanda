@@ -1,10 +1,9 @@
 ﻿@using Quanda.Client.Authentication
-@using Blazored.Toast.Configuration
 @inject IAuthenticationService _authenticationService
 @inject NavigationManager _navManager
 @inject IToastService _toastService
 <div>
-    <img class="logo" aria-hidden="true" src="img/logo_lightbg_wthtext.svg" />
+    <img class="logo" aria-hidden="true" src="img/logo_lightbg_wthtext.svg"/>
 </div>
 <NavLink href="" Match="NavLinkMatch.All" class="side-menu-item">
     <div class="quanda-icon icon-home" aria-hidden="true"></div>
@@ -34,12 +33,30 @@
     </NotAuthorized>
 </AuthorizeView>
 
-<DarkModeSwitcherComponent />
+<DarkModeSwitcherComponent EventCallback="HandleThemeChange"/>
 
 @code {
+
+    /// <summary>
+    ///     Z głównego layoutu callbak słuchający na zmiany theme
+    /// </summary>
+    [Parameter]
+    public EventCallback<bool> EventCallback { get; set; }
+
     private async Task HandleLogout()
     {
         await _authenticationService.LogoutAsync(true);
         _toastService.ShowSuccess("You have logged out.");
     }
+
+    /// <summary>
+    ///     Funkcja która zmienia aktualny theme
+    /// </summary>
+    /// <param name="theme">True = light, False = dark</param>
+    /// <returns>void</returns>
+    public async Task HandleThemeChange(bool theme)
+    {
+        await EventCallback.InvokeAsync(theme);
+    }
+
 }

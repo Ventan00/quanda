@@ -1,18 +1,22 @@
-﻿@using Blazored.Toast.Configuration
-@using Quanda.Client.Authentication
-@inherits LayoutComponentBase
+﻿@inherits LayoutComponentBase
 @inject HttpClientInterceptorService _interceptorService
+@using Quanda.Client.Authentication
+@using Blazored.Toast.Configuration
 @implements IDisposable
 
 <div class="sidebar">
-    <NavMenuComponent/>
+    <NavMenuComponent EventCallback="HandleThemeChange"/>
 </div>
-<div class="page">
-    <div class="topbar">
-        <TopBarComponent/>
+<div class="page @(isWhiteTheme ? "" : "page-dark")">
+    <div class="topbar @(isWhiteTheme ? "" : "topbar-dark")">
+        <CascadingValue Value="isWhiteTheme">
+            <TopBarComponent/>
+        </CascadingValue>
     </div>
     <div class="page-content">
-        @Body
+        <CascadingValue Value="isWhiteTheme">
+            @Body
+        </CascadingValue>
     </div>
     <footer class="page-footer">
 
@@ -26,19 +30,25 @@
     </div>
 
     <div class="content px-4">
-            
+
     </div>
 </div>
 
 
 <BlazoredToasts Position="ToastPosition.BottomRight" Timeout="3" IconType="IconType.FontAwesome"
                 SuccessClass="success-toast-override"
-                ShowProgressBar=true
+                ShowProgressBar="true"
                 SuccessIcon="fa fa-thumbs-up"
-                ErrorIcon="fa fa-bug" />
+                ErrorIcon="fa fa-bug"/>
 
 @code
 {
+    /// <summary>
+    ///     Zmienna opisująca jaki jest theme
+    /// </summary>
+    public bool isWhiteTheme = true;
+
+
     protected override void OnInitialized()
     {
         _interceptorService.RegisterEvents();
@@ -47,5 +57,15 @@
     public void Dispose()
     {
         _interceptorService.DisposeEvents();
+    }
+
+    /// <summary>
+    ///     Funkcja która zmienia aktualny theme
+    /// </summary>
+    /// <param name="theme">True = light, False = dark</param>
+    /// <returns>void</returns>
+    public async Task HandleThemeChange(bool theme)
+    {
+        isWhiteTheme = theme;
     }
 }

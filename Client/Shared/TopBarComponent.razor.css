@@ -1,112 +1,134 @@
 ﻿.search-bar-container {
-    display: flex;
     background-color: #ECECEC;
-    color: #878787;
     border-radius: 33px;
-    margin-top: 17px;
-    margin-left: 46px;
+    color: #878787;
+    display: flex;
     margin-bottom: 17px;
+    margin-left: 46px;
+    margin-top: 17px;
     transition: all 0.4s;
     width: 100%;
 }
-.search-bar-container img {
-    padding: 10px;
-}
+
+.search-bar-container-dark { background-color: #54656E; }
+
+.search-bar-container img { padding: 10px; }
+
 .search-bar-container:hover {
-    background: linear-gradient(38deg, rgba(237,116,110,1) 0%, rgba(240,135,130,1) 35%, rgba(251,228,138,1) 70%, rgba(247,217,100,1) 100%);
+    background: linear-gradient(38deg, rgba(237, 116, 110, 1) 0%, rgba(240, 135, 130, 1) 35%, rgba(251, 228, 138, 1) 70%, rgba(247, 217, 100, 1) 100%);
     padding: 1px;
 }
+
 .bar-content {
     background-color: #ECECEC;
     border-radius: 33px;
+    height: 100%;
     margin: auto;
     width: 100%;
-    height: 100%;
 }
+
+.bar-content-dark {
+    background-color: #54656E;
+    color: #94A7B0;
+}
+
 .search-bar {
+    background-color: #ECECEC;
     border: none;
     outline: 0;
-    background-color: #ECECEC;
-    width: calc(100% - 85px);
-    padding-top: 15px;
     padding-bottom: 15px;
+    padding-top: 15px;
+    width: calc(100% - 85px);
 }
+
+.search-bar-dark {
+    background-color: #54656E;
+    color: #94A7B0;
+}
+
 .login-btn {
-    font-family: 'Sen', sans-serif;
     background-color: #F08782;
     border-radius: 33px;
-    margin-left: 21px;
-    width: 150px;
-    height: 55px;
-    cursor: pointer;
     color: white;
-    text-align: center;
-    padding-top: 15px;
-    margin-top: 15px;
-    transition: all 0.4s;
-}
-.sign-up-btn {
+    cursor: pointer;
     font-family: 'Sen', sans-serif;
+    height: 55px;
+    margin-left: 21px;
+    margin-top: 15px;
+    padding-top: 15px;
+    text-align: center;
+    transition: all 0.4s;
+    width: 150px;
+}
+
+.sign-up-btn {
     background-color: #FBE48A;
     border-radius: 33px;
-    margin-left: 21px;
-    width: 150px;
-    height: 55px;
-    cursor: pointer;
     color: #292F36;
-    text-align: center;
-    padding-top: 15px;
-    margin-top: 15px;
-    transition: all 0.4s;
-    margin-right: 150px;
-}
-.sign-up-btn:hover {
-    color: black;
-}
-.login-btn:hover {
-    color: #ececec;
-}
-.ask-question-btn {
-    font-family: 'Sen', sans-serif;
-    background: linear-gradient(65.14deg, #fbe48a 0%, #f7d964 8.6%, #f08782 70.3%, #ed746e 100%);
-    border-radius: 33px;
-    margin-left: 21px;
-    width: 150px;
-    height: 55px;
     cursor: pointer;
-    color: white;
-    text-align: center;
-    padding-top: 15px;
+    font-family: 'Sen', sans-serif;
+    height: 55px;
+    margin-left: 21px;
+    margin-right: 150px;
     margin-top: 15px;
+    padding-top: 15px;
+    text-align: center;
     transition: all 0.4s;
+    width: 150px;
 }
-.ask-question-btn:hover {
-    color: #ececec;
+
+.sign-up-btn:hover { color: black; }
+
+.login-btn:hover { color: #ececec; }
+
+.ask-question-btn {
+    background: linear-gradient(245.14deg, #fbe48a 0%, #f7d964 8.6%, #f08782 70.3%, #ed746e 100%);
+    border-radius: 33px;
+    color: white;
+    cursor: pointer;
+    font-family: 'Sen', sans-serif;
+    height: 55px;
+    margin-left: 21px;
+    margin-top: 15px;
+    padding-top: 15px;
+    text-align: center;
+    transition: all 0.4s;
+    width: 150px;
 }
+
+.ask-question-btn:hover { color: #ececec; }
+
 .icon {
     background-color: #ECECEC;
     border-radius: 100%;
-    font-size: 26px;
     color: #878787;
-    text-align: center;
-    margin-left: 21px;
+    font-size: 26px;
     height: 55px;
-    width: 80px;
+    margin-left: 21px;
+    margin-top: 15px;
     padding: 8px;
     padding-top: 15px;
-    margin-top: 15px;
+    text-align: center;
+    width: 80px;
 }
+
+.icon-dark {
+    background-color: #54656E;
+    color: #94A7B0;
+}
+
 .icon-notification {
-    font-size: 43px;
+    font-size: 40px;
     padding: 10px;
     padding-top: 7px;
 }
+
 .profile-logo {
-    border-radius: 100%;
-    margin-left: 21px;
-    height: 55px;
-    width: 55px;
     background-color: #ECECEC;
-    margin-top: 15px;
+    border-radius: 100%;
+    height: 55px;
+    margin-left: 21px;
     margin-right: 60px;
+    margin-top: 15px;
+    width: 55px;
 }
