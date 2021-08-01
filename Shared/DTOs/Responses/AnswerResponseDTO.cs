@@ -12,5 +12,6 @@ namespace Quanda.Shared.DTOs.Responses
         public int Mark { get; set; }
         public UserResponseDTO UserResponseDTO { get; set; }
         public List<AnswerResponseDTO> ChildAnswers { get; set; }
+        public int AmountOfChildAnswers { get; set; }
     }
 }

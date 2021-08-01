@@ -6,15 +6,28 @@ using System.Threading.Tasks;
 
 namespace Quanda.Server.Repositories.Interfaces
 {
+    /// <summary>
+    /// Repozytorium odpowiedzialne za odpowiedzi.
+    /// </summary>
     public interface IAnswerRepository
     {
+
         /// <summary>
-        /// Metoda zwraca listę odpowiedzi na dane pytanie.
+        /// Metoda zwraca listę odpowiedzi na pytanie z podanego przedziału.
         /// </summary>
         /// <param name="idQuestion">Id pytania, do którego odnoszą się odpowiedzi.</param>
         /// <param name="idUserLogged">Id użytkownika przeglądającego pytanie. Używane w celu wyznaczenia informacji o głosach oddanych na odpowiedzi.</param>
-        /// <returns>Lista odpowiedzi.</returns>
-        Task<List<AnswerResponseDTO>> GetAnswersAsync(int idQuestion, int idUserLogged);
+        /// <param name="answersParams">Zawiera parametry dotyczące ilości elementów na stronie oraz początkowy indeks do pobrania nowej listy odpowiedzi.</param>
+        /// <returns>Lista odpowiedzi z podanego przedziału.</returns>
+        Task<List<AnswerResponseDTO>> GetAnswersAsync(int idQuestion, int idUserLogged, AnswersPageDTO answersParams);
+
+        /// <summary>
+        /// Metoda zwraca konkretną odpowiedź.
+        /// </summary>
+        /// <param name="idAnswer">Id odpowiedzi pobieranej.</param>
+        /// <param name="idUserLogged">Id użytkownika przeglądającego pytanie. Używane w celu wyznaczenia informacji o głosach oddanych na odpowiedzi.</param>
+        /// <returns>Konkretna odpowiedź.</returns>
+        Task<AnswerResponseDTO> GetAnswerAsync(int idAnswer, int idUserLogged);
 
         /// <summary>
         /// Metoda odpowiedzialna za dodanie odpowiedzi do bazy. Przed dodaniem sprawdzone zostaje: czy pytanie oraz konto użytkownika nadal istnieje. W przypadku usunięcia odpowiedzi do którego odnosiła się odpowiedź, odpowiedź staję się z kategorii główną.
@@ -48,5 +61,6 @@ namespace Quanda.Server.Repositories.Interfaces
         /// <param name="updateRatingAnswer">Zawiera nową ocenę odpowiedzi.</param>
         /// <returns>Informacja o sukcesie akcji edycji oceny odpowiedzi.</returns>
         Task<AnswerResult> UpdateRatingAnswerAsync(int idAnswer, int idUserLogged, UpdateRatingAnswerDTO updateRatingAnswer);
+
     }
 }

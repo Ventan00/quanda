@@ -11,7 +11,7 @@
                     }
                     else
                     {
-                        <button class="triangle-up" @onclick="@(async() => await IncreaseRating())" disabled="@DisableButton" />
+                        <button class="triangle-up" @onclick="@(async() => await IncreaseRating())" disabled="@isNonInteractive" />
                     }
                 </div>
                 <div>
@@ -24,7 +24,7 @@
                     }
                     else
                     {
-                        <button class="triangle-down" @onclick="@(async() => await DecreaseRating())" disabled="@DisableButton" />
+                        <button class="triangle-down" @onclick="@(async() => await DecreaseRating())" disabled="@isNonInteractive" />
                     }
                 </div>
             </div>
@@ -92,7 +92,7 @@
     /// EventCallback odpowiedzialny za aktualizacje listy odpowiedzi.
     /// </summary>
     [Parameter]
-    public EventCallback ReloadAnswers { get; set; }
+    public EventCallback<AnswerResponseDTO> RemoveAnswer { get; set; }
     /// <summary>
     /// EventCallback odpowiedzialny za ustawienie odpowiedzi, na którą użytkownik chce odpowiedzieć.
     /// </summary>
@@ -117,9 +117,9 @@
     /// </summary>
     public bool EditMode { get; set; }
     /// <summary>
-    /// Property używany do zablokowania przycisków odpowiadających za zmianę oceny odpowiedzi w trakcie przetwarzania zapytania.
+    /// Property uniemożliwiające zmiany oceny odpowiedzi przez ich właścicieli lub w trakcie przetwarzania zapytania.
     /// </summary>
-    public bool DisableButton { get; set; }
+    public bool isNonInteractive { get; set; }
 
 
     /// <summary>
@@ -128,7 +128,10 @@
     protected override void OnInitialized()
     {
         if (ActiveUser == Answer.UserResponseDTO.IdUser)
+        {
             OwnerOfAnswer = true;
+            isNonInteractive = true;
+        }
     }
     /// <summary>
     /// Metoda aktulizająca ocenę odpowiedzi o 1 w górę.
@@ -136,18 +139,14 @@
     /// <returns></returns>
     private async Task IncreaseRating()
     {
-        DisableButton = true;
+        isNonInteractive = true;
         var result = await answerRepository.UpdateRatingAnswerAsync(Answer.IdAnswer, Answer.Mark + 1);
         if (result.Item1)
         {
             Answer.Mark += 1;
             Answer.Rating += 1;
         }
-        else
-        {
-            await js.InvokeVoidAsync("alert", result.Item2);
-        }
-        DisableButton = false;
+        isNonInteractive = false;
     }
     /// <summary>
     /// Metoda aktulizająca ocenę odpowiedzi o 1 w dół.
@@ -155,18 +154,14 @@
     /// <returns></returns>
     private async Task DecreaseRating()
     {
-        DisableButton = true;
+        isNonInteractive = true;
         var result = await answerRepository.UpdateRatingAnswerAsync(Answer.IdAnswer, Answer.Mark - 1);
         if (result.Item1)
         {
             Answer.Mark -= 1;
             Answer.Rating -= 1;
         }
-        else
-        {
-            await js.InvokeVoidAsync("alert", result.Item2);
-        }
-        DisableButton = false;
+        isNonInteractive = false;
     }
     /// <summary>
     /// Metoda odpowiedzialna za usunięcie odpowiedzi po wcześniejszym potwierdzeniu decyzji. W przypadku błędu wyświetlany zostaje komunikat.
@@ -178,11 +173,10 @@
         if (confirmed)
         {
             var result = await answerRepository.DeleteAnswer(Answer.IdAnswer);
-            await ReloadAnswers.InvokeAsync();
             if (!result.Item1)
-            {
                 await js.InvokeVoidAsync("alert", result.Item2);
-            }
+            else
+                await RemoveAnswer.InvokeAsync(Answer);
         }
 
     }

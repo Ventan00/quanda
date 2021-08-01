@@ -13,5 +13,10 @@
         ///     Wartość która opisuje ile stron może maksymalnie być wyświetlana na komponencie pagination
         /// </summary>
         public static readonly int MAX_ITEMS_AVILABLE_ON_PAGINATION_PAGE = 6;
+
+        /// <summary>
+        ///     Wartość która opisuje ile odpowiedzi ma załadować klient na jednej stronie.
+        /// </summary>
+        public static readonly int ANSWERS_PAGE_SIZE = 10;
     }
 }

@@ -1,4 +1,5 @@
-﻿using Quanda.Client.Helpers;
+﻿using Microsoft.AspNetCore.WebUtilities;
+using Quanda.Client.Helpers;
 using Quanda.Client.Repositories.Interfaces;
 using Quanda.Shared.DTOs.Requests;
 using Quanda.Shared.DTOs.Responses;
@@ -18,14 +19,26 @@ namespace Quanda.Client.Repositories.Implementations
             this._httpService = httpService;
         }
 
-        public async Task<List<AnswerResponseDTO>> GetAnswersAsync(int idQuestion)
+        public async Task<List<AnswerResponseDTO>> GetAnswersAsync(int idQuestion, AnswersPageDTO productParams)
         {
-            return (await _httpService.Get<List<AnswerResponseDTO>>($"{url}/{idQuestion}")).Response;
+            var queryStringParam = new Dictionary<string, string>
+            {
+                ["pageSize"] = productParams.PageSize.ToString(),
+                ["startIndex"] = productParams.StartIndex.ToString()
+            };
+            var response = await _httpService.Get<List<AnswerResponseDTO>>(QueryHelpers.AddQueryString($"api/answers/{idQuestion}", queryStringParam));
+            return response.Response;
+        }
+
+        public async Task<AnswerResponseDTO> GetAnswerAsync(int idAnswer)
+        {
+            var response = await _httpService.Get<AnswerResponseDTO>($"{url}/{idAnswer}/details");
+            return response.Response;
         }
 
         public async Task<Tuple<bool, string>> UpdateRatingAnswerAsync(int idAnswer, int rating)
         {
-            UpdateRatingAnswerDTO updateRatingDto = new ()
+            UpdateRatingAnswerDTO updateRatingDto = new()
             {
                 Rating = rating
             };
@@ -35,15 +48,15 @@ namespace Quanda.Client.Repositories.Implementations
                 return new(false, await response.GetBody());
             }
 
-            return new(true,null);
+            return new(true, null);
         }
 
         public async Task<Tuple<bool, string>> DeleteAnswer(int idAnswer)
         {
             var response = await _httpService.Delete($"{url}/{idAnswer}");
             if (!response.Success)
-                return new(false,await response.GetBody());
-            return new(true,null);
+                return new(false, await response.GetBody());
+            return new(true, null);
         }
 
         public async Task<Tuple<bool, string>> UpdateAnswer(int idAnswer, String text)
@@ -55,8 +68,8 @@ namespace Quanda.Client.Repositories.Implementations
 
             var response = await _httpService.Put<UpdateAnswerDTO>($"{url}/{idAnswer}", updateAnswerDTO);
             if (!response.Success)
-                return new(false,await response.GetBody());
-            return new(true,null);
+                return new(false, await response.GetBody());
+            return new(true, null);
         }
 
         public async Task<Tuple<bool, string>> AddAnswer(string text, int idQuestion, int idRootAnswer)
@@ -72,5 +85,6 @@ namespace Quanda.Client.Repositories.Implementations
                 return new(false, await response.GetBody());
             return new(true, null);
         }
+
     }
 }

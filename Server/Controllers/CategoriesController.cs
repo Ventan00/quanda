@@ -1,9 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Quanda.Server.Repositories.Interfaces;
 using Quanda.Shared.DTOs.Requests;
 using Quanda.Shared.Enums;
+using System;
+using System.Threading.Tasks;
 
 namespace Quanda.Server.Controllers
 {
@@ -20,7 +20,7 @@ namespace Quanda.Server.Controllers
         private readonly ICategoryRepository _repository;
 
         /// <summary>
-        ///     Konstruktor towrzący kontroler
+        ///     Konstruktor tworzący kontroler
         /// </summary>
         /// <param name="repository">Wstrzykiwane repozytorium</param>
         public CategoriesController(ICategoryRepository repository)

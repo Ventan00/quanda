@@ -2,6 +2,7 @@
 using Quanda.Server.Data;
 using Quanda.Server.Repositories.Interfaces;
 using Quanda.Server.Utils;
+using Quanda.Shared;
 using Quanda.Shared.DTOs.Requests;
 using Quanda.Shared.DTOs.Responses;
 using Quanda.Shared.Models;
@@ -19,34 +20,79 @@ namespace Quanda.Server.Repositories.Implementations
             _context = context;
         }
 
-        public async Task<List<AnswerResponseDTO>> GetAnswersAsync(int idQuestion, int idUserLogged)
+        public async Task<List<AnswerResponseDTO>> GetAnswersAsync(int idQuestion, int idUserLogged, AnswersPageDTO answersParams)
         {
-            var answers = await _context.Answers.Where(a => a.IdQuestion == idQuestion).Select(a => new AnswerResponseDTO
+            var answers = await _context.Answers.Where(a => a.IdQuestion == idQuestion && a.IdRootAnswer == null).Select(a => new AnswerResponseDTO
             {
                 IdAnswer = a.IdAnswer,
                 Text = a.Text,
                 Rating = a.RatingAnswers.Select(ra => new { ValueAns = ra.Value == false ? -1 : 1 }).Sum(r => r.ValueAns),
                 IsModified = a.IsModified,
-                UserResponseDTO =  new UserResponseDTO { 
+                UserResponseDTO = new UserResponseDTO
+                {
                     IdUser = a.IdUserNavigation.IdUser,
                     Nickname = a.IdUserNavigation.Nickname,
                     Avatar = a.IdUserNavigation.Avatar
                 },
                 IdRootAnswer = a.IdRootAnswer,
-                ChildAnswers = new List<AnswerResponseDTO>(),
-                Mark = 0
-            }).ToListAsync();
-            foreach (var ans in answers)
-            {
-                var ratingAnswer = await _context.RatingAnswers.SingleOrDefaultAsync(ra => ra.IdUser == idUserLogged && ra.IdAnswer == ans.IdAnswer);
-                if (ratingAnswer != null)
-                    ans.Mark = (ratingAnswer.Value == true ? 1 : -1);
-                ans.ChildAnswers = answers.Where(a => a.IdRootAnswer == ans.IdAnswer).ToList();
-            }
-
-            return answers.Where(a => a.IdRootAnswer == null).ToList();
+                ChildAnswers = a.InverseIdRootAnswersNavigation.Select(a => new AnswerResponseDTO
+                {
+                    IdAnswer = a.IdAnswer,
+                    Text = a.Text,
+                    Rating = a.RatingAnswers.Select(ra => new { ValueAns = ra.Value == false ? -1 : 1 }).Sum(r => r.ValueAns),
+                    IsModified = a.IsModified,
+                    UserResponseDTO = new UserResponseDTO
+                    {
+                        IdUser = a.IdUserNavigation.IdUser,
+                        Nickname = a.IdUserNavigation.Nickname,
+                        Avatar = a.IdUserNavigation.Avatar
+                    },
+                    IdRootAnswer = a.IdRootAnswer,
+                    Mark = a.RatingAnswers.Any(ra => ra.IdUser == idUserLogged) == false ? 0 : a.RatingAnswers.SingleOrDefault(ra => ra.IdUser == idUserLogged).Value ? 1 : -1
+                }).OrderByDescending(a => a.Rating).ThenBy(a => a.IdAnswer).Skip(0).Take(3).ToList(),
+                Mark = a.RatingAnswers.Any(ra => ra.IdUser == idUserLogged) == false ? 0 : a.RatingAnswers.SingleOrDefault(ra => ra.IdUser == idUserLogged).Value ? 1 : -1,
+                AmountOfChildAnswers = a.InverseIdRootAnswersNavigation.Count
+            }).OrderByDescending(a => a.Rating).ThenBy(a => a.IdAnswer).ToListAsync();
+            var pageSize = answersParams.PageSize == 0 ? Config.ANSWERS_PAGE_SIZE : answersParams.PageSize;
+            return answers.Skip(answersParams.StartIndex).Take(pageSize).ToList();
         }
-        
+
+        public async Task<AnswerResponseDTO> GetAnswerAsync(int idAnswer, int idUserLogged)
+        {
+            var answer = await _context.Answers.Where(a => a.IdAnswer == idAnswer).Select(a => new AnswerResponseDTO
+            {
+                IdAnswer = a.IdAnswer,
+                Text = a.Text,
+                Rating = a.RatingAnswers.Select(ra => new { ValueAns = ra.Value == false ? -1 : 1 }).Sum(r => r.ValueAns),
+                IsModified = a.IsModified,
+                UserResponseDTO = new UserResponseDTO
+                {
+                    IdUser = a.IdUserNavigation.IdUser,
+                    Nickname = a.IdUserNavigation.Nickname,
+                    Avatar = a.IdUserNavigation.Avatar
+                },
+                IdRootAnswer = a.IdRootAnswer,
+                ChildAnswers = a.InverseIdRootAnswersNavigation.Select(a => new AnswerResponseDTO
+                {
+                    IdAnswer = a.IdAnswer,
+                    Text = a.Text,
+                    Rating = a.RatingAnswers.Select(ra => new { ValueAns = ra.Value == false ? -1 : 1 }).Sum(r => r.ValueAns),
+                    IsModified = a.IsModified,
+                    UserResponseDTO = new UserResponseDTO
+                    {
+                        IdUser = a.IdUserNavigation.IdUser,
+                        Nickname = a.IdUserNavigation.Nickname,
+                        Avatar = a.IdUserNavigation.Avatar
+                    },
+                    IdRootAnswer = a.IdRootAnswer,
+                    Mark = a.RatingAnswers.Any(ra => ra.IdUser == idUserLogged) == false ? 0 : a.RatingAnswers.SingleOrDefault(ra => ra.IdUser == idUserLogged).Value ? 1 : -1
+                }).OrderByDescending(a => a.Rating).ThenBy(a => a.IdAnswer).ToList(),
+                Mark = a.RatingAnswers.Any(ra => ra.IdUser == idUserLogged) == false ? 0 : a.RatingAnswers.SingleOrDefault(ra => ra.IdUser == idUserLogged).Value ? 1 : -1,
+                AmountOfChildAnswers = a.InverseIdRootAnswersNavigation.Count
+            }).SingleOrDefaultAsync();
+            return answer;
+        }
+
         public async Task<AnswerResult> AddAnswerAsync(AddAnswerDTO answerDTO, int idUserLogged)
         {
             var existsQuestion = await _context.Questions.AnyAsync(q => q.IdQuestion == answerDTO.IdQuestion);
@@ -75,7 +121,7 @@ namespace Quanda.Server.Repositories.Implementations
 
             return AnswerResult.SUCCESS;
         }
-        
+
         public async Task<AnswerResult> UpdateAnswerAsync(int idAnswer, UpdateAnswerDTO answerDTO)
         {
             var answer = await _context.Answers.SingleOrDefaultAsync(a => a.IdAnswer == idAnswer);
@@ -87,7 +133,7 @@ namespace Quanda.Server.Repositories.Implementations
                 return AnswerResult.UPDATE_DB_ERROR;
             return AnswerResult.SUCCESS;
         }
-        
+
         public async Task<AnswerResult> DeleteAnswerAsync(int idAnswer, int idUserLogged)
         {
             var answer = await _context.Answers.SingleOrDefaultAsync(a => a.IdAnswer == idAnswer);
@@ -102,11 +148,11 @@ namespace Quanda.Server.Repositories.Implementations
             return AnswerResult.SUCCESS;
         }
 
-        
+
         public async Task<AnswerResult> UpdateRatingAnswerAsync(int idAnswer, int idUserLogged, UpdateRatingAnswerDTO updateRatingAnswer)
         {
             var answerRated = await _context.RatingAnswers.SingleOrDefaultAsync(ra => ra.IdAnswer == idAnswer && ra.IdUser == idUserLogged);
-            if(answerRated == null)
+            if (answerRated == null)
             {
                 var existsAnswer = await _context.Answers.AnyAsync(a => a.IdAnswer == idAnswer);
                 if (!existsAnswer)
@@ -134,9 +180,9 @@ namespace Quanda.Server.Repositories.Implementations
                 var ownerAnswer = await _context.Answers.AnyAsync(a => a.IdAnswer == idAnswer && a.IdUser == idUserLogged);
                 if (!ownerAnswer)
                 {
-                        _context.RatingAnswers.Remove(answerRated);
-                        if (!(await _context.SaveChangesAsync() > 0))
-                            return AnswerResult.DELETE_DB_ERROR;
+                    _context.RatingAnswers.Remove(answerRated);
+                    if (!(await _context.SaveChangesAsync() > 0))
+                        return AnswerResult.DELETE_DB_ERROR;
                 }
                 else
                     return AnswerResult.OWNER_OF_ANSWER;

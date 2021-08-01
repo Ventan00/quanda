@@ -6,25 +6,57 @@ using System.Threading.Tasks;
 
 namespace Quanda.Server.Controllers
 {
+    /// <summary>
+    /// Kontroler obsługujący końcówki związane z odpowiedziami.
+    /// </summary>
     [Route("api/answers")]
     [ApiController]
     public class AnswersController : ControllerBase
     {
+        /// <summary>
+        /// Repozytorium wykonujące akcje na odpowiedziach.
+        /// </summary>
         private readonly IAnswerRepository _repository;
-        private readonly int requestIdUser = 25; //future => Request.GetUser(); które będzie pobierane przy konkretnych zapytaniach do serwera
-
+        private readonly int requestIdUser = 25; //future => Request.GetUser(); które będzie pobierane przy konkretnych zapytaniach do serwera HtttpRequest.Context.GetUser
+        /// <summary>
+        ///     Konstruktor tworzący kontroler.
+        /// </summary>
+        /// <param name="repository">Wstrzykiwane repozytorium</param>
         public AnswersController(IAnswerRepository repository)
         {
             _repository = repository;
         }
 
+        /// <summary>
+        /// Końcówka zwracająca listę odpowiedzi z konkretnego pytania.
+        /// </summary>
+        /// <param name="idQuestion">Id pytania do którego odnoszą się odpowiedzi.</param>
+        /// <param name="answersPage">Zawiera informacje z jakiego zakresu pobrać odpowiedzi.</param>
+        /// <returns>Lista odpowiedzi.</returns>
         [HttpGet("{idQuestion}")]
-        public async Task<IActionResult> GetAnswers(int idQuestion)
+        public async Task<IActionResult> GetAnswers(int idQuestion, [FromQuery] AnswersPageDTO answersPage)
         {
-            var result = await _repository.GetAnswersAsync(idQuestion, requestIdUser);
+            var result = await _repository.GetAnswersAsync(idQuestion, requestIdUser, answersPage);
             return Ok(result);
         }
 
+        /// <summary>
+        /// Końcówka zwracająca konkrętną odpowiedź.
+        /// </summary>
+        /// <param name="idAnswer">Id odpowiedzi żądanej.</param>
+        /// <returns>Konkretna odpowiedź.</returns>
+        [HttpGet("{idAnswer}/details")]
+        public async Task<IActionResult> GetAnswer(int idAnswer)
+        {
+            var result = await _repository.GetAnswerAsync(idAnswer, requestIdUser);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Końcówka odpowiedzialna za dodanie odpowiedzi do bazy.
+        /// </summary>
+        /// <param name="answerDTO">Zawiera informacje dotyczące nowej odpowiedzi.</param>
+        /// <returns>IActionResult</returns>
         [HttpPost]
         public async Task<IActionResult> AddAnswer([FromBody] AddAnswerDTO answerDTO)
         {
@@ -36,8 +68,14 @@ namespace Quanda.Server.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Końcówka odpowiedzialna za zaktualizawanie odpowiedzi.
+        /// </summary>
+        /// <param name="idAnswer">Id odpowiedzi do aktualizacji.</param>
+        /// <param name="answerDTO">Zawiera nową treść odpowiedzi.</param>
+        /// <returns>IActionResult</returns>
         [HttpPut("{idAnswer}")]
-        public async Task<IActionResult> UpdateAnswer(int idAnswer,[FromBody] UpdateAnswerDTO answerDTO)
+        public async Task<IActionResult> UpdateAnswer(int idAnswer, [FromBody] UpdateAnswerDTO answerDTO)
         {
             var result = await _repository.UpdateAnswerAsync(idAnswer, answerDTO);
             if (result == AnswerResult.ANSWER_DELETED)
@@ -47,6 +85,11 @@ namespace Quanda.Server.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Końcówka odpowiedzialna usunięcie odpowiedzi.
+        /// </summary>
+        /// <param name="idAnswer">Id odpowiedzi do usunięcia.</param>
+        /// <returns>IActionResult</returns>
         [HttpDelete("{idAnswer}")]
         public async Task<IActionResult> DeleteAnswer(int idAnswer)
         {
@@ -58,6 +101,12 @@ namespace Quanda.Server.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Koncówka odpowiedzialna za zaktualizowanie ratingu odpowiedzi.
+        /// </summary>
+        /// <param name="idAnswer">Id odpowiedzi do aktualizacji ratingu.</param>
+        /// <param name="updateRatingAnswer">Zawiera informacja o nowym ratingu.</param>
+        /// <returns>IActionResult</returns>
         [HttpPost("{idAnswer}/rating")]
         public async Task<IActionResult> UpdateRatingAnswer(int idAnswer, [FromBody] UpdateRatingAnswerDTO updateRatingAnswer)
         {
@@ -73,6 +122,6 @@ namespace Quanda.Server.Controllers
 
             return NoContent();
         }
-       
+
     }
 }
