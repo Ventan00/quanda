@@ -1,34 +1,54 @@
-﻿@using Blazored.Toast.Configuration
-@using Quanda.Client.Authentication
-@inherits LayoutComponentBase
+﻿@inherits LayoutComponentBase
 @inject HttpClientInterceptorService _interceptorService
+@using Quanda.Client.Authentication
+@using Blazored.Toast.Configuration
 @implements IDisposable
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
+<div class="sidebar">
+    <NavMenuComponent EventCallback="HandleThemeChange"/>
+</div>
+<div class="page @(isWhiteTheme ? "" : "page-dark")">
+    <div class="topbar @(isWhiteTheme ? "" : "topbar-dark")">
+        <CascadingValue Value="isWhiteTheme">
+            <TopBarComponent/>
+        </CascadingValue>
+    </div>
+    <div class="page-content">
+        <CascadingValue Value="isWhiteTheme">
+            @Body
+        </CascadingValue>
+    </div>
+    <footer class="page-footer">
+
+    </footer>
+</div>
+
+
+<div class="main">
+    <div class="top-row px-4">
+        <a href="http://blazor.net" target="_blank" class="ml-md-auto">About</a>
     </div>
 
-    <div class="main">
-        <div class="top-row px-4">
-            <a href="http://blazor.net" target="_blank" class="ml-md-auto">About</a>
-        </div>
+    <div class="content px-4">
 
-        <div class="content px-4">
-            @Body
-        </div>
     </div>
 </div>
 
 
 <BlazoredToasts Position="ToastPosition.BottomRight" Timeout="3" IconType="IconType.FontAwesome"
                 SuccessClass="success-toast-override"
-                ShowProgressBar=true
+                ShowProgressBar="true"
                 SuccessIcon="fa fa-thumbs-up"
-                ErrorIcon="fa fa-bug" />
+                ErrorIcon="fa fa-bug"/>
 
 @code
 {
+    /// <summary>
+    ///     Zmienna opisująca jaki jest theme
+    /// </summary>
+    public bool isWhiteTheme = true;
+
+
     protected override void OnInitialized()
     {
         _interceptorService.RegisterEvents();
@@ -37,5 +57,15 @@
     public void Dispose()
     {
         _interceptorService.DisposeEvents();
+    }
+
+    /// <summary>
+    ///     Funkcja która zmienia aktualny theme
+    /// </summary>
+    /// <param name="theme">True = light, False = dark</param>
+    /// <returns>void</returns>
+    public async Task HandleThemeChange(bool theme)
+    {
+        isWhiteTheme = theme;
     }
 }
