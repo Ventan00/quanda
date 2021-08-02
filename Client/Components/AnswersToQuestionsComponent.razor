@@ -87,6 +87,7 @@
         ActiveUser = 25;
         PageSize = 10;
         Answers = new();
+        await js.InvokeVoidAsync("import", "./js/InfiniteScroll.js");
         await LoadMore();
         await js.InvokeVoidAsync("ScrollList.Init", "list-end", DotNetObjectReference.Create(this));
     }
