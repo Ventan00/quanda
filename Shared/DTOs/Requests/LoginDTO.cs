@@ -4,7 +4,8 @@ namespace Quanda.Shared.DTOs.Requests
 {
     public class LoginDTO
     {
-        [Required] [EmailAddress] public string Email { get; set; }
+        [Required]
+        public string NicknameOrEmail { get; set; }
 
         [Required]
         [MaxLength(30)]

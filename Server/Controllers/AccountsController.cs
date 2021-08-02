@@ -112,7 +112,7 @@ namespace Quanda.Server.Controllers
                 LoginStatus = LoginStatusEnum.INVALID_CREDENTIALS
             };
 
-            var user = await _usersRepository.GetUserByEmailAsync(loginDto.Email);
+            var user = await _usersRepository.GetUserByNicknameOrEmailAsync(loginDto.NicknameOrEmail);
             if (user is null)
                 return Unauthorized(response);
 
