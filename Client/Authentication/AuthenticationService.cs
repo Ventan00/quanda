@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Blazored.LocalStorage;
@@ -15,17 +14,17 @@ using Quanda.Shared.Enums;
 namespace Quanda.Client.Authentication
 {
     /// <summary>
-    /// Serwis odpowiedzialny za operace Login/Logout/RefreshToken
+    ///     Serwis odpowiedzialny za operace Login/Logout/RefreshToken
     /// </summary>
     public class AuthenticationService : IAuthenticationService
     {
-        private readonly IHttpService _httpService;
-        private readonly IUsersRepository _usersRepository;
-        private readonly HttpClient _httpClient;
         private readonly AuthenticationStateProvider _authStateProvider;
+        private readonly HttpClient _httpClient;
+        private readonly IHttpService _httpService;
         private readonly ILocalStorageService _localStorage;
         private readonly NavigationManager _navManager;
         private readonly IToastService _toastService;
+        private readonly IUsersRepository _usersRepository;
 
         public AuthenticationService(
             IHttpService httpService,
@@ -46,13 +45,13 @@ namespace Quanda.Client.Authentication
         }
 
         /// <summary>
-        /// Metoda wywolywana w celu zalogowania uzytkownika, po poprawnym zalogowaniu zapisuje odpowiednio
-        /// w local storage accessToken oraz refreshToken uzytkownika dodajac accessToken do naglowkow zapytan
-        /// wykonwyach przy uzyciu http client oraz zmienia stan uwierzytelnienia uzytkownika
+        ///     Metoda wywolywana w celu zalogowania uzytkownika, po poprawnym zalogowaniu zapisuje odpowiednio
+        ///     w local storage accessToken oraz refreshToken uzytkownika dodajac accessToken do naglowkow zapytan
+        ///     wykonwyach przy uzyciu http client oraz zmienia stan uwierzytelnienia uzytkownika
         /// </summary>
         /// <param name="loginDto"></param>
         /// <returns>
-        /// LoginResponseDTO(RefreshToken,AccessToken)
+        ///     LoginResponseDTO(RefreshToken,AccessToken)
         /// </returns>
         public async Task<LoginResponseDTO> LoginAsync(LoginDTO loginDto)
         {
@@ -64,7 +63,7 @@ namespace Quanda.Client.Authentication
             await _localStorage.SetItemAsync("access_token", result.AccessToken);
             await _localStorage.SetItemAsync("refresh_token", result.RefreshToken);
 
-            ((AuthStateProvider)_authStateProvider).NotifyUserAuthentication(result.AccessToken);
+            ((AuthStateProvider) _authStateProvider).NotifyUserAuthentication(result.AccessToken);
             _httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("bearer", result.AccessToken);
 
@@ -72,13 +71,13 @@ namespace Quanda.Client.Authentication
         }
 
         /// <summary>
-        /// Metoda wywolywana w celu wylogwania uzytkownika, usuwa odpowiednio
-        /// z local storage accessToken oraz refreshToken uzytkownika usuwajac rowniez accessToken z naglowkow zapytan
-        /// wykonwyach przy uzyciu http client oraz zmienia stan uwierzytelnienia uzytkownika
+        ///     Metoda wywolywana w celu wylogwania uzytkownika, usuwa odpowiednio
+        ///     z local storage accessToken oraz refreshToken uzytkownika usuwajac rowniez accessToken z naglowkow zapytan
+        ///     wykonwyach przy uzyciu http client oraz zmienia stan uwierzytelnienia uzytkownika
         /// </summary>
         /// <param name="notifyServer">
-        /// parametr boolean decydujacy czy wylogowanie ma zostac wykonane tylko po stronie klienta
-        /// czy ma byc o nim powiadomiony rowniez serwer
+        ///     parametr boolean decydujacy czy wylogowanie ma zostac wykonane tylko po stronie klienta
+        ///     czy ma byc o nim powiadomiony rowniez serwer
         /// </param>
         /// <returns></returns>
         public async Task LogoutAsync(bool notifyServer = false)
@@ -96,20 +95,21 @@ namespace Quanda.Client.Authentication
 
             await _localStorage.RemoveItemAsync("access_token");
             await _localStorage.RemoveItemAsync("refresh_token");
+            await _localStorage.RemoveItemAsync("avatar");
 
-            ((AuthStateProvider)_authStateProvider).NotifyUserLogout();
+            ((AuthStateProvider) _authStateProvider).NotifyUserLogout();
             _httpClient.DefaultRequestHeaders.Authorization = null;
             _navManager.NavigateTo("/login");
         }
 
         /// <summary>
-        /// Metoda wywolywana w celu odświeżenia tokenów uzytkownika, która w przypadku poprawnej odpowiedzi
-        /// od serwera (2xx) zapisuje otrzymane tokeny do localstorage oraz zmienia stan uwierzytelnienia uzytkownika.
-        /// Odpowiedz z grupy innej niz 2xx oznacza ze sesja uzytkownika się przedawniła więc użytkownik jest wylogowywany
+        ///     Metoda wywolywana w celu odświeżenia tokenów uzytkownika, która w przypadku poprawnej odpowiedzi
+        ///     od serwera (2xx) zapisuje otrzymane tokeny do localstorage oraz zmienia stan uwierzytelnienia uzytkownika.
+        ///     Odpowiedz z grupy innej niz 2xx oznacza ze sesja uzytkownika się przedawniła więc użytkownik jest wylogowywany
         /// </summary>
         /// <returns>
-        /// Jeżeli serwer zwróci kod 2xx zwrócony zostaje RefreshResponseDto(accessToken, refreshToken),
-        /// jeżeli natomiast kod nie jest z grupy 2xx zwrócony zostaje null
+        ///     Jeżeli serwer zwróci kod 2xx zwrócony zostaje RefreshResponseDto(accessToken, refreshToken),
+        ///     jeżeli natomiast kod nie jest z grupy 2xx zwrócony zostaje null
         /// </returns>
         public async Task<RefreshResponseDTO> RefreshTokenAsync()
         {
@@ -136,7 +136,7 @@ namespace Quanda.Client.Authentication
             await _localStorage.SetItemAsync("refresh_token", response.Response.RefreshToken);
             _httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("bearer", response.Response.AccessToken);
-            ((AuthStateProvider)_authStateProvider).NotifyUserAuthentication(response.Response.AccessToken);
+            ((AuthStateProvider) _authStateProvider).NotifyUserAuthentication(response.Response.AccessToken);
 
             return response.Response;
         }

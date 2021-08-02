@@ -1,5 +1,4 @@
 ﻿@using Quanda.Client.Authentication
-@using Quanda.Shared.DTOs.Requests
 @using Quanda.Shared.Enums
 @using Blazored.LocalStorage
 @inject IAuthenticationService _authenticationService
@@ -80,7 +79,7 @@
         StateHasChanged();
 
         var loginResponseDto = await _authenticationService.LoginAsync(_loginDto);
-        await HandleLoginResponse(loginResponseDto.LoginStatus);
+        await HandleLoginResponse(loginResponseDto.LoginStatus, loginResponseDto.Avatar);
 
         _isPending = false;
     }
@@ -89,8 +88,10 @@
     ///     Metoda obsługująca odpowiedz od serwera na wysłany formularz
     /// </summary>
     /// <param name="loginStatusEnum"></param>
+    /// <param name="Avatar>
+    /// </param>
     /// <returns></returns>
-    private async Task HandleLoginResponse(LoginStatusEnum loginStatusEnum)
+    private async Task HandleLoginResponse(LoginStatusEnum loginStatusEnum, string Avatar)
     {
         _loginStatus = loginStatusEnum;
 
@@ -98,6 +99,7 @@
         {
             case LoginStatusEnum.LOGIN_ACCEPTED:
                 _toastService.ShowSuccess("You have logged in.");
+                await _localStorageService.SetItemAsync("avatar", Avatar);
                 _navManager.NavigateTo("");
                 return;
             case LoginStatusEnum.INVALID_CREDENTIALS:

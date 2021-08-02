@@ -1,4 +1,6 @@
-﻿<div class="search-bar-container @(isWhiteTheme ? "" : "search-bar-container-dark")">
+﻿@using Blazored.LocalStorage
+@inject ILocalStorageService _localStorageService
+<div class="search-bar-container @(isWhiteTheme ? "" : "search-bar-container-dark")">
     <div class="bar-content @(isWhiteTheme ? "" : "bar-content-dark")">
         <img src="img/magnifing-glass.svg"/>
         <input type="text" class="search-bar @(isWhiteTheme ? "" : "search-bar-dark")" placeholder="Search..."/>
@@ -25,7 +27,8 @@
         </NavLink>
         <div class="icon icon-mail @(isWhiteTheme ? "" : "icon-dark")"/>
         <div class="icon icon-notification @(isWhiteTheme ? "" : "icon-dark")"/>
-        <img src="missing" class="profile-logo"/>
+        <img src="@Avatar" class="profile-logo"/>
+
     </Authorized>
 </AuthorizeView>
 
@@ -37,5 +40,16 @@
     /// </summary>
     [CascadingParameter]
     protected bool isWhiteTheme { get; set; }
+
+    /// <summary>
+    ///     Zmienna przechowująca watar
+    /// </summary>
+    private string Avatar;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        Avatar = await _localStorageService.GetItemAsync<string>("avatar");
+    }
 
 }
