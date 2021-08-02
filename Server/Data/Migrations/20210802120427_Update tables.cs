@@ -96,27 +96,6 @@ namespace Quanda.Server.Data.Migrations
                 column: "IdUser");
 
             migrationBuilder.CreateTable(
-                name: "Recovery_User",
-                columns: table => new
-                {
-                    IdUser = table.Column<int>(type: "int", nullable: false),
-                    Code = table.Column<string>(type: "varchar(36)", maxLength: 36, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ExpirationDate = table.Column<DateTime>(type: "datetime(6)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("RecoveryUser_pk", x => x.IdUser);
-                    table.ForeignKey(
-                        name: "RecoveryUser_User",
-                        column: x => x.IdUser,
-                        principalTable: "User",
-                        principalColumn: "IdUser",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
                 name: "Tag",
                 columns: table => new
                 {
@@ -257,7 +236,6 @@ namespace Quanda.Server.Data.Migrations
                 {
                     IdReport = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    IdEntity = table.Column<int>(type: "int", nullable: false),
                     IdIssuer = table.Column<int>(type: "int", nullable: false),
                     IdMessage = table.Column<int>(type: "int", nullable: true),
                     IdAnswer = table.Column<int>(type: "int", nullable: true),
@@ -307,12 +285,6 @@ namespace Quanda.Server.Data.Migrations
                 name: "IX_Question_Tag_IdTag",
                 table: "Question_Tag",
                 column: "IdTag");
-
-            migrationBuilder.CreateIndex(
-                name: "Unique_code",
-                table: "Recovery_User",
-                column: "Code",
-                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Report_IdAnswer",
@@ -443,9 +415,6 @@ namespace Quanda.Server.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "Question_Tag");
-
-            migrationBuilder.DropTable(
-                name: "Recovery_User");
 
             migrationBuilder.DropTable(
                 name: "Report");

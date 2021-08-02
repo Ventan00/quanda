@@ -48,6 +48,5 @@ namespace Quanda.Shared.Models
 
         public virtual Service IdServiceNavigation { get; set; }
         public virtual TempUser IdTempUserNavigation { get; set; }
-        public virtual RecoveryUser IdRecoveryUserNavigation { get; set; }
     }
 }

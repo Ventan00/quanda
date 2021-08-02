@@ -3,7 +3,6 @@
     public class Report
     {
         public int IdReport { get; set; }
-        public int IdEntity { get; set; }
         public int IdIssuer { get; set; }
         public int? IdMessage { get; set; }
         public int? IdAnswer { get; set; }

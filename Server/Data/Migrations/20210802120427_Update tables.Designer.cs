@@ -10,7 +10,7 @@ using Quanda.Server.Data;
 namespace Quanda.Server.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20210801220002_Update tables")]
+    [Migration("20210802120427_Update tables")]
     partial class Updatetables
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -198,29 +198,6 @@ namespace Quanda.Server.Data.Migrations
                     b.ToTable("Rating_Answer");
                 });
 
-            modelBuilder.Entity("Quanda.Shared.Models.RecoveryUser", b =>
-                {
-                    b.Property<int>("IdUser")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(36)
-                        .HasColumnType("varchar(36)");
-
-                    b.Property<DateTime>("ExpirationDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.HasKey("IdUser")
-                        .HasName("RecoveryUser_pk");
-
-                    b.HasIndex("Code")
-                        .IsUnique()
-                        .HasDatabaseName("Unique_code");
-
-                    b.ToTable("Recovery_User");
-                });
-
             modelBuilder.Entity("Quanda.Shared.Models.Report", b =>
                 {
                     b.Property<int>("IdReport")
@@ -229,9 +206,6 @@ namespace Quanda.Server.Data.Migrations
                         .HasAnnotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int?>("IdAnswer")
-                        .HasColumnType("int");
-
-                    b.Property<int>("IdEntity")
                         .HasColumnType("int");
 
                     b.Property<int>("IdIssuer")
@@ -598,18 +572,6 @@ namespace Quanda.Server.Data.Migrations
                     b.Navigation("IdUserNavigation");
                 });
 
-            modelBuilder.Entity("Quanda.Shared.Models.RecoveryUser", b =>
-                {
-                    b.HasOne("Quanda.Shared.Models.User", "IdUserNavigation")
-                        .WithOne("IdRecoveryUserNavigation")
-                        .HasForeignKey("Quanda.Shared.Models.RecoveryUser", "IdUser")
-                        .HasConstraintName("RecoveryUser_User")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("IdUserNavigation");
-                });
-
             modelBuilder.Entity("Quanda.Shared.Models.Report", b =>
                 {
                     b.HasOne("Quanda.Shared.Models.Answer", "IdAnswerNavigation")
@@ -788,8 +750,6 @@ namespace Quanda.Server.Data.Migrations
             modelBuilder.Entity("Quanda.Shared.Models.User", b =>
                 {
                     b.Navigation("Answers");
-
-                    b.Navigation("IdRecoveryUserNavigation");
 
                     b.Navigation("IdTempUserNavigation");
 

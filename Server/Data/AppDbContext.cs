@@ -21,7 +21,6 @@ namespace Quanda.Server.Data
         public virtual DbSet<Message> Messages { get; set; }
         public virtual DbSet<Report> Reports { get; set; }
         public virtual DbSet<TagUser> TagUsers { get; set; }
-        public virtual DbSet<RecoveryUser> RecoveryUsers { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options)
@@ -46,7 +45,6 @@ namespace Quanda.Server.Data
             modelBuilder.ApplyConfiguration(new MessageEfConfiguration());
             modelBuilder.ApplyConfiguration(new ReportEfConfiguration());
             modelBuilder.ApplyConfiguration(new TagUserEfConfiguration());
-            modelBuilder.ApplyConfiguration(new RecoveryUserEfConfiguration());
         }
     }
 }
