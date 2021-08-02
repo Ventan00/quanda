@@ -18,14 +18,14 @@ namespace Quanda.Server.EfConfigurations
             builder.HasOne(ur => ur.IdRoleNavigation)
                 .WithMany(r => r.UserRoles)
                 .HasForeignKey(ur => ur.IdRole)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("Role_UserRole");
 
 
             builder.HasOne(ur => ur.IdUserNavigation)
                 .WithMany(u => u.UserRoles)
                 .HasForeignKey(ur => ur.IdUser)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("User_UserRole");
         }
     }

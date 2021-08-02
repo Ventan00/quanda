@@ -8,6 +8,7 @@ namespace Quanda.Shared.Models
         {
             InverseIdRootAnswersNavigation = new HashSet<Answer>();
             RatingAnswers = new HashSet<RatingAnswer>();
+            Reports = new HashSet<Report>();
         }
 
         public int IdAnswer { get; set; }
@@ -20,8 +21,10 @@ namespace Quanda.Shared.Models
         public virtual User IdUserNavigation { get; set; }
         public virtual Question IdQuestionNavigation { get; set; }
         public virtual Answer IdRootAnswerNavigation { get; set; }
+
         public virtual ICollection<Answer> InverseIdRootAnswersNavigation { get; set; }
         public virtual ICollection<RatingAnswer> RatingAnswers { get; set; }
+        public virtual ICollection<Report> Reports { get; set; }
 
     }
 }

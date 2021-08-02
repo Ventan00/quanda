@@ -23,7 +23,7 @@ namespace Quanda.Server.EfConfigurations
             builder.HasMany(s => s.Users)
                 .WithOne(u => u.IdServiceNavigation)
                 .HasForeignKey(u => u.IdService)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("Service_User");
         }
     }

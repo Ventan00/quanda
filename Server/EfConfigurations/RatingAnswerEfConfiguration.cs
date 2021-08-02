@@ -17,12 +17,14 @@ namespace Quanda.Server.EfConfigurations
             builder.HasOne(ra => ra.IdAnswerNavigation)
                 .WithMany(ra => ra.RatingAnswers)
                 .HasForeignKey(ra => ra.IdAnswer)
-                .HasConstraintName("Answer_RatingAnswer");
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("RatingAnswer_Answer");
 
             builder.HasOne(ra => ra.IdUserNavigation)
                 .WithMany(ra => ra.RatingAnswers)
                 .HasForeignKey(ra => ra.IdUser)
-                .HasConstraintName("User_RatingAnswer");
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("RatingAnswer_User");
         }
     }
 }

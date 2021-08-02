@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Quanda.Shared.Models;
 
@@ -31,14 +30,11 @@ namespace Quanda.Server.EfConfigurations
 
             builder.Property(u => u.HashedPassword).HasMaxLength(84).IsRequired();
 
-            builder.Property(u => u.Points).IsRequired().HasDefaultValue(0);
-
             builder.Property(u => u.PhoneNumber).HasMaxLength(9).IsRequired(false);
 
             builder.Property(u => u.Bio).IsRequired(false);
 
             builder.Property(u => u.Avatar).IsRequired(false);
-
             builder.Property(u => u.RegistrationDate).IsRequired();
 
             builder.Property(u => u.RefreshToken).HasMaxLength(36).IsRequired(false);
@@ -49,11 +45,11 @@ namespace Quanda.Server.EfConfigurations
 
             builder.Property(u => u.ServiceToken).IsRequired(false);
 
-            builder.HasMany(u => u.Questions)
-                .WithOne(q => q.IdUserNavigation)
-                .HasForeignKey(q => q.IdUser)
+            builder.HasOne(u => u.IdServiceNavigation)
+                .WithMany(s => s.Users)
+                .HasForeignKey(u => u.IdService)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("User_Question");
+                .HasConstraintName("User_Service");
         }
     }
 }

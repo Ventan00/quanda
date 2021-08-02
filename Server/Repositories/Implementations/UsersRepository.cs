@@ -1,16 +1,14 @@
-﻿using System;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Quanda.Server.Data;
-using Quanda.Server.Utils;
 using Quanda.Server.Repositories.Interfaces;
+using Quanda.Server.Utils;
 using Quanda.Shared.DTOs.Requests;
-using Quanda.Shared.DTOs.Responses;
 using Quanda.Shared.Models;
+using System;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 using static Quanda.Server.Utils.UserStatus;
 
 namespace Quanda.Server.Repositories.Implementations
@@ -72,7 +70,7 @@ namespace Quanda.Server.Repositories.Implementations
 
             return await _context.SaveChangesAsync() > 0 ? USER_REFRESH_TOKEN_UPDATED : USER_DB_ERROR;
         }
-        
+
         public async Task<User> GetUserByIdAsync(int idUser)
         {
             return await GetUserWithDetailsByAsync(u => u.IdUser == idUser);

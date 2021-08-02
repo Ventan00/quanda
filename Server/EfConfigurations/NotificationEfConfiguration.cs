@@ -10,19 +10,18 @@ namespace Quanda.Server.EfConfigurations
         {
             builder.ToTable("Notification");
 
-            builder.HasKey(n => new { n.IdQuestion, n.IdUser });
+            builder.HasKey(n => n.IdUser);
+
+            builder.Property(n => n.IsSeen).IsRequired().HasDefaultValue(false);
+
+            builder.Property(n => n.IdEntity).IsRequired(false);
 
             builder.HasOne(n => n.IdUserNavigation)
                 .WithMany(u => u.Notifications)
                 .HasForeignKey(n => n.IdUser)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("User_Notification");
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("Notification_User");
 
-            builder.HasOne(n => n.IdQuestionNavigation)
-                .WithMany(q => q.Notifications)
-                .HasForeignKey(n => n.IdQuestion)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("Question_Notification");
         }
     }
 }
