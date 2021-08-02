@@ -1,0 +1,87 @@
+﻿@page "/"
+
+<AuthorizeView>
+    <Authorized>
+
+    </Authorized>
+    <NotAuthorized>
+        <div id="header-hcontainer">
+            <img alt="homepagebackground" src="img/Hompage_background.svg" />
+            <div class="container-fluid">
+                <div class="row text-container">
+                    <div class="col left-container">
+                        <h1>Find knowledge<br />faster<br />with Quanda!</h1>
+                        <a href="/register" class="gradient-button join-button">
+                            Join us now!
+                        </a>
+                    </div>
+                    <div class="col right-container">
+                        <h1>What is Quanda?</h1>
+                        <p>
+                            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="pink-hcontainer" class="d-flex flex-column p-3">
+            <div class="d-flex flex-row justify-content-center my-4">
+                <h1>What Quanda gives you?</h1>
+            </div>
+            <div class="d-flex flex-row justify-content-center children-container">
+                <div class="ml-4 mr-2 flex-column d-flex align-items-center ">
+                    <img alt="problemsolving" src="img/problemsolving.svg" />
+                    <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero</p>
+                </div>
+                <div class="mx-5 flex-column d-flex align-items-center">
+                    <img alt="knowledge" src="img/knowledge.svg" />
+                    <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero</p>
+                </div>
+                <div class="mr-4 ml-2 flex-column d-flex align-items-center">
+                    <img alt="team" src="img/team.svg" />
+                    <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero</p>
+                </div>
+            </div>
+        </div>
+        <div id="middle-hcontainer" class="d-flex flex-row align-items-center justify-content-center">
+            <div class="d-flex flex-column">
+                <h2>We know more together!<br />We just need to help each other!</h2>
+                <p>When you can't find answer to question, just ask!<br />Let others help you! Help others as well!</p>
+            </div>
+            <div class="d-flex flex-column align-items-center">
+                <img alt="homepageillustration" src="img/homepageillustration.svg" />
+            </div>
+        </div>
+        <div id="yellow-hcontainer" class="d-flex flex-column p-3">
+            <div class="d-flex flex-row justify-content-center mt-3">
+                <h1>Have more possibilities with Premium account!</h1>
+            </div>
+            <p><i>Use Quanda without any limits!</i></p>
+            <div class="d-flex flex-row justify-content-center children-container">
+                <div class="ml-4 flex-column d-flex align-items-center">
+                    <img alt="check" src="img/check.svg" class="mb-3" />
+                    <p>Ask as many questions as you like</p>
+                </div>
+                <div class="flex-column d-flex align-items-center">
+                    <img alt="check" src="img/check.svg" class="mb-3" />
+                    <p>Do you have doubts? Ask the user about it in a private message</p>
+                </div>
+                <div class="mr-4 flex-column d-flex align-items-center">
+                    <img alt="check" src="img/check.svg" class="mb-3" />
+                    <p>Don't be annoyed with ads</p>
+                </div>
+            </div>
+        </div>
+        <div id="bottom-hcontainer" class="d-flex flex-column justify-content-center align-items-center">
+            <h1>Don't wait!<br>Join Quanda now!</h1>
+            <p>You just need to sign up!</p>
+            <a href="/register" class="gradient-button">
+                Join us now!
+            </a>
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+
+}
