@@ -1,0 +1,197 @@
+﻿#header-hcontainer {
+    background-color: transparent;
+    height: 800px;
+    position: relative;
+}
+
+    #header-hcontainer img {
+        width: 1077.3px;
+        height: 1027.03px;
+        position: absolute;
+        z-index: 0;
+        top: -314px;
+        left: -97px;
+    }
+
+    #header-hcontainer .text-container {
+        position: relative;
+        z-index: 1;
+        margin-left: 4rem;
+        margin-top: 6rem;
+    }
+
+    #header-hcontainer .left-container {
+        position: relative;
+        z-index: 1;
+        min-width: 796px;
+    }
+
+    #header-hcontainer .right-container {
+        position: relative;
+        z-index: 1;
+        margin-right: auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        transform: translateY(50px);
+    }
+
+
+    #header-hcontainer .left-container h1 {
+        font-size: 90px;
+        font-family: 'Roboto', sans-serif;
+        font-weight: bold;
+        color: #ffffff;
+    }
+
+    #header-hcontainer .left-container .join-button {
+        background: rgba(255,255,255,0.35) !important;
+        width: 478px;
+        height: 78px;
+    }
+
+    #header-hcontainer .right-container h1 {
+        font-size: 35px;
+        font-weight: bold;
+        font-family: 'Sen', sans-serif;
+        color: #3F4D54;
+    }
+
+    #header-hcontainer .right-container p {
+        font-size: 25px;
+        font-family: 'Sen', sans-serif;
+        color: #3F4D54;
+        max-width: 433px;
+        max-height: 211px;
+        overflow: hidden;
+    }
+
+#pink-hcontainer {
+    background-color: #f08782;
+}
+
+    #pink-hcontainer h1 {
+        color: #ffffff;
+        text-align: center;
+        font-weight: bold;
+        font-size: 40px;
+        font-family: 'Sen', sans-serif;
+    }
+
+    #pink-hcontainer p {
+        color: #ffffff;
+        text-align: left;
+        font-size: 25px;
+        font-family: 'Sen', sans-serif;
+    }
+
+    #pink-hcontainer img {
+        height: 135.81px;
+        margin-bottom: 1rem;
+        filter: brightness(0) invert(1);
+    }
+
+    #pink-hcontainer .children-container div {
+        max-width: 474px;
+    }
+
+#middle-hcontainer {
+    background-color: transparent;
+    padding: 6rem 0;
+}
+
+    #middle-hcontainer h2 {
+        color: #3f4d54;
+        font-weight: bold;
+        text-align: center;
+        font-size: 40px;
+        font-family: 'Sen', sans-serif;
+    }
+
+    #middle-hcontainer > div {
+        margin: 0 9rem;
+    }
+
+    #middle-hcontainer p {
+        color: #878787;
+        text-align: center;
+        font-size: 20px;
+        font-family: 'Roboto', sans-serif;
+    }
+
+    #middle-hcontainer img {
+        width: 404.9px;
+    }
+
+#yellow-hcontainer {
+    background-color: #f8eab0;
+}
+
+    #yellow-hcontainer h1 {
+        color: #3f4d54;
+        font-weight: bold;
+        font-size: 45px;
+        font-family: 'Roboto', sans-serif;
+        text-align: center;
+    }
+
+    #yellow-hcontainer p {
+        color: #3f4d54;
+        text-align: center;
+        font-size: 20px;
+        font-family: 'Roboto', sans-serif;
+    }
+
+    #yellow-hcontainer img {
+        height: 80px;
+        margin-bottom: 1rem;
+        filter: invert(88%) sepia(46%) saturate(958%) hue-rotate(333deg) brightness(93%) contrast(96%);
+    }
+
+    #yellow-hcontainer .children-container div {
+        max-width: 250px;
+    }
+
+        #yellow-hcontainer .children-container div:nth-child(2) {
+            margin: 0 8.5rem;
+        }
+
+#bottom-hcontainer {
+    background-color: transparent;
+    padding: 8rem 0;
+}
+
+    #bottom-hcontainer h1 {
+        color: #3f4d54;
+        font-size: 50px;
+        text-align: center;
+        font-family: 'Sen', sans-serif;
+        font-weight: bold;
+        margin-bottom: 0;
+    }
+
+    #bottom-hcontainer p {
+        color: #878787;
+        font-size: 20px;
+        font-family: 'Roboto', sans-serif;
+    }
+
+.gradient-button {
+    display: block;
+    width: 573px;
+    height: 97px;
+    background: linear-gradient(38deg, #ED746E 0%, #F08782 35%, #FBE48A 70%, #F7D964 100%);
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    font-family: 'Sen', sans-serif;
+    font-weight: bold;
+    color: #ffffff;
+    transition: letter-spacing 300ms ease-in-out;
+}
+
+    .gradient-button:hover {
+        letter-spacing: 5px;
+    }
