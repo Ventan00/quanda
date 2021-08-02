@@ -1,7 +1,7 @@
 .page {
     background-color: #f6f6f6;
     color: black;
-    height: 100vh;
+    height: 100%;
     margin-left: 90px;
     width: calc(100% - 90px);
 }
@@ -18,7 +18,7 @@
     height: 100%;
     position: fixed;
     width: 90px;
-    z-index: 2;
+    z-index: 3;
 }
 
 .topbar {
@@ -28,6 +28,7 @@
     height: 90px;
     position: fixed;
     width: calc(100% - 90px);
+    z-index: 2;
 }
 
 .topbar-dark {
