@@ -92,7 +92,7 @@ namespace Quanda.Server.Repositories.Implementations
             return await GetUserWithDetailsByAsync(u => u.RefreshToken == refreshToken);
         }
 
-        public Task<User> GetUserByEmailAsync(string email)
+        public async Task<User> GetUserByEmailAsync(string email)
         {
             return await GetUserWithDetailsByAsync(u => u.Email == email);
         }
