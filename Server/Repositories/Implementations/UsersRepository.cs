@@ -58,9 +58,13 @@ namespace Quanda.Server.Repositories.Implementations
             return !isRegistered ? USER_DB_ERROR : USER_REGISTERED;
         }
 
-        public async Task<User> GetUserByEmailAsync(string email)
+        public async Task<User> GetUserByNicknameOrEmailAsync(string nicknameOrEmail)
         {
-            return await GetUserWithDetailsByAsync(u => u.Email == email);
+            var foundUser = await GetUserWithDetailsByAsync(u => u.Email == nicknameOrEmail);
+            if (foundUser is null)
+                foundUser = await GetUserWithDetailsByAsync(u => u.Nickname == nicknameOrEmail);
+
+            return foundUser;
         }
 
         public async Task<UserStatus> UpdateRefreshTokenForUserAsync(User user, string refreshToken, DateTime? refreshTokenExpirationDate)
@@ -84,6 +88,11 @@ namespace Quanda.Server.Repositories.Implementations
         public async Task<User> GetUserByRefreshTokenAsync(string refreshToken)
         {
             return await GetUserWithDetailsByAsync(u => u.RefreshToken == refreshToken);
+        }
+
+        public async Task<User> GetUserByEmailAsync(string email)
+        {
+            return await GetUserWithDetailsByAsync(u => u.Email == email);
         }
 
         private async Task<User> GetUserWithDetailsByAsync(Expression<Func<User, bool>> predicate)

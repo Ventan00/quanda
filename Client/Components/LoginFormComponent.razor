@@ -7,16 +7,16 @@
 @inject IToastService _toastService
 
 <EditForm Model="@_loginDto" OnValidSubmit="@HandleValidSubmit" autocomplete="off">
-    <DataAnnotationsValidator/>
+    <DataAnnotationsValidator />
     <div class="form-group">
-        <label for="email-input" class="d-block">Email Address</label>
-        <InputText id="email-input" @bind-Value="_loginDto.Email"/>
-        <ValidationMessage For="() => _loginDto.Email"/>
+        <label for="email-input" class="d-block">Nickname or Email</label>
+        <InputText id="email-input" @bind-Value="_loginDto.NicknameOrEmail" />
+        <ValidationMessage For="() => _loginDto.NicknameOrEmail" />
     </div>
     <div class="form-group">
         <label for="password-input" class="d-block">Password</label>
-        <InputText id="password-input" @bind-Value="_loginDto.RawPassword"/>
-        <ValidationMessage For="() => _loginDto.RawPassword"/>
+        <InputText id="password-input" @bind-Value="_loginDto.RawPassword" />
+        <ValidationMessage For="() => _loginDto.RawPassword" />
     </div>
 
     @if (_loginStatus == LoginStatusEnum.EMAIL_NOT_CONFIRMED)
@@ -26,7 +26,7 @@
         <a class="btn btn-link pl-1" href="recover/email-confirmation">Click here</a>
     }
 
-    <CaptchaComponent @ref="_captchaComponent"/>
+    <CaptchaComponent @ref="_captchaComponent" />
 
     @if (_isPending)
     {
