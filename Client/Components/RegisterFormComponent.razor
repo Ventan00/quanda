@@ -7,7 +7,9 @@
     <FormInputComponent Type="text" @bind-Value="@_registerDto.Nickname" Placeholder="Login" />
     <FormInputComponent Type="text" @bind-Value="@_registerDto.Email" Placeholder="Email" />
     <FormInputComponent Type="password" @bind-Value="@_registerDto.RawPassword" Placeholder="Password" />
-    <FormSubmitComponent SubmitText="Sign up" PendingSubmitText="Singing up..." IsPending="@_isPending" />
+    <div class="mb-2 w-100">
+        <FormSubmitComponent SubmitText="Sign up" PendingSubmitText="Singing up..." IsPending="@_isPending" />
+    </div>
 </GenericFormComponent>
 
 @code {
