@@ -1,0 +1,28 @@
+﻿button {
+    background-color: #ffffff;
+    border: none;
+    border-radius: 50px;
+    color: #878787;
+    font-family: 'Roboto', sans-serif;
+    font-size: 20px;
+    font-weight: bold;
+    height: 67px;
+    margin-bottom: 1.6rem;
+    outline: none;
+    width: 401px;
+}
+
+    button img {
+        height: 39px;
+        width: 39px;
+    }
+
+    button span {
+        display: inline-block;
+        margin-left: 10px;
+    }
+
+.button-dark {
+    background-color: #54656E;
+    color: #94A7B0;
+}
