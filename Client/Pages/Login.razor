@@ -1,8 +1,30 @@
 ﻿@page "/login"
 
-<LoginFormComponent/>
-<label>Forgot your password?</label><a class="btn btn-link pl-1" href="recover/password">Click here</a>
+
+<TopSemicircleComponent />
+<div class="center-container @(!IsWhiteTheme ? "center-container-dark" : "")">
+    <h1>Log in</h1>
+    <LoginFormComponent />
+    <div class="line">
+        <span>OR</span>
+    </div>
+    <ExternalServicesComponent FacebookText="Log in with Facebook" GoogleText="Log in with Google" />
+    <div class="footer-container">
+        <p>
+            Don't have an account?
+            <NavLink href="/register">
+                <span class="register-link">Sign up!</span>
+            </NavLink>
+        </p>
+    </div>
+</div>
 
 @code {
+
+    /// <summary>
+    ///     Zmienna informująca jaki jest aktualny theme
+    /// </summary>
+    [CascadingParameter]
+    public bool IsWhiteTheme { get; set; }
 
 }
