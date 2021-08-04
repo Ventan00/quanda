@@ -6,37 +6,17 @@
 @inject ILocalStorageService _localStorageService
 @inject IToastService _toastService
 
-<EditForm Model="@_loginDto" OnValidSubmit="@HandleValidSubmit" autocomplete="off">
-    <DataAnnotationsValidator />
-    <div class="form-group">
-        <label for="email-input" class="d-block">Nickname or Email</label>
-        <InputText id="email-input" @bind-Value="_loginDto.NicknameOrEmail" />
-        <ValidationMessage For="() => _loginDto.NicknameOrEmail" />
-    </div>
-    <div class="form-group">
-        <label for="password-input" class="d-block">Password</label>
-        <InputText id="password-input" @bind-Value="_loginDto.RawPassword" />
-        <ValidationMessage For="() => _loginDto.RawPassword" />
-    </div>
+<GenericFormComponent @ref="@_form" Model="@_loginDto" OnValidSubmit="@LoginAsync" IsAutoCompleteOn="false" RequireCaptcha="true">
+    <FormInputComponent Type="text" @bind-Value="@_loginDto.NicknameOrEmail" Placeholder="Login or e-mail" />
+    <FormInputComponent Type="password" @bind-Value="@_loginDto.RawPassword" Placeholder="Password" />
+    <FormSubmitComponent SubmitText="Log In" PendingSubmitText="Logging in..." IsPending="@_isPending" />
+    <NavLink href="recover/password">
+        <span class="forgot-password-link">
+            Forgot password?
+        </span>
+    </NavLink>
+</GenericFormComponent>
 
-    @if (_loginStatus == LoginStatusEnum.EMAIL_NOT_CONFIRMED)
-    {
-        <label class="text-danger d-block">Email address is not confirmed.</label>
-        <label>Don't see an email?</label>
-        <a class="btn btn-link pl-1" href="recover/email-confirmation">Click here</a>
-    }
-
-    <CaptchaComponent @ref="_captchaComponent" />
-
-    @if (_isPending)
-    {
-        <button type="submit" class="btn btn-dark d-block mt-3" disabled>Logging in...</button>
-    }
-    else
-    {
-        <button type="submit" class="btn btn-success d-block mt-3">Log In</button>
-    }
-</EditForm>
 
 @code {
 
@@ -46,17 +26,12 @@
     private readonly LoginDTO _loginDto = new();
 
     /// <summary>
-    ///     Enum zawierający się w odpowiedzi od serwera na próbe zalogowania
+    ///     Referencja do formularza logowania
     /// </summary>
-    private LoginStatusEnum? _loginStatus;
+    private GenericFormComponent<LoginDTO> _form;
 
     /// <summary>
-    ///     Komponent captcha
-    /// </summary>
-    private CaptchaComponent _captchaComponent;
-
-    /// <summary>
-    ///     Zmienna mowiąca o tym, czy rządanie jest w trakcie realizacji
+    ///     Zmienna mowiąca o tym, czy formularz jest w trakcie przetwarzania
     /// </summary>
     private bool _isPending;
 
@@ -64,22 +39,13 @@
     ///     Metoda wywoływana przy potwierdzeniu prawidłowo wypełnionego formularza logowania
     /// </summary>
     /// <returns></returns>
-    private async Task HandleValidSubmit()
+    private async Task LoginAsync()
     {
-        var captchaResponseToken = await _captchaComponent.GetCaptchaResponseAsync();
-        if (captchaResponseToken is null)
-        {
-            _toastService.ShowError("reCaptcha must be completed");
-            return;
-        }
-        _loginDto.CaptchaResponseToken = captchaResponseToken;
-
-        _loginStatus = null;
         _isPending = true;
-        StateHasChanged();
+        _loginDto.CaptchaResponseToken = await _form.CaptchaComponent.GetCaptchaResponseAsync();
 
         var loginResponseDto = await _authenticationService.LoginAsync(_loginDto);
-        await HandleLoginResponse(loginResponseDto.LoginStatus, loginResponseDto.Avatar);
+        await HandleLoginResponse(loginResponseDto.LoginStatus);
 
         _isPending = false;
     }
@@ -88,32 +54,30 @@
     ///     Metoda obsługująca odpowiedz od serwera na wysłany formularz
     /// </summary>
     /// <param name="loginStatusEnum"></param>
-    /// <param name="Avatar>
-    /// </param>
     /// <returns></returns>
-    private async Task HandleLoginResponse(LoginStatusEnum loginStatusEnum, string Avatar)
+    private async Task HandleLoginResponse(LoginStatusEnum loginStatusEnum)
     {
-        _loginStatus = loginStatusEnum;
-
         switch (loginStatusEnum)
         {
             case LoginStatusEnum.LOGIN_ACCEPTED:
                 _toastService.ShowSuccess("You have logged in.");
-                await _localStorageService.SetItemAsync("avatar", Avatar);
                 _navManager.NavigateTo("");
                 return;
             case LoginStatusEnum.INVALID_CREDENTIALS:
                 _toastService.ShowError("Invalid credentials. Please try again.");
                 break;
             case LoginStatusEnum.INVALID_CAPTCHA:
-                _toastService.ShowError("reCaptcha must be completed");
+                _toastService.ShowError("reCaptcha is invalid. Please try again.");
+                break;
+            case LoginStatusEnum.EMAIL_NOT_CONFIRMED:
+                _toastService.ShowError("Email is not confirmed");
                 break;
             case LoginStatusEnum.SERVER_ERROR:
                 _toastService.ShowError("An unexpected error has occurred. Please try again.");
                 break;
         }
 
-        await _captchaComponent.ResetCaptchaAsync();
+        await _form.CaptchaComponent.ResetCaptchaAsync();
     }
 
 }
