@@ -45,7 +45,7 @@
         _loginDto.CaptchaResponseToken = await _form.CaptchaComponent.GetCaptchaResponseAsync();
 
         var loginResponseDto = await _authenticationService.LoginAsync(_loginDto);
-        await HandleLoginResponse(loginResponseDto.LoginStatus);
+        await HandleLoginResponse(loginResponseDto);
 
         _isPending = false;
     }
@@ -55,12 +55,13 @@
     /// </summary>
     /// <param name="loginStatusEnum"></param>
     /// <returns></returns>
-    private async Task HandleLoginResponse(LoginStatusEnum loginStatusEnum)
+    private async Task HandleLoginResponse(LoginResponseDTO loginResponseDto)
     {
-        switch (loginStatusEnum)
+        switch (loginResponseDto.LoginStatus)
         {
             case LoginStatusEnum.LOGIN_ACCEPTED:
                 _toastService.ShowSuccess("You have logged in.");
+                await _localStorageService.SetItemAsStringAsync("avatar", loginResponseDto.Avatar);
                 _navManager.NavigateTo("");
                 return;
             case LoginStatusEnum.INVALID_CREDENTIALS:
