@@ -1,0 +1,15 @@
+﻿.img-container {
+    height: 160px;
+    overflow: hidden;
+    position: relative;
+}
+
+    .img-container img {
+        height: 250px;
+        left: -90px;
+        object-fit: cover;
+        object-position: bottom;
+        position: absolute;
+        top: -90px;
+        width: calc(100% + 270px);
+    }

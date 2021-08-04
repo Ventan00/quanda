@@ -1,0 +1,23 @@
+﻿::deep input {
+    background-color: #ffffff;
+    border: none;
+    border-radius: 50px;
+    color: #878787;
+    font-family: 'Roboto', sans-serif;
+    font-size: 20px;
+    height: 57px;
+    margin: 0.8rem 0;
+    outline: none;
+    padding-left: 1.75rem;
+    width: 100%;
+}
+
+.input-container {
+    width: 100%;
+}
+
+.input-container-dark
+::deep input {
+    background-color: #54656E !important;
+    color: #94A7B0 !important;
+}

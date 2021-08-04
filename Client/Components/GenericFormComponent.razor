@@ -1,0 +1,81 @@
+﻿@typeparam TItem
+@inject IToastService _toastService
+
+<div class="generic-form-component-container">
+    <EditForm Model="@Model" OnValidSubmit="@HandleFormValidSubmit" autocomplete="@(IsAutoCompleteOn ? "on" : "off")">
+        <DataAnnotationsValidator />
+        <div class="generic-form-body">
+            @ChildContent
+            @if (RequireCaptcha)
+            {
+                <CaptchaComponent @ref="@CaptchaComponent" />
+            }
+        </div>
+    </EditForm>
+</div>
+
+
+@code {
+
+    /// <summary>
+    ///     Model formularza
+    /// </summary>
+    [Parameter]
+    public TItem Model { get; set; }
+
+    /// <summary>
+    ///     Metoda wywoływana przy potwierdzeniu poprawnie wypełnionego formularza
+    /// </summary>
+    [Parameter]
+    public EventCallback OnValidSubmit { get; set; }
+
+    /// <summary>
+    ///     Zawartość która zostanie wyrenderowana w formularzu
+    /// </summary>
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    /// <summary>
+    ///     Czy formularz ma mieć włączone auto wypełnianie
+    /// </summary>
+    [Parameter]
+    public bool IsAutoCompleteOn { get; set; }
+
+    /// <summary>
+    ///     Czy formularz ma wyrenderować oraz weryfikować captche
+    /// </summary>
+    [Parameter]
+    public bool RequireCaptcha { get; set; }
+
+    /// <summary>
+    ///     Referencja do wyrenderowanego captcha komponentu
+    /// </summary>
+    public CaptchaComponent CaptchaComponent { get; set; }
+
+    /// <summary>
+    ///     Metoda wywoływana przy potwierdzeniu poprawnie wypełnionego formularza
+    /// </summary>
+    /// <returns></returns>
+    private async Task HandleFormValidSubmit()
+    {
+        if (!RequireCaptcha)
+            await OnValidSubmit.InvokeAsync();
+        else if (await IsCaptchaChecked())
+            await OnValidSubmit.InvokeAsync();
+    }
+
+    /// <summary>
+    ///     Metoda sprawdzająca czy captcha została wypełniona (sprawdzenie po stronie klienta)
+    /// </summary>
+    /// <returns></returns>
+    private async Task<bool> IsCaptchaChecked()
+    {
+        var captchaResponse = await CaptchaComponent.GetCaptchaResponseAsync();
+        if (captchaResponse is not null)
+            return true;
+
+        _toastService.ShowError("reCaptcha must be completed.");
+        return false;
+    }
+
+}
