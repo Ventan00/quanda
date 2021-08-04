@@ -1,0 +1,47 @@
+﻿<div class="input-container @(!IsWhiteTheme ? "input-container-dark" : "")">
+    <InputText @bind-Value="Value" type="@Type" placeholder="@Placeholder" @oninput="OnInputValueChanged" />
+</div>
+
+
+@code {
+
+    /// <summary>
+    ///     Zmienna informująca jaki jest aktualny theme
+    /// </summary>
+    [CascadingParameter]
+    public bool IsWhiteTheme { get; set; }
+
+    /// <summary>
+    ///     Zmienna zawierająca wartość pola input
+    /// </summary>
+    [Parameter]
+    public string Value { get; set; }
+
+    /// <summary>
+    ///     Tekst wyświetlany w polu input jeżeli jest puste
+    /// </summary>
+    [Parameter]
+    public string Placeholder { get; set; }
+
+    /// <summary>
+    ///     Typ pola input
+    /// </summary>
+    [Parameter]
+    public string Type { get; set; }
+
+    /// <summary>
+    ///     Metoda pozwalająca zbindować wartość pola input do zmiennej podanej w rodzicu (zupdatowanie jej wartości)
+    /// </summary>
+    [Parameter]
+    public EventCallback<string> ValueChanged { get; set; }
+
+    /// <summary>
+    ///     Metoda wywoływana przy zmianie wartości pola input
+    /// </summary>
+    Task OnInputValueChanged(ChangeEventArgs e)
+    {
+        Value = e.Value?.ToString();
+        return ValueChanged.InvokeAsync(Value);
+    }
+
+}

@@ -1,0 +1,26 @@
+﻿.form-submit-btn {
+    background: linear-gradient(38deg, #ED746E 0%, #F08782 35%, #FBE48A 70%, #F7D964 100%);
+    border: none;
+    border-radius: 50px;
+    color: white;
+    font-family: 'San', sans-serif;
+    font-size: 20px;
+    font-weight: bold;
+    height: 57px;
+    margin: 0.8rem 0;
+    outline: none;
+    transition: letter-spacing 300ms ease-in;
+    width: 100%;
+}
+
+    .form-submit-btn:hover {
+        letter-spacing: 5px;
+    }
+
+.form-submit-btn-dark {
+    color: #94A7B0;
+}
+
+.form-submit-btn-disabled {
+    opacity: 0.7;
+}

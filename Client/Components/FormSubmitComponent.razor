@@ -1,0 +1,30 @@
+﻿@if (IsPending)
+{
+    <button type="submit" class="form-submit-btn form-submit-btn-disabled" disabled>@PendingSubmitText</button>
+}
+else
+{
+    <button type="submit" class="form-submit-btn">@SubmitText</button>
+}
+
+@code {
+
+    /// <summary>
+    ///     Tekst wyświetlany na przycisku submit
+    /// </summary>
+    [Parameter]
+    public string SubmitText { get; set; }
+
+    /// <summary>
+    ///     Tekst wyświetlany na przycisku submit w trakcie przetwarzania formularza
+    /// </summary>
+    [Parameter]
+    public string PendingSubmitText { get; set; }
+
+    /// <summary>
+    ///     Zmienna mówiąca o tym czy formularz jest w trakcie przetwarzania
+    /// </summary>
+    [Parameter]
+    public bool IsPending { get; set; }
+
+}
