@@ -5,12 +5,12 @@
 @implements IDisposable
 
 <div class="sidebar">
-    <NavMenuComponent EventCallback="HandleThemeChange"/>
+    <NavMenuComponent EventCallback="HandleThemeChange" />
 </div>
-<div class="page @(isWhiteTheme ? "" : "page-dark")">
+<div class="page @(isWhiteTheme ? "light-mode" : "dark-mode")">
     <div class="topbar @(isWhiteTheme ? "" : "topbar-dark")">
         <CascadingValue Value="isWhiteTheme">
-            <TopBarComponent/>
+            <TopBarComponent />
         </CascadingValue>
     </div>
     <div class="page-content">
@@ -19,7 +19,6 @@
         </CascadingValue>
     </div>
     <footer class="page-footer">
-
     </footer>
 </div>
 
@@ -28,7 +27,7 @@
                 SuccessClass="success-toast-override"
                 ShowProgressBar="true"
                 SuccessIcon="fa fa-thumbs-up"
-                ErrorIcon="fa fa-bug"/>
+                ErrorIcon="fa fa-bug" />
 
 @code
 {
