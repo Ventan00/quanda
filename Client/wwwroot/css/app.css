@@ -25,13 +25,18 @@ h1, h2, h3, h4, h5, h6 {
     background-color: #f6f6f6;
 }
 
-    .light-mode
-    p, span, a {
+    .light-mode p,
+    .light-mode span,
+    .light-mode a {
         color: #000000;
     }
 
-    .light-mode
-    h1, h2, h3, h4, h5, h6 {
+    .light-mode h1,
+    .light-mode h2,
+    .light-mode h3,
+    .light-mode h4,
+    .light-mode h5,
+    .light-mode h6 {
         color: #3F4D54;
     }
 
@@ -40,13 +45,18 @@ h1, h2, h3, h4, h5, h6 {
     background-color: #49555C;
 }
 
-    .dark-mode
-    p, span, a {
+    .dark-mode p,
+    .dark-mode span,
+    .dark-mode a {
         color: #F6F6F6;
     }
 
-    .dark-mode
-    h1, h2, h3, h4, h5, h6 {
+    .dark-mode h1,
+    .dark-mode h2,
+    .dark-mode h3,
+    .dark-mode h4,
+    .dark-mode h5,
+    .dark-mode h6 {
         color: #F6F6F6;
     }
 
