@@ -2,29 +2,21 @@
 
 
 <TopSemicircleComponent />
-<div class="center-container @(!IsWhiteTheme ? "center-container-dark" : "")">
-    <h1>Log in</h1>
+<div class="center-container">
+    <h1 class="title">Log in</h1>
     <LoginFormComponent />
     <div class="line">
-        <span>OR</span>
+        <span class="line-text">OR</span>
     </div>
     <ExternalServicesComponent FacebookText="Log in with Facebook" GoogleText="Log in with Google" />
-    <div class="footer-container">
-        <p>
-            Don't have an account?
-            <NavLink href="/register">
-                <span class="register-link">Sign up!</span>
-            </NavLink>
-        </p>
+    <div>
+        <p class="bottom-text">Don't have an account?</p>
+        <NavLink href="/register">
+            <p class="bottom-link">Sign up!</p>
+        </NavLink>
     </div>
 </div>
 
 @code {
-
-    /// <summary>
-    ///     Zmienna informująca jaki jest aktualny theme
-    /// </summary>
-    [CascadingParameter]
-    public bool IsWhiteTheme { get; set; }
 
 }
