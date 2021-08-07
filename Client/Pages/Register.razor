@@ -1,23 +1,22 @@
 ﻿@page "/register"
 
 <TopSemicircleComponent />
-<div class="center-container @(!IsWhiteTheme ? "center-container-dark" : "")">
-    <h1 class="header">Sign up</h1>
+<div class="center-container">
+    <h1 class="title">Sign up</h1>
     <RegisterFormComponent />
     <div class="line">
         <span class="line-text">OR</span>
     </div>
     <ExternalServicesComponent FacebookText="Sign up with Facebook" GoogleText="Sign up Google" />
-    <p class="footer-text">
-        Already have an account?
+    <div>
+        <p class="bottom-text">Already have an account?</p>
         <NavLink href="/login">
-            <span class="footer-link">Log in!</span>
+            <p class="bottom-link">Sign up!</p>
         </NavLink>
-    </p>
+    </div>
 </div>
 
 
 @code {
-    [CascadingParameter]
-    public bool IsWhiteTheme { get; set; }
+
 }
