@@ -1,24 +1,18 @@
-﻿<button @onclick="@FacebookAction" class="@(!IsWhiteTheme ? "button-dark" : "")">
-    <img src="img/facebook.svg" alt="facebook">
-    <span>
+﻿<button @onclick="@FacebookAction" class="external-btn">
+    <img src="img/facebook.svg" alt="facebook" class="external-btn-img">
+    <span class="external-btn-text">
         @FacebookText
     </span>
 </button>
-<button @onclick="@GoogleAction" class="@(!IsWhiteTheme ? "button-dark" : "")">
-    <img src="img/google.svg" alt="google">
-    <span>
+<button @onclick="@GoogleAction" class="external-btn">
+    <img src="img/google.svg" alt="google" class="external-btn-img">
+    <span class="external-btn-text">
         @GoogleText
     </span>
 </button>
 
 
 @code {
-
-    /// <summary>
-    ///     Zmienna informująca jaki jest aktualny theme
-    /// </summary>
-    [CascadingParameter]
-    public bool IsWhiteTheme { get; set; }
 
     /// <summary>
     ///     Tekst wyświetlany na przycisku facebook
