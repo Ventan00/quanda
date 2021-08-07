@@ -1,0 +1,26 @@
+﻿<div class="recovery-container">
+    <h1 class="recovery-title">@Title</h1>
+    <div class="recovery-body">
+        <p class="recovery-description">@Description</p>
+        @ChildContent
+    </div>
+</div>
+
+@code {
+
+    /// <summary>
+    /// </summary>
+    [Parameter]
+    public string Title { get; set; }
+
+    /// <summary>
+    /// </summary>
+    [Parameter]
+    public string Description { get; set; }
+
+    /// <summary>
+    /// </summary>
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+}

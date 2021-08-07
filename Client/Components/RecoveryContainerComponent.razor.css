@@ -1,0 +1,47 @@
+﻿.recovery-container {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+}
+
+.recovery-title {
+    font-size: 27px;
+    margin: 2rem 0 5rem 0;
+}
+
+.recovery-body {
+    align-items: center;
+    border: none;
+    border-radius: 25px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: auto;
+    margin-bottom: 7rem;
+    max-width: 478px;
+    padding: 2rem;
+}
+
+.light-mode
+.recovery-body {
+    background-color: #ffffff;
+}
+
+    .light-mode
+    .recovery-body ::deep input {
+        background: #f6f6f6 !important;
+    }
+
+.dark-mode
+.recovery-body {
+    background-color: #3f4d54;
+}
+
+.recovery-description {
+    font-size: 18px;
+}
+
+.light-mode
+.recovery-description {
+    color: #292F36;
+}
