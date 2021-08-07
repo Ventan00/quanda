@@ -1,65 +1,60 @@
 ﻿.center-container {
+    align-items: center;
     display: flex;
     flex-direction: column;
-    align-items: center;
 }
 
-    .center-container .header {
-        font-family: 'Sen', sans-serif;
-        font-size: 27px;
-        font-weight: bold;
-        color: #3F4D54;
-        margin: 2rem 0 1rem 0;
-    }
-
-    .center-container .line {
-        max-width: 374px;
-        width: 100%;
-        text-align: center;
-        border-top: 2px solid #6f6f6f;
-        line-height: 0;
-        margin: 2rem 0;
-    }
-
-    .center-container .line-text {
-        background: #f6f6f6;
-        padding: 0 1.5rem;
-        color: #878787;
-        font-family: 'Roboto', sans-serif;
-        font-size: 20px;
-    }
-
-    .center-container
-    .footer-text, .footer-link {
-        font-family: 'Roboto', sans-serif;
-        font-size: 18px;
-    }
-
-    .center-container
-    .footer-text {
-        color: #878787;
-        display: inline-block;
-    }
-
-    .center-container
-    .footer-link {
-        color: #f08782;
-        display: inline-block !important;
-        margin-left: 0.6rem;
-        text-decoration: none;
-    }
-
-.center-container-dark
-.header, .line-text, .footer-text {
-    color: #94A7B0 !important;
+.title {
+    font-size: 27px;
+    margin: 2rem 0 1rem 0;
 }
 
-.center-container-dark
 .line {
-    border-color: #94A7B0;
+    border-top: 2px solid;
+    line-height: 0;
+    margin: 2rem 0;
+    max-width: 374px;
+    text-align: center;
+    width: 100%;
 }
 
-.center-container-dark
+.light-mode
+.line {
+    border-color: #707070;
+}
+
+.dark-mode
+.line {
+    border-color: #F6F6F6;
+}
+
 .line-text {
-    background: #49555C;
+    font-size: 20px;
+    padding: 0 1.5rem;
+}
+
+.light-mode
+.line-text {
+    background-color: #F6F6F6;
+    color: #707070;
+}
+
+.dark-mode
+.line-text {
+    background-color: #49555C;
+}
+
+.bottom-text {
+    display: inline-block;
+}
+
+.light-mode
+.bottom-text {
+    color: #707070;
+}
+
+.bottom-link {
+    color: #f08782;
+    display: inline-block;
+    margin-left: 0.6rem;
 }
