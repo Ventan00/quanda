@@ -9,16 +9,19 @@
 @code {
 
     /// <summary>
+    ///     Tekst wyświetlany w nagłówku kontenera
     /// </summary>
     [Parameter]
     public string Title { get; set; }
 
     /// <summary>
+    ///     Tekst wyświetlany w opisie kontenera
     /// </summary>
     [Parameter]
     public string Description { get; set; }
 
     /// <summary>
+    ///     Zawartość która zostanie wyrenderowana w body kontenera
     /// </summary>
     [Parameter]
     public RenderFragment ChildContent { get; set; }
