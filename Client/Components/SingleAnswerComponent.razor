@@ -2,6 +2,7 @@
 @inject IJSRuntime js
 @inject NavigationManager navigationManager
 
+
 <div class="header-info">
     <div class="publish-date">
         @Answer.PublishDate.ToShortDateString()
@@ -12,7 +13,7 @@
     <div>
         <a href="/users/@Answer.User.IdUser">
             <img class="user-avatar" src="@Answer.User.Avatar" alt="Avatar" />
-        </a>
+        </a> 
     </div>
     <div>
         <div class="user-nickname">
@@ -23,53 +24,73 @@
         </div>
     </div>
 </div>
-<div class="text">
-    @Answer.Text
-</div>
-<div class="footer">
-    <button class="quanda-icon icon-arrowup answer-rating-arrow" style="@(Answer.IsLiked==1?"color:#FFAD33":"")" @onclick="@(async() => await IncreaseRating())" disabled="@(isNonInteractive || OwnerOfAnswer || Answer.IsLiked == 1)" />
-    <div class="answer-rating-text">
-        @Answer.Rating
+<div class="grid-container">
+    @if (ActiveUser == null)
+    {
+        <div class="row-line">
+        </div>
+        <div class="row-unloggedUser">
+            <UnloggedUserComponent></UnloggedUserComponent>
+        </div>
+    }
+    <div class="row-answer">
+        <div class="text @(ActiveUser==null?"blur":"")">
+            @Answer.Text
+        </div>
+
+        <div class="footer @(ActiveUser==null?"blur":"")">
+            <button class="quanda-icon icon-arrowup answer-rating-arrow" style="@(Answer.IsLiked==1?"color:#FFAD33":"")" @onclick="@(async() => await IncreaseRating())" disabled="@(isNonInteractive || OwnerOfAnswer || Answer.IsLiked == 1)" />
+            <div class="answer-rating-text">
+                @Answer.Rating
+            </div>
+            <button class="quanda-icon icon-arrowdown answer-rating-arrow" style="@(Answer.IsLiked==-1?"color:#FFAD33":"")" @onclick="@(async() => await DecreaseRating())" disabled="@(isNonInteractive || OwnerOfAnswer || Answer.IsLiked == -1)" />
+            @if (Answer.IdRootAnswer == null)
+            {
+                <div class="black-action" @onclick="@(async () =>await SetReplayActive())">
+                    replay
+                </div>
+            }
+            @if (OwnerOfAnswer)
+            {
+                <div class="black-action" @onclick="@(async () =>await EditAnswer())">
+                    <button class="quanda-icon icon-edit" />
+                    <div>
+                        edit
+                    </div>
+                </div>
+                <div class="red-action" @onclick="@(()=> DeleteAnswer.InvokeAsync(Answer))">
+                    <button class="quanda-icon icon-delete red" />
+                    <div>
+                        delete
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="red-action" @onclick="@(async () =>await ReportAnswer())">
+                    <button class="quanda-icon icon-report red" />
+                    <div>
+                        Report answer
+                    </div>
+                </div>
+            }
+        </div>
+
+        @if (IsReplayActive)
+        {
+            <div style="margin-left: 80px;">
+                <input />
+            </div>
+        }
     </div>
-    <button class="quanda-icon icon-arrowdown answer-rating-arrow" style="@(Answer.IsLiked==-1?"color:#FFAD33":"")" @onclick="@(async() => await DecreaseRating())" disabled="@(isNonInteractive || OwnerOfAnswer || Answer.IsLiked == -1)" />
-    @if (Answer.IdRootAnswer == null)
-    {
-        <div class="black-action" @onclick="@(async () =>await SetReplayActive())">
-            replay
-        </div>
-    }
-    @if (OwnerOfAnswer)
-    {
-        <div class="black-action" @onclick="@(async () =>await EditAnswer())">
-            <button class="quanda-icon icon-edit" />
-            <div>
-                edit
-            </div>
-        </div>
-        <div class="red-action" @onclick="@(()=> DeleteAnswer.InvokeAsync(Answer))">
-            <button class="quanda-icon icon-delete red" />
-            <div>
-                delete
-            </div>
-        </div>
-    }
-    else
-    {
-        <div class="red-action" @onclick="@(async () =>await ReportAnswer())">
-            <button class="quanda-icon icon-report red" />
-            <div>
-                Report answer
-            </div>
-        </div>
-    }
 </div>
 
-@if (IsReplayActive)
-{
-    <div style="margin-left: 80px;">
-        <input />
-    </div>
-}
+
+
+
+
+
+
 
 
 
@@ -85,7 +106,7 @@
     /// Id użytkownika aktywnie przeglądającego pytania użytkownika.
     /// </summary>
     [Parameter]
-    public int ActiveUser { get; set; }
+    public int? ActiveUser { get; set; }
     /// <summary>
     /// Property informująca czy właścicielem odpowiedzi jest aktualnie przeglądajacy użytkownik.
     /// </summary>

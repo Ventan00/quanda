@@ -1,13 +1,13 @@
 ﻿@inject IAnswerRepository answerRepository
 @inject IQuestionsReposiotry questionRepository
 @inject NavigationManager navigationManager
-@inject IJSRuntime js
+@inject IJSRuntime js 
 
 <div class="main-container">
     @if (Question != null)
     {
         <QuestionForAnswersComponent Question="Question" OwnerOfAnswer="OwnerOfQuestion" />
-        <div class="answers-container">
+        <div class="answers-container">  
             @if (Answers == null)
             {
                 <LoadingIndicatorComponent />
@@ -16,7 +16,7 @@
             {
                 <div class="answers-empty">
                     Brak odpowiedzi. Znasz odpowiedź na to pytanie? Odpowiedz!
-                </div>
+                </div> 
             }
             else
             {
@@ -26,7 +26,7 @@
                 @foreach (var answer in Answers)
                 {
                     <div class="answer">
-                        <SingleAnswerComponent Answer="answer" ActiveUser="ActiveUser" DeleteAnswer="DeleteAnswer"  />
+                        <SingleAnswerComponent Answer="answer" ActiveUser="ActiveUser" DeleteAnswer="DeleteAnswer" />
                         @if (answer.AmountOfAnswerChildren > 0)
                         {
                             <div class="answer-child-explorer" @onclick="() => GetChildAnswers(answer.IdAnswer)">
@@ -52,7 +52,6 @@
         </div>
     }
 </div>
-
 @code {
     /// <summary>
     ///     Id pytania, do którego odnoszą się odpowiedzi.
@@ -66,7 +65,7 @@
     /// <summary>
     ///     Id aktualnie przeglądającego użytkownika.
     /// </summary>
-    public int ActiveUser { get; set; }
+    public int? ActiveUser { get; set; }
     /// <summary>
     ///     Property informujacę o stanie ładowania odpowiedzi.
     /// </summary>
@@ -88,6 +87,9 @@
     /// </summary>
     public bool OwnerOfQuestion { get; set; }
 
+    [CascadingParameter]
+    public Task<AuthenticationState> authenticationStateTask { get; set; }
+
     /// <summary>
     ///     Pobranie Id aktualnie przeglądającego użytkownika oraz pobranie pytania z początkową listą odpowiedzi.
     /// </summary>
@@ -98,15 +100,18 @@
         PageSize = Config.ANSWERS_PAGE_SIZE;
         PageNumber = 1;
         Question = await questionRepository.GetQuestion(IdQuestion);
-        if(Question != null)
+        if (Question != null)
         {
             OwnerOfQuestion = ActiveUser == Question.User.IdUser;
             Answers = Question.Answers;
             Question.Answers = null;
             IsLoading = false;
-            await js.InvokeVoidAsync("import", "./js/InfiniteScroll.js");
-            StateHasChanged();
-            await js.InvokeVoidAsync("ScrollList.Init", "list-end", DotNetObjectReference.Create(this));
+            if(ActiveUser != null)
+            {
+                await js.InvokeVoidAsync("import", "./js/InfiniteScroll.js");
+                StateHasChanged();
+                await js.InvokeVoidAsync("ScrollList.Init", "list-end", DotNetObjectReference.Create(this));
+            }
         }
         else
         {

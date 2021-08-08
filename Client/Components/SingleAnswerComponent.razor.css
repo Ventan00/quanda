@@ -1,0 +1,32 @@
+﻿.grid-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+    grid-template-areas: "overlap";
+}
+
+.row-unloggedUser {
+    margin-top: 10px;
+    grid-area: overlap;
+    justify-self: center;
+    grid-column: 1 / 1;
+    grid-row: 1 / 1;
+    z-index: 1;
+    width: 75%;
+}
+
+.row-line {
+    grid-area: overlap;
+    grid-column: 1 / 1;
+    grid-row: 1 / 1;
+    content: "";
+    display: block;
+    width: 75%;
+    border-top: 1px solid;
+    color: #878787;
+}
+
+.row-answer {
+    grid-column: 1 / 1;
+    grid-row: 1 / 1;
+}

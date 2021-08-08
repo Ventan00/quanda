@@ -5,6 +5,7 @@
     margin-top: 50px;
     padding: 30px;
     width: 75%;
+    height: 100%;
 }
 
 .answer {
@@ -17,7 +18,15 @@
         margin-bottom: 10px;
     }
 
-.header {
+::deep .blur {
+    -webkit-filter: blur(5px);
+    -moz-filter: blur(5px);
+    -o-filter: blur(5px);
+    -ms-filter: blur(5px);
+    filter: blur(5px);
+    pointer-events: none;
+}
+::deep .header {
     font-size: 25px;
     font-family: 'Sen', sans-serif;
     font-weight: bold;
@@ -95,14 +104,14 @@
 }
 
     ::deep .text::after{
-        margin-top: 15px;
+        margin-top: 20px;
         content: "";
         display: block;
         width: 75%;
         border-bottom: 1px solid #878787;
     }
     ::deep .text::before {
-        margin-bottom: 15px;
+        margin-bottom: 20px;
         content: "";
         display: block;
         width: 75%;
