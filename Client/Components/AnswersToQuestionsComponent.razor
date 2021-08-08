@@ -1,163 +1,150 @@
 ﻿@inject IAnswerRepository answerRepository
+@inject IQuestionsReposiotry questionRepository
+@inject NavigationManager navigationManager
 @inject IJSRuntime js
-<div class="answers-container">
-    @if (Answers == null)
-    {
-        <LoadingIndicatorComponent />
-    }
-    else
-    {
-        @foreach (var answer in Answers)
-        {
 
-            <div class="answer-Main">
-                <SingleAnswerComponent Answer="answer" RemoveAnswer="DeleteAnswer" OnSetReplyAnswer="setResponseAnswer" ActiveResponse="IdResponseAnswer" ActiveUser="ActiveUser" />
-            </div>
-            <div class="answer-Main_child">
-                @foreach (var childAnswer in answer.ChildAnswers)
-                {
-                    <div class="answer-child" style="margin-left: 20px;">
-                        <SingleAnswerComponent Answer="childAnswer" RemoveAnswer="DeleteAnswer" OnSetReplyAnswer="setResponseAnswer" ActiveResponse="IdResponseAnswer" ActiveUser="ActiveUser" />
-                    </div>
-                }
-            </div>
-            @if (answer.AmountOfChildAnswers > answer.ChildAnswers.Count)
-                    {
-                        <div class="answer-child" style="margin-left: 20px;">
-                            <button @onclick="() => GetChildAnswers(answer.IdAnswer)">
-                                Show @(answer.AmountOfChildAnswers - 3) more answers
-                            </button>
-                        </div>
-                    }
-}
-
-        <div id="list-end" class="mt-5 mb-5 p-5">
-            @if (IsLoading)
+<div class="main-container">
+    @if (Question != null)
+    {
+        <QuestionForAnswersComponent Question="Question" OwnerOfAnswer="OwnerOfQuestion" />
+        <div class="answers-container">
+            @if (Answers == null)
             {
                 <LoadingIndicatorComponent />
             }
-        </div>
-        <div>
-            <AnswerTextComponent Text="@TextAdd" Publish="AddAnswer" Discard="discard"></AnswerTextComponent>
+            else if (Answers.Count == 0)
+            {
+                <div class="answers-empty">
+                    Brak odpowiedzi. Znasz odpowiedź na to pytanie? Odpowiedz!
+                </div>
+            }
+            else
+            {
+                <div class="header">
+                    Answers
+                </div>
+                @foreach (var answer in Answers)
+                {
+                    <div class="answer">
+                        <SingleAnswerComponent Answer="answer" ActiveUser="ActiveUser" DeleteAnswer="DeleteAnswer"  />
+                        @if (answer.AmountOfAnswerChildren > 0)
+                        {
+                            <div class="answer-child-explorer" @onclick="() => GetChildAnswers(answer.IdAnswer)">
+                                <div class="arrow-down"> </div>
+                                @(answer.AnswerChildren.Count == 0 ? "show" : "hide") @answer.AmountOfAnswerChildren replies
+                            </div>
+                            @foreach (var childAnswer in answer.AnswerChildren)
+                            {
+                                <div class="answer-children">
+                                    <SingleAnswerComponent Answer="childAnswer" ActiveUser="ActiveUser" DeleteAnswer="DeleteAnswer"  />
+                                </div>
+                            }
+                        }
+                    </div>
+                }
+                <div id="list-end">
+                    @if (IsLoading)
+                    {
+                        <LoadingIndicatorComponent />
+                    }
+                </div>
+            }
         </div>
     }
 </div>
 
-
 @code {
     /// <summary>
-    /// Id pytania, do którego odnoszą się odpowiedzi.
+    ///     Id pytania, do którego odnoszą się odpowiedzi.
     /// </summary>
     [Parameter]
     public int IdQuestion { get; set; }
     /// <summary>
-    /// Lista odpowiedzi do pytania.
+    ///     Lista odpowiedzi do pytania.
     /// </summary>
     public List<AnswerResponseDTO> Answers { get; set; }
     /// <summary>
-    /// Id odpowiedzi, do której odnosi się nowa odpowiedź.
-    /// </summary>
-    public int IdResponseAnswer { get; set; }
-    /// <summary>
-    /// Tekst pola dla nowej odpowiedzi.
-    /// </summary>
-    public string TextAdd { get; set; }
-    /// <summary>
-    /// Id aktualnie przeglądającego użytkownika.
+    ///     Id aktualnie przeglądającego użytkownika.
     /// </summary>
     public int ActiveUser { get; set; }
     /// <summary>
-    /// Property informujacę o stanie ładowania odpowiedzi.
+    ///     Property informujacę o stanie ładowania odpowiedzi.
     /// </summary>
     public bool IsLoading { get; set; }
     /// <summary>
-    /// Property zawierające ilość odpowiedzi ładowanych na jednej stronie.
+    ///     Property zawierające ilość odpowiedzi ładowanych na jednej stronie.
     /// </summary>
     public int PageSize { get; set; }
     /// <summary>
-    /// Numer strony do której zostały załadowane odpowiedzi.
+    ///     Numer strony do której zostały załadowane odpowiedzi.
     /// </summary>
     public int PageNumber { get; set; }
+    /// <summary>
+    ///     Pytanie z początkową listą odpowiedzi
+    /// </summary>
+    public QuestionResponseDTO Question { get; set; }
+    /// <summary>
+    ///     Property infomujące czy aktualnie przeglądający użytkownik jest właścicielem pytania.
+    /// </summary>
+    public bool OwnerOfQuestion { get; set; }
 
     /// <summary>
-    /// Pobranie Id aktualnie przeglądającego użytkownika oraz pobranie początkowej listy odpowiedzi.
+    ///     Pobranie Id aktualnie przeglądającego użytkownika oraz pobranie pytania z początkową listą odpowiedzi.
     /// </summary>
     protected async override Task OnInitializedAsync()
     {
+        IsLoading = true;
         ActiveUser = 25;
-        PageSize = 10;
-        Answers = new();
-        await js.InvokeVoidAsync("import", "./js/InfiniteScroll.js");
-        await LoadMore();
-        await js.InvokeVoidAsync("ScrollList.Init", "list-end", DotNetObjectReference.Create(this));
-    }
-
-    /// <summary>
-    /// Metoda wysyłająca zapytanie do serwera z dodaniem nowej odpowiedzi.
-    /// </summary>
-    /// <param name="text">Tekst odpowiedzi</param>
-    private async Task AddAnswer(string text)
-    {
-        AnswerResponseDTO answer = null;
-        if (IdResponseAnswer != 0)
-            answer = Answers.Where(a => a.ChildAnswers.Any(ach => ach.IdAnswer == IdResponseAnswer)).SingleOrDefault();
-
-        int idRootAnswer = -1;
-        if (answer != null)
-            idRootAnswer = answer.IdAnswer; //Skorygowane id odpowiedzi na jego nadrzędną odpowiedź.
-
-        Tuple<bool, string> result = null;
-        if (idRootAnswer != -1)
-            result = await answerRepository.AddAnswer(text, 1, idRootAnswer);
-        else
-            result = await answerRepository.AddAnswer(text, 1, IdResponseAnswer);
-
-        if (!result.Item1)
-            await js.InvokeVoidAsync("alert", result.Item2);
+        PageSize = Config.ANSWERS_PAGE_SIZE;
+        PageNumber = 1;
+        Question = await questionRepository.GetQuestion(IdQuestion);
+        if(Question != null)
+        {
+            OwnerOfQuestion = ActiveUser == Question.User.IdUser;
+            Answers = Question.Answers;
+            Question.Answers = null;
+            IsLoading = false;
+            await js.InvokeVoidAsync("import", "./js/InfiniteScroll.js");
+            StateHasChanged();
+            await js.InvokeVoidAsync("ScrollList.Init", "list-end", DotNetObjectReference.Create(this));
+        }
         else
         {
-            if(IdResponseAnswer == 0)
-                await GetAnswers(0, Answers.Count + 1);
-            else
-                await GetAnswers(0, Answers.Count);
+            await js.InvokeVoidAsync("alert", "Question deleted!!!");
+            navigationManager.NavigateTo("/");
         }
-        IdResponseAnswer = 0;
     }
 
     /// <summary>
-    /// Metoda odpowiedzialna za usunięcie odpowiedzi.
+    ///     Metoda odpowiedzialna za usunięcie odpowiedzi.
     /// </summary>
     /// <param name="answer">Odpowiedź przeznaczona do usunięcia.</param>
     private async Task DeleteAnswer(AnswerResponseDTO answer)
     {
-        if (answer.IdRootAnswer == null)
-            Answers.Remove(answer);
-        else
-            Answers.SingleOrDefault(a => a.IdAnswer == answer.IdRootAnswer).ChildAnswers.Remove(answer);
+        var confirmed = await js.InvokeAsync<bool>("confirm", "Do want to delete answer?");
+        if (confirmed)
+        {
+            var result = await answerRepository.DeleteAnswer(answer.IdAnswer);
+            if (!result.Item1)
+                await js.InvokeVoidAsync("alert", result.Item2);
+            else
+            {
+                if (answer.IdRootAnswer == null)
+                    Answers.Remove(answer);
+                else
+                {
+                    var rootAnswer = Answers.SingleOrDefault(a => a.IdAnswer == answer.IdRootAnswer);
+                    rootAnswer.AnswerChildren.Remove(answer);
+                    rootAnswer.AmountOfAnswerChildren -= 1;
+                }
+            }
+
+        }
+
     }
 
     /// <summary>
-    /// Metoda odpowiedzialna za ustawienie id odpowiedzi do której będzie odnosić się nowa odpowiedź.
-    /// </summary>
-    /// <param name="idAnswer"></param>
-    private void setResponseAnswer(int idAnswer)
-    {
-        if (IdResponseAnswer == idAnswer)
-            IdResponseAnswer = 0;
-        else
-            IdResponseAnswer = idAnswer;
-    }
-
-    /// <summary>
-    /// Metoda odpowiedzialna za wyczyszczenie tekstu z pola dla nowej odpowiedzi.
-    /// </summary>
-    private void discard()
-    {
-        TextAdd = null;
-    }
-
-    /// <summary>
-    /// Metoda odpowiedzialna za doładowywanie nowych odpowiedzi.
+    ///     Metoda odpowiedzialna za doładowywanie nowych odpowiedzi.
     /// </summary>
     [JSInvokable]
     public async Task LoadMore()
@@ -169,7 +156,7 @@
             var TotalSize = PageNumber * PageSize;
             var answersParams = new AnswersPageDTO
             {
-                StartIndex = Answers.Count != TotalSize ? TotalSize - 1: TotalSize
+                StartIndex = Answers.Count != TotalSize ? Answers.Count + PageSize : TotalSize
             };
             var newAnswers = await answerRepository.GetAnswersAsync(IdQuestion, answersParams);
             newAnswers.RemoveAll(a => Answers.Any(an => an.IdAnswer == a.IdAnswer));
@@ -185,34 +172,22 @@
     }
 
     /// <summary>
-    /// Metoda odpowiedzialna za załadowanie konkretnych odpowiedzi.
-    /// </summary>
-    /// <param name="startIndex">Indeks od którego zostaną załadowane odpowiedzi.</param>
-    /// <param name="pageSize">Ilość odpowiedzi do załadowania</param>
-    private async Task GetAnswers(int startIndex, int answersAmount)
-    {
-        var answersParams = new AnswersPageDTO
-        {
-            StartIndex = startIndex,
-            PageSize = answersAmount
-        };
-
-        var answers = await answerRepository.GetAnswersAsync(IdQuestion, answersParams);
-        Answers = answers;
-    }
-
-    /// <summary>
-    /// Metoda odpowiedzialna za pobranie konkretnej odpowiedzi wraz z listą pododpowiedzi.
+    ///     Metoda odpowiedzialna za pobranie konkretnej odpowiedzi wraz z listą pododpowiedzi.
     /// </summary>
     /// <param name="idRootAnswer">Id konkrentej odpowiedzi.</param>
     private async Task GetChildAnswers(int idRootAnswer)
     {
-        var updatedAnswer = await answerRepository.GetAnswerAsync(idRootAnswer);
-        var answer = Answers.SingleOrDefault(a => a.IdAnswer == idRootAnswer);
-        answer.Text = updatedAnswer.Text;
-        answer.Rating = updatedAnswer.Rating;
-        answer.ChildAnswers = updatedAnswer.ChildAnswers;
-        answer.AmountOfChildAnswers = updatedAnswer.AmountOfChildAnswers;
+        var mainAnswer = Answers.SingleOrDefault(a => a.IdAnswer == idRootAnswer);
+        if (mainAnswer.AnswerChildren.Count == 0)
+        {
+            var answerChilds = await answerRepository.GetAnswerChildrenAsync(idRootAnswer);
+            var answer = Answers.SingleOrDefault(a => a.IdAnswer == idRootAnswer);
+            answer.AnswerChildren = answerChilds;
+        }
+        else
+        {
+            mainAnswer.AnswerChildren = new List<AnswerResponseDTO>();
+        }
     }
 
 }

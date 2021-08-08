@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Quanda.Client.Helpers;
+﻿using Quanda.Client.Helpers;
 using Quanda.Client.Repositories.Interfaces;
 using Quanda.Shared;
 using Quanda.Shared.DTOs.Responses;
 using Quanda.Shared.Enums;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Quanda.Client.Repositories.Implementations
 {
@@ -28,19 +28,27 @@ namespace Quanda.Client.Repositories.Implementations
             _httpService = httpService;
         }
 
-        public async Task<List<GetQuestionsDTO>> GetQuestions(int page, SortOptionEnum sortingBy, List<int> categories)
+        public async Task<QuestionResponseDTO> GetQuestion(int idQuestion)
+        {
+            var response = await _httpService.Get<QuestionResponseDTO>($"{ApiUrl}/{idQuestion}");
+            if (!response.Success)
+                return null;
+            return response.Response;
+        }
+
+        public async Task<List<GetQuestionsDTO>> GetQuestions(int page, SortOptionEnum sortingBy, List<int> tags)
         {
             var url = $"{ApiUrl}?skip={page * _skipAmount}&sortOption={Enum.GetName(sortingBy)}";
-            if (categories.Count != 0) url += $"&category={string.Join("&category=", categories)}";
+            if (tags.Count != 0) url += $"&tag={string.Join("&tag=", tags)}";
             var response = await _httpService.Get<List<GetQuestionsDTO>>(url);
 
             return response.Response;
         }
 
-        public async Task<int> GetQuestionsAmount(List<int> categories)
+        public async Task<int> GetQuestionsAmount(List<int> tags)
         {
             var url = $"{ApiUrl}/count?";
-            if (categories.Count != 0) url += $"category={string.Join("&category=", categories)}";
+            if (tags.Count != 0) url += $"tag={string.Join("&tag=", tags)}";
             var response = await _httpService.Get<int>(url);
             return response.Response;
         }

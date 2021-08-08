@@ -3,7 +3,7 @@
     <div class="categories-popup">
         <div class="categories-popup-up">
             <div class="categories-popup-up-list">
-                @foreach (var category in Categories.Where(category => category.IdMainCategory == null))
+                @foreach (var category in Categories.Where(category => category.IdMainTag == null))
                 {
                     <div class="categories-first-level-category">
                         <div class="category-popup-text">
@@ -11,20 +11,20 @@
                             <div @onclick="@(() => InsideCategorySelectionChange(category))">@category.Name</div>
                         </div>
                         <div class="category-popup-close" @onclick="@(() => InsideCategorySelectionChange(category))">
-                            @if (SelectedCategories.Contains(category.IdCategory))
+                            @if (SelectedCategories.Contains(category.IdTag))
                             {
                                 @:x
                             }
                         </div>
                     </div>
-                    if (OpenedCategories[category.IdCategory])
+                    if (OpenedCategories[category.IdTag])
                     {
-                        @foreach (var cat in Categories.Where(cate => cate.IdMainCategory == category.IdCategory))
+                        @foreach (var cat in Categories.Where(cate => cate.IdMainTag == category.IdTag))
                         {
                             <div class="categories-second-level-category" @onclick="@(() => InsideCategorySelectionChange(cat))">
                                 <div class="category-popup-text">@cat.Name</div>
                                 <div class="category-popup-close" @onclick="@(() => InsideCategorySelectionChange(category))">
-                                    @if (SelectedCategories.Contains(cat.IdCategory))
+                                    @if (SelectedCategories.Contains(cat.IdTag))
                                     {
                                         @:x
                                     }
@@ -48,7 +48,7 @@
     ///     Lista wszystkich kategorii zapisanych w BD
     /// </summary>
     [Parameter]
-    public List<CategoriesResponseDTO> Categories { get; set; }
+    public List<TagResponseDTO> Categories { get; set; }
 
     /// <summary>
     ///     Callback który przyjmuje inta opisującego ID kategorii wybranej w komponencie
@@ -82,9 +82,9 @@
     protected override async Task OnInitializedAsync()
     {
         OpenedCategories = new Dictionary<int, bool>();
-        foreach (var category in Categories.Where(category => category.IdMainCategory == null))
+        foreach (var category in Categories.Where(category => category.IdMainTag == null))
         {
-            OpenedCategories.Add(category.IdCategory, false);
+            OpenedCategories.Add(category.IdTag, false);
         }
     }
 
@@ -93,9 +93,9 @@
     /// </summary>
     /// <param name="category">Kategoria która zmieniła swój stan na wybrany bądź odznaczony</param>
     /// <returns></returns>
-    private async Task InsideCategorySelectionChange(CategoriesResponseDTO category)
+    private async Task InsideCategorySelectionChange(TagResponseDTO tag)
     {
-        var IdCategory = category.IdCategory;
+        var IdCategory = tag.IdTag;
         if (SelectedCategories.Contains(IdCategory))
         {
             await CategoryDeSelected.InvokeAsync(IdCategory);
@@ -111,9 +111,9 @@
     ///     Funkcja która reaguje na rządanie rozwinięcia listy podkategorii kategorii pierwszego poziomu
     /// </summary>
     /// <param name="category">Kategoria pierwszego poiomu która zmienia stan z rozwiniętego w zwinięty bądź w drugą stronę</param>
-    private void OpenClose(CategoriesResponseDTO category)
+    private void OpenClose(TagResponseDTO category)
     {
-        OpenedCategories[category.IdCategory] = !OpenedCategories[category.IdCategory];
+        OpenedCategories[category.IdTag] = !OpenedCategories[category.IdTag];
         StateHasChanged();
     }
 

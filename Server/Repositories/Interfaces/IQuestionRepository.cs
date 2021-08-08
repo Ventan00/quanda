@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Quanda.Server.Utils;
+﻿using Quanda.Server.Utils;
 using Quanda.Shared.DTOs.Requests;
 using Quanda.Shared.DTOs.Responses;
 using Quanda.Shared.Enums;
-using Quanda.Shared.Models;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Quanda.Server.Repositories.Interfaces
 {
@@ -24,19 +23,20 @@ namespace Quanda.Server.Repositories.Interfaces
         /// <param name="sortOption">
         ///     Parametr opisujący sposób sortowania pobranych pytań.
         /// </param>
-        /// <param name="categories">
-        ///     Opcjonalna lista kategorii służąca do filtracji pytań
+        /// <param name="tags">
+        ///     Opcjonalna lista tagów służąca do filtracji pytań
         ///     po przez przypisane do nich kategorie
         /// </param>
         /// <returns>List(GetQuestionsDTO)</returns>
-        Task<List<GetQuestionsDTO>> GetQuestions(int skip, SortOptionEnum sortOption, List<int>? categories);
+        Task<List<GetQuestionsDTO>> GetQuestions(int skip, SortOptionEnum sortOption, List<int>? tags);
 
         /// <summary>
-        ///     Końcówka która zwraca Question o podanym questionId
+        ///     Końcówka która zwraca Question o podanym idQuestion z listą odpowiedzi z zakresu ANSWERS_PAGE_SIZE.
         /// </summary>
-        /// <param name="questionId">ID pytania w BD</param>
-        /// <returns>Question</returns>
-        Task<Question> GetQuestion(int questionId);
+        /// <param name="idQuestion">ID pytania w BD</param>
+        /// <param name="idUserLogged">Id użytkownika przeglądającego pytanie. Używane w celu wyznaczenia informacji o głosach oddanych na odpowiedzi.</param>
+        /// <returns>QuestionResponseDTO</returns>
+        Task<QuestionResponseDTO> GetQuestion(int idQuestion, int? idUserLogged);
 
         /// <summary>
         ///     Dodaje Question do BD
@@ -82,8 +82,8 @@ namespace Quanda.Server.Repositories.Interfaces
         /// <summary>
         ///     Zwraca ilość Question z podanymi Categories
         /// </summary>
-        /// <param name="category">Lista kategorii do filtrowania pytań</param>
+        /// <param name="tags">Lista kategorii do filtrowania pytań</param>
         /// <returns>int</returns>
-        Task<int> GetAmountOfQuestions(List<int> category);
+        Task<int> GetAmountOfQuestions(List<int> tags);
     }
 }

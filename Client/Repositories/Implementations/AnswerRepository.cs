@@ -30,9 +30,9 @@ namespace Quanda.Client.Repositories.Implementations
             return response.Response;
         }
 
-        public async Task<AnswerResponseDTO> GetAnswerAsync(int idAnswer)
+        public async Task<List<AnswerResponseDTO>> GetAnswerChildrenAsync(int idAnswer)
         {
-            var response = await _httpService.Get<AnswerResponseDTO>($"{url}/{idAnswer}/details");
+            var response = await _httpService.Get<List<AnswerResponseDTO>>($"{url}/{idAnswer}/children");
             return response.Response;
         }
 

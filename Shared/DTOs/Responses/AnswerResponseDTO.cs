@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Quanda.Shared.DTOs.Responses
 {
@@ -9,9 +10,11 @@ namespace Quanda.Shared.DTOs.Responses
         public int Rating { get; set; }
         public bool IsModified { get; set; }
         public int? IdRootAnswer { get; set; }
-        public int Mark { get; set; }
-        public UserResponseDTO UserResponseDTO { get; set; }
-        public List<AnswerResponseDTO> ChildAnswers { get; set; }
-        public int AmountOfChildAnswers { get; set; }
+        public int IsLiked { get; set; }
+        public DateTime PublishDate { get; set; }
+        public int AmountOfAnswerChildren { get; set; }
+        public UserResponseDTO User { get; set; }
+        public List<AnswerResponseDTO> AnswerChildren { get; set; }
+
     }
 }

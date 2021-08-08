@@ -1,0 +1,165 @@
+﻿.main-container {
+    background-color: white;
+    border-radius: 25px;
+    margin-left: 50px;
+    margin-top: 50px;
+    padding: 30px;
+    width: 75%;
+}
+
+.answer {
+    display: flex;
+    flex-flow: column;
+    margin-bottom: 20px;
+}
+    .answer .answer-children {
+        margin-left: 40px;
+        margin-bottom: 10px;
+    }
+
+.header {
+    font-size: 25px;
+    font-family: 'Sen', sans-serif;
+    font-weight: bold;
+    color: #3F4D54;
+    margin-bottom: 20px;
+}
+    .header::after {
+        content: "";
+        display: block;
+        width: 40%;
+        border-bottom: 1px solid;
+        margin-bottom: 15px;
+    }
+
+.answers-empty {
+    font-size: 25px;
+    font-family: 'Sen', sans-serif;
+    font-weight: bold;
+    color: #3F4D54;
+}
+.answer-child-explorer {
+    display: flex;
+    flex-flow: row;
+    align-items: center;
+    font-family: 'Roboto', sans-serif;
+    font-size: 15px;
+    font-weight: bold;
+    color: #F08782;
+    gap: 1px;
+    cursor: pointer;
+}
+
+.arrow-down {
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 8px solid;
+}
+
+::deep .header-info {
+    display: flex;
+    flex-flow: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    color: #3F4D54;
+    font-style: italic;
+}
+
+    ::deep .header-info .user-nickname {
+        font-family: 'Sen', sans-serif;
+        font-weight: bold;
+        font-style: normal;
+    }
+
+    ::deep .header-info .publish-date {
+        color: #000000;
+        margin-right: 10px;
+    }
+
+
+::deep .user-avatar {
+    border-radius: 70%;
+    width: 30px;
+    height: 30px;
+}
+
+::deep .text {
+    font-family: 'Roboto', sans-serif;
+    font-size: 15px;
+    color: #000000;
+}
+
+    ::deep .text::after{
+        margin-top: 15px;
+        content: "";
+        display: block;
+        width: 75%;
+        border-bottom: 1px solid #878787;
+    }
+    ::deep .text::before {
+        margin-bottom: 15px;
+        content: "";
+        display: block;
+        width: 75%;
+        border-top: 1px solid #878787;
+    }
+
+::deep button {
+    background-color: Transparent;
+    background-repeat: no-repeat;
+    border: none;
+    overflow: hidden;
+    outline: none;
+}
+
+
+::deep .footer {
+    display: flex;
+    flex-flow: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 5px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 15px;
+}
+
+    ::deep .footer .answer-rating-text {
+        font-family: 'Sen', sans-serif;
+        font-weight: bold;
+        font-size: 27px;
+        color: #878787;
+    }
+
+    ::deep .footer .answer-rating-arrow {
+        color: #878787;
+    }
+
+    ::deep .footer .red-action {
+        color: #F08782;
+        cursor: pointer;
+        display: flex;
+        flex-flow: row;
+    }
+
+    ::deep .footer .black-action{
+        color: #000000;
+        cursor: pointer;
+        display: flex;
+        flex-flow: row;
+    }
+
+::deep .red {
+    color: #F08782;
+}
+
+::deep .black {
+    color: #000000;
+}
+
+

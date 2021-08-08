@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Quanda.Server.Repositories.Interfaces;
 using Quanda.Server.Utils;
 using Quanda.Shared.DTOs.Requests;
 using Quanda.Shared.Enums;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Quanda.Server.Controllers
 {
@@ -42,32 +42,33 @@ namespace Quanda.Server.Controllers
         ///     Parametr opisujący sposób sortowania pobranych pytań.
         ///     Ma przełożenie na SortOptionEnum
         /// </param>
-        /// <param name="category">
-        ///     Opcjonalna lista kategorii służąca do filtracji pytań
-        ///     po przez przypisane do nich kategorie
+        /// <param name="tags">
+        ///     Opcjonalna lista tagów służąca do filtracji pytań
+        ///     po przez przypisane do nich tagi
         /// </param>
         /// <returns>List(GetQuestionsDTO)</returns>
         [HttpGet]
         public async Task<IActionResult> GetQuestions([FromQuery] int skip, [FromQuery] string sortOption,
-            [FromQuery] List<int> category = null)
+            [FromQuery] List<int> tags = null)
         {
-            if (category == null)
-                category = new List<int>();
+            if (tags == null)
+                tags = new List<int>();
             var questions = await _repository.GetQuestions(skip,
-                (SortOptionEnum) Enum.Parse(typeof(SortOptionEnum), sortOption), category);
+                (SortOptionEnum)Enum.Parse(typeof(SortOptionEnum), sortOption), tags);
             questions.Reverse();
             return Ok(questions);
         }
 
         /// <summary>
-        ///     Końcówka która zwraca Question o podanym QuestionID
+        ///     Końcówka która zwraca pytanie o podanym idQuestion
         /// </summary>
-        /// <param name="QuestionID">ID pytania w BD</param>
-        /// <returns>Question</returns>
-        [HttpGet("{QuestionID}")]
-        public async Task<IActionResult> GetQuestion([FromRoute] int QuestionID)
+        /// <param name="QuestionID">Id pytania w BD</param>
+        /// <returns>QuestionResponseDTO</returns>
+        [HttpGet("{idQuestion}")]
+        public async Task<IActionResult> GetQuestion([FromRoute] int idQuestion)
         {
-            var question = await _repository.GetQuestion(QuestionID);
+            int? idUserLogged = 25;// HttpContext.Request.GetUserId();
+            var question = await _repository.GetQuestion(idQuestion, idUserLogged);
             return question != null ? Ok(question) : NotFound();
         }
 
@@ -148,14 +149,14 @@ namespace Quanda.Server.Controllers
         /// <summary>
         ///     Zwraca ilość Question z podanymi Categories
         /// </summary>
-        /// <param name="category">Lista kategorii do filtrowania pytań</param>
+        /// <param name="tags">Lista tagów do filtrowania pytań</param>
         /// <returns>int</returns>
         [HttpGet("count")]
-        public async Task<IActionResult> GetAmountOfQuestions([FromQuery] List<int> category = null)
+        public async Task<IActionResult> GetAmountOfQuestions([FromQuery] List<int> tags = null)
         {
-            if (category == null)
-                category = new List<int>();
-            return Ok(await _repository.GetAmountOfQuestions(category));
+            if (tags == null)
+                tags = new List<int>();
+            return Ok(await _repository.GetAmountOfQuestions(tags));
         }
     }
 }

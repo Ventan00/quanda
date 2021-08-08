@@ -1,6 +1,3 @@
-using System;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -16,6 +13,9 @@ using Quanda.Server.Repositories.Implementations;
 using Quanda.Server.Repositories.Interfaces;
 using Quanda.Server.Services.Implementations;
 using Quanda.Server.Services.Interfaces;
+using System;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Quanda.Server
 {
@@ -86,7 +86,7 @@ namespace Quanda.Server
             services.AddScoped<IAnswerRepository, AnswerRepository>();
             services.AddScoped<IUsersRepository, UsersRepository>();
             services.AddScoped<ITempUsersRepository, TempUsersRepository>();
-            services.AddScoped<ICategoryRepository, CategoryRepository>();
+            services.AddScoped<ITagRepository, TagRepository>();
 
             //custom services
             services.AddScoped<IUserAuthService, UserAuthService>();

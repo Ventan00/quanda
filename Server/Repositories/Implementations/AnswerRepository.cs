@@ -28,69 +28,39 @@ namespace Quanda.Server.Repositories.Implementations
                 Text = a.Text,
                 Rating = a.RatingAnswers.Select(ra => new { ValueAns = ra.Value == false ? -1 : 1 }).Sum(r => r.ValueAns),
                 IsModified = a.IsModified,
-                UserResponseDTO = new UserResponseDTO
+                User = new UserResponseDTO
                 {
                     IdUser = a.IdUserNavigation.IdUser,
                     Nickname = a.IdUserNavigation.Nickname,
                     Avatar = a.IdUserNavigation.Avatar
                 },
                 IdRootAnswer = a.IdRootAnswer,
-                ChildAnswers = a.InverseIdRootAnswersNavigation.Select(a => new AnswerResponseDTO
-                {
-                    IdAnswer = a.IdAnswer,
-                    Text = a.Text,
-                    Rating = a.RatingAnswers.Select(ra => new { ValueAns = ra.Value == false ? -1 : 1 }).Sum(r => r.ValueAns),
-                    IsModified = a.IsModified,
-                    UserResponseDTO = new UserResponseDTO
-                    {
-                        IdUser = a.IdUserNavigation.IdUser,
-                        Nickname = a.IdUserNavigation.Nickname,
-                        Avatar = a.IdUserNavigation.Avatar
-                    },
-                    IdRootAnswer = a.IdRootAnswer,
-                    Mark = a.RatingAnswers.Any(ra => ra.IdUser == idUserLogged) == false ? 0 : a.RatingAnswers.SingleOrDefault(ra => ra.IdUser == idUserLogged).Value ? 1 : -1
-                }).OrderByDescending(a => a.Rating).ThenBy(a => a.IdAnswer).Skip(0).Take(3).ToList(),
-                Mark = a.RatingAnswers.Any(ra => ra.IdUser == idUserLogged) == false ? 0 : a.RatingAnswers.SingleOrDefault(ra => ra.IdUser == idUserLogged).Value ? 1 : -1,
-                AmountOfChildAnswers = a.InverseIdRootAnswersNavigation.Count
+                AnswerChildren = new List<AnswerResponseDTO>(),
+                IsLiked = a.RatingAnswers.Any(ra => ra.IdUser == idUserLogged) == false ? 0 : a.RatingAnswers.SingleOrDefault(ra => ra.IdUser == idUserLogged).Value ? 1 : -1,
+                AmountOfAnswerChildren = a.InverseIdRootAnswersNavigation.Count,
             }).OrderByDescending(a => a.Rating).ThenBy(a => a.IdAnswer).ToListAsync();
             var pageSize = answersParams.PageSize == 0 ? Config.ANSWERS_PAGE_SIZE : answersParams.PageSize;
             return answers.Skip(answersParams.StartIndex).Take(pageSize).ToList();
         }
 
-        public async Task<AnswerResponseDTO> GetAnswerAsync(int idAnswer, int idUserLogged)
+        public async Task<List<AnswerResponseDTO>> GetAnswerChildrenAsync(int idAnswer, int idUserLogged)
         {
-            var answer = await _context.Answers.Where(a => a.IdAnswer == idAnswer).Select(a => new AnswerResponseDTO
+            var answerChilds = await _context.Answers.Where(a => a.IdRootAnswer == idAnswer).Select(a => new AnswerResponseDTO
             {
                 IdAnswer = a.IdAnswer,
                 Text = a.Text,
                 Rating = a.RatingAnswers.Select(ra => new { ValueAns = ra.Value == false ? -1 : 1 }).Sum(r => r.ValueAns),
                 IsModified = a.IsModified,
-                UserResponseDTO = new UserResponseDTO
+                User = new UserResponseDTO
                 {
                     IdUser = a.IdUserNavigation.IdUser,
                     Nickname = a.IdUserNavigation.Nickname,
                     Avatar = a.IdUserNavigation.Avatar
                 },
                 IdRootAnswer = a.IdRootAnswer,
-                ChildAnswers = a.InverseIdRootAnswersNavigation.Select(a => new AnswerResponseDTO
-                {
-                    IdAnswer = a.IdAnswer,
-                    Text = a.Text,
-                    Rating = a.RatingAnswers.Select(ra => new { ValueAns = ra.Value == false ? -1 : 1 }).Sum(r => r.ValueAns),
-                    IsModified = a.IsModified,
-                    UserResponseDTO = new UserResponseDTO
-                    {
-                        IdUser = a.IdUserNavigation.IdUser,
-                        Nickname = a.IdUserNavigation.Nickname,
-                        Avatar = a.IdUserNavigation.Avatar
-                    },
-                    IdRootAnswer = a.IdRootAnswer,
-                    Mark = a.RatingAnswers.Any(ra => ra.IdUser == idUserLogged) == false ? 0 : a.RatingAnswers.SingleOrDefault(ra => ra.IdUser == idUserLogged).Value ? 1 : -1
-                }).OrderByDescending(a => a.Rating).ThenBy(a => a.IdAnswer).ToList(),
-                Mark = a.RatingAnswers.Any(ra => ra.IdUser == idUserLogged) == false ? 0 : a.RatingAnswers.SingleOrDefault(ra => ra.IdUser == idUserLogged).Value ? 1 : -1,
-                AmountOfChildAnswers = a.InverseIdRootAnswersNavigation.Count
-            }).SingleOrDefaultAsync();
-            return answer;
+                IsLiked = a.RatingAnswers.Any(ra => ra.IdUser == idUserLogged) == false ? 0 : a.RatingAnswers.SingleOrDefault(ra => ra.IdUser == idUserLogged).Value ? 1 : -1,
+            }).OrderByDescending(a => a.Rating).ToListAsync();
+            return answerChilds;
         }
 
         public async Task<AnswerResult> AddAnswerAsync(AddAnswerDTO answerDTO, int idUserLogged)
@@ -140,8 +110,6 @@ namespace Quanda.Server.Repositories.Implementations
             if (answer == null)
                 return AnswerResult.ANSWER_DELETED;
             _context.Answers.Remove(answer);
-            if (answer.IdUser != idUserLogged)
-                return AnswerResult.NOT_OWNER_OF_ANSWER;
             if (!(await _context.SaveChangesAsync() > 0))
                 return AnswerResult.DELETE_DB_ERROR;
 
@@ -186,7 +154,6 @@ namespace Quanda.Server.Repositories.Implementations
                 }
                 else
                     return AnswerResult.OWNER_OF_ANSWER;
-
             }
             return AnswerResult.SUCCESS;
         }
