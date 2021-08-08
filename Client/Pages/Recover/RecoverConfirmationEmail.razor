@@ -1,0 +1,58 @@
+﻿@page "/recover/confirmation-email"
+
+@inject IUsersRepository _usersRepository
+@inject IToastService _toastService
+
+<TopSemicircleComponent />
+<RecoveryContainerComponent Title="Confirmation email recovery" Description="Did you not receive the e-mail needed to confirm your registration? Enter your email address and we'll send you a mail, that can help you.">
+    <GenericFormComponent Model="@_recoverDto" @ref="_form" OnValidSubmit="@RecoverConfirmationEmailAsync" IsAutoCompleteOn="false" RequireCaptcha="true">
+        <FormInputComponent Type="text" @bind-Value="@_recoverDto.Email" Placeholder="Email address" />
+        <div class="mb-2 w-100">
+            <FormSubmitComponent IsPending="@_isPending" SubmitText="Recover password" PendingSubmitText="Processing..." />
+        </div>
+    </GenericFormComponent>
+</RecoveryContainerComponent>
+
+@code {
+
+    /// <summary>
+    ///     Model formularza
+    /// </summary>
+    private RecoverDTO _recoverDto = new();
+
+    /// <summary>
+    ///     Zmienna mowiąca o tym, czy formularz jest w trakcie przetwarzania
+    /// </summary>
+    private bool _isPending;
+
+    /// <summary>
+    ///     Referencja do komponentu formularza
+    /// </summary>
+    private GenericFormComponent<RecoverDTO> _form;
+
+
+    /// <summary>
+    ///     Metoda wysyłająca oraz obsługująca rządanie - wywoływana po zatwierdzeniu poprawnie wypełnionego formularza
+    /// </summary>
+    /// <returns></returns>
+    public async Task RecoverConfirmationEmailAsync()
+    {
+        _isPending = true;
+        _recoverDto.CaptchaResponseToken = await _form.CaptchaComponent.GetCaptchaResponseAsync();
+
+        var isRecovered = await _usersRepository.RecoverConfirmationEmailAsync(_recoverDto);
+        if (!isRecovered)
+        {
+            _toastService.ShowError("Invalid reCaptcha.");
+        }
+        else
+        {
+            _toastService.ShowSuccess("Confirmation email has been re-send.");
+            _recoverDto = new RecoverDTO();
+        }
+
+        await _form.CaptchaComponent.ResetCaptchaAsync();
+        _isPending = false;
+    }
+
+}
