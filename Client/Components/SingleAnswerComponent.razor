@@ -39,11 +39,11 @@
         </div>
 
         <div class="footer @(ActiveUser==null?"blur":"")">
-            <button class="quanda-icon icon-arrowup answer-rating-arrow" style="@(Answer.IsLiked==1?"color:#FFAD33":"")" @onclick="@(async() => await IncreaseRating())" disabled="@(isNonInteractive || OwnerOfAnswer || Answer.IsLiked == 1)" />
+            <button class="quanda-icon icon-arrowup answer-rating-arrow @(Answer.IsLiked==1?"liked-answer":"")" @onclick="@(async() => await IncreaseRating())" disabled="@(isNonInteractive || OwnerOfAnswer || Answer.IsLiked == 1)" />
             <div class="answer-rating-text">
                 @Answer.Rating
             </div>
-            <button class="quanda-icon icon-arrowdown answer-rating-arrow" style="@(Answer.IsLiked==-1?"color:#FFAD33":"")" @onclick="@(async() => await DecreaseRating())" disabled="@(isNonInteractive || OwnerOfAnswer || Answer.IsLiked == -1)" />
+            <button class="quanda-icon icon-arrowdown answer-rating-arrow @(Answer.IsLiked==-1?"liked-answer":"")" @onclick="@(async() => await DecreaseRating())" disabled="@(isNonInteractive || OwnerOfAnswer || Answer.IsLiked == -1)" />
             @if (Answer.IdRootAnswer == null)
             {
                 <div class="black-action" @onclick="@(async () =>await SetReplayActive())">
@@ -78,21 +78,12 @@
 
         @if (IsReplayActive)
         {
-            <div style="margin-left: 80px;">
+            <div class="replay-component">
                 <input />
             </div>
         }
     </div>
 </div>
-
-
-
-
-
-
-
-
-
 
 @code {
     [Parameter]

@@ -20,7 +20,7 @@ namespace Quanda.Server.Repositories.Implementations
             _context = context;
         }
 
-        public async Task<List<AnswerResponseDTO>> GetAnswersAsync(int idQuestion, int idUserLogged, AnswersPageDTO answersParams)
+        public async Task<List<AnswerResponseDTO>> GetAnswersAsync(int idQuestion, int? idUserLogged, AnswersPageDTO answersParams)
         {
             var answers = await _context.Answers.Where(a => a.IdQuestion == idQuestion && a.IdRootAnswer == null).Select(a => new AnswerResponseDTO
             {
@@ -43,7 +43,7 @@ namespace Quanda.Server.Repositories.Implementations
             return answers.Skip(answersParams.StartIndex).Take(pageSize).ToList();
         }
 
-        public async Task<List<AnswerResponseDTO>> GetAnswerChildrenAsync(int idAnswer, int idUserLogged)
+        public async Task<List<AnswerResponseDTO>> GetAnswerChildrenAsync(int idAnswer, int? idUserLogged)
         {
             var answerChilds = await _context.Answers.Where(a => a.IdRootAnswer == idAnswer).Select(a => new AnswerResponseDTO
             {
@@ -63,7 +63,7 @@ namespace Quanda.Server.Repositories.Implementations
             return answerChilds;
         }
 
-        public async Task<AnswerResult> AddAnswerAsync(AddAnswerDTO answerDTO, int idUserLogged)
+        public async Task<AnswerResult> AddAnswerAsync(AddAnswerDTO answerDTO, int? idUserLogged)
         {
             var existsQuestion = await _context.Questions.AnyAsync(q => q.IdQuestion == answerDTO.IdQuestion);
             if (!existsQuestion)
@@ -82,7 +82,7 @@ namespace Quanda.Server.Repositories.Implementations
             {
                 Text = answerDTO.Text,
                 IdQuestion = answerDTO.IdQuestion,
-                IdUser = idUserLogged,
+                IdUser = (int)idUserLogged,
                 IdRootAnswer = answerDTO.IdRootAnswer
             }
             );
@@ -104,7 +104,7 @@ namespace Quanda.Server.Repositories.Implementations
             return AnswerResult.SUCCESS;
         }
 
-        public async Task<AnswerResult> DeleteAnswerAsync(int idAnswer, int idUserLogged)
+        public async Task<AnswerResult> DeleteAnswerAsync(int idAnswer)
         {
             var answer = await _context.Answers.SingleOrDefaultAsync(a => a.IdAnswer == idAnswer);
             if (answer == null)
@@ -117,7 +117,7 @@ namespace Quanda.Server.Repositories.Implementations
         }
 
 
-        public async Task<AnswerResult> UpdateRatingAnswerAsync(int idAnswer, int idUserLogged, UpdateRatingAnswerDTO updateRatingAnswer)
+        public async Task<AnswerResult> UpdateRatingAnswerAsync(int idAnswer, int? idUserLogged, UpdateRatingAnswerDTO updateRatingAnswer)
         {
             var answerRated = await _context.RatingAnswers.SingleOrDefaultAsync(ra => ra.IdAnswer == idAnswer && ra.IdUser == idUserLogged);
             if (answerRated == null)
@@ -137,7 +137,7 @@ namespace Quanda.Server.Repositories.Implementations
                 await _context.AddAsync(new RatingAnswer
                 {
                     IdAnswer = idAnswer,
-                    IdUser = idUserLogged,
+                    IdUser = (int)idUserLogged,
                     Value = updateRatingAnswer.Rating == 1
                 });
                 if (!(await _context.SaveChangesAsync() > 0))

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Quanda.Server.Extensions;
 using Quanda.Server.Repositories.Interfaces;
 using Quanda.Server.Utils;
 using Quanda.Shared.DTOs.Requests;
@@ -17,7 +18,7 @@ namespace Quanda.Server.Controllers
         ///     Repozytorium wykonujące akcje na odpowiedziach.
         /// </summary>
         private readonly IAnswerRepository _repository;
-        private readonly int requestIdUser = 25; //HttpContext.Request.GetUserId()
+
         /// <summary>
         ///     Konstruktor tworzący kontroler.
         /// </summary>
@@ -36,6 +37,7 @@ namespace Quanda.Server.Controllers
         [HttpGet("{idQuestion}")]
         public async Task<IActionResult> GetAnswers(int idQuestion, [FromQuery] AnswersPageDTO answersPage)
         {
+            var requestIdUser = HttpContext.Request.GetUserId();
             var result = await _repository.GetAnswersAsync(idQuestion, requestIdUser, answersPage);
             return Ok(result);
         }
@@ -48,6 +50,7 @@ namespace Quanda.Server.Controllers
         [HttpGet("{idAnswer}/children")]
         public async Task<IActionResult> GetAnswerChildrenAsync(int idAnswer)
         {
+            var requestIdUser = HttpContext.Request.GetUserId();
             var result = await _repository.GetAnswerChildrenAsync(idAnswer, requestIdUser);
             return Ok(result);
         }
@@ -60,6 +63,7 @@ namespace Quanda.Server.Controllers
         [HttpPost]
         public async Task<IActionResult> AddAnswer([FromBody] AddAnswerDTO answerDTO)
         {
+            var requestIdUser = HttpContext.Request.GetUserId();
             var result = await _repository.AddAnswerAsync(answerDTO, requestIdUser);
             if (result == AnswerResult.QUESTION_DELETED || result == AnswerResult.USER_DELETED)
                 return BadRequest(result.ToString());
@@ -93,7 +97,8 @@ namespace Quanda.Server.Controllers
         [HttpDelete("{idAnswer}")]
         public async Task<IActionResult> DeleteAnswer(int idAnswer)
         {
-            var result = await _repository.DeleteAnswerAsync(idAnswer, requestIdUser);
+            var requestIdUser = HttpContext.Request.GetUserId();
+            var result = await _repository.DeleteAnswerAsync(idAnswer);
             if (result == AnswerResult.ANSWER_DELETED)
                 return NotFound(result.ToString());
             else if (result == AnswerResult.DELETE_DB_ERROR)
@@ -110,6 +115,7 @@ namespace Quanda.Server.Controllers
         [HttpPost("{idAnswer}/rating")]
         public async Task<IActionResult> UpdateRatingAnswer(int idAnswer, [FromBody] UpdateRatingAnswerDTO updateRatingAnswer)
         {
+            var requestIdUser = HttpContext.Request.GetUserId();
             var result = await _repository.UpdateRatingAnswerAsync(idAnswer, requestIdUser, updateRatingAnswer);
             if (result == AnswerResult.ANSWER_DELETED || result == AnswerResult.USER_DELETED)
                 return BadRequest(result.ToString());

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Quanda.Server.Extensions;
 using Quanda.Server.Repositories.Interfaces;
 using Quanda.Server.Utils;
 using Quanda.Shared.DTOs.Requests;
@@ -67,8 +68,8 @@ namespace Quanda.Server.Controllers
         [HttpGet("{idQuestion}")]
         public async Task<IActionResult> GetQuestion([FromRoute] int idQuestion)
         {
-            int? idUserLogged = 25;// HttpContext.Request.GetUserId();
-            var question = await _repository.GetQuestion(idQuestion, idUserLogged);
+            var requestIdUser = HttpContext.Request.GetUserId();
+            var question = await _repository.GetQuestion(idQuestion, requestIdUser);
             return question != null ? Ok(question) : NotFound();
         }
 
