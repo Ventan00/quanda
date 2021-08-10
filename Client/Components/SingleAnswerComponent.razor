@@ -2,61 +2,58 @@
 @inject IJSRuntime js
 @inject NavigationManager navigationManager
 
-
 <div class="header-info">
-    <div class="publish-date">
+    <span class="publish-date">
         @Answer.PublishDate.ToShortDateString()
-    </div>
-    <div>
+    </span>
+    <span class="gray">
         answered by
-    </div>
+    </span>
     <div>
         <a href="/users/@Answer.User.IdUser">
             <img class="user-avatar" src="@Answer.User.Avatar" alt="Avatar" />
         </a> 
     </div>
-    <div>
-        <div class="user-nickname">
+    <div class="user-column">
+        <span class="user-nickname gray">
             @Answer.User.Nickname
-        </div>
-        <div>
+        </span>
+        <span class="gray">
             @Answer.User.Points points
-        </div>
+        </span>
     </div>
 </div>
 <div class="grid-container">
     @if (ActiveUser == null)
     {
-        <div class="row-line">
-        </div>
+        <div class="row-line rating-color"></div>
         <div class="row-unloggedUser">
             <UnloggedUserComponent></UnloggedUserComponent>
         </div>
     }
     <div class="row-answer">
-        <div class="text @(ActiveUser==null?"blur":"")">
+        <span class="text @(ActiveUser==null?"blur":"") white">
             @Answer.Text
-        </div>
-
+        </span>
         <div class="footer @(ActiveUser==null?"blur":"")">
-            <button class="quanda-icon icon-arrowup answer-rating-arrow @(Answer.IsLiked==1?"liked-answer":"")" @onclick="@(async() => await IncreaseRating())" disabled="@(isNonInteractive || OwnerOfAnswer || Answer.IsLiked == 1)" />
-            <div class="answer-rating-text">
+            <button class="quanda-icon icon-arrowup rating-color @(Answer.IsLiked==1?"liked-answer":"")" @onclick="@(async() => await IncreaseRating())" disabled="@(isNonInteractive || OwnerOfAnswer || Answer.IsLiked == 1)" />
+            <span class="answer-rating-text rating-color">
                 @Answer.Rating
-            </div>
-            <button class="quanda-icon icon-arrowdown answer-rating-arrow @(Answer.IsLiked==-1?"liked-answer":"")" @onclick="@(async() => await DecreaseRating())" disabled="@(isNonInteractive || OwnerOfAnswer || Answer.IsLiked == -1)" />
+            </span>
+            <button class="quanda-icon icon-arrowdown rating-color @(Answer.IsLiked==-1?"liked-answer":"")" @onclick="@(async() => await DecreaseRating())" disabled="@(isNonInteractive || OwnerOfAnswer || Answer.IsLiked == -1)" />
             @if (Answer.IdRootAnswer == null)
             {
-                <div class="black-action" @onclick="@(async () =>await SetReplayActive())">
+                <span class="black-action" @onclick="@(async () =>await SetReplayActive())">
                     replay
-                </div>
+                </span>
             }
             @if (OwnerOfAnswer)
             {
                 <div class="black-action" @onclick="@(async () =>await EditAnswer())">
-                    <button class="quanda-icon icon-edit" />
-                    <div>
+                    <button class="quanda-icon icon-edit white" />
+                    <span>
                         edit
-                    </div>
+                    </span>
                 </div>
                 <div class="red-action" @onclick="@(()=> DeleteAnswer.InvokeAsync(Answer))">
                     <button class="quanda-icon icon-delete red" />

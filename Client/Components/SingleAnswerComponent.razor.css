@@ -1,18 +1,18 @@
-﻿.grid-container {
+﻿.user-column {
+    display: flex;
+    flex-flow: column;
+}
+
+.grid-container {
     display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: 1fr;
     grid-template-areas: "overlap";
 }
 
-.row-unloggedUser {
-    margin-top: 10px;
-    grid-area: overlap;
-    justify-self: center;
+.row-answer {
     grid-column: 1 / 1;
     grid-row: 1 / 1;
-    z-index: 1;
-    width: 75%;
 }
 
 .row-line {
@@ -26,9 +26,28 @@
     color: #878787;
 }
 
-.row-answer {
+.row-unloggedUser {
+    margin-top: 10px;
+    grid-area: overlap;
+    justify-self: center;
     grid-column: 1 / 1;
     grid-row: 1 / 1;
+    z-index: 1;
+    width: 75%;
+}
+
+.answer-rating-text {
+    font-size: 27px;
+    font-family: 'Sen', sans-serif;
+    font-weight: bold;
+}
+
+.light-mode .rating-color {
+    color: #878787;
+}
+
+.dark-mode .rating-color {
+    color: #F6F6F6;
 }
 
 .liked-answer {
@@ -37,4 +56,37 @@
 
 .replay-component {
     margin-left: 80px;
+}
+
+.light-mode .gray {
+    color: #3F4D54;
+}
+
+.dark-mode .white {
+    color: #F6F6F6;
+}
+
+.dark-mode .text::after {
+    margin-top: 20px;
+    content: "";
+    display: block;
+    width: 75%;
+    border-bottom: 1px solid #F6F6F6;
+}
+
+.dark-mode .text::before {
+    margin-bottom: 20px;
+    content: "";
+    display: block;
+    width: 75%;
+    border-top: 1px solid #F6F6F6;
+}
+
+.blur {
+    -webkit-filter: blur(5px);
+    -moz-filter: blur(5px);
+    -o-filter: blur(5px);
+    -ms-filter: blur(5px);
+    filter: blur(5px);
+    pointer-events: none;
 }

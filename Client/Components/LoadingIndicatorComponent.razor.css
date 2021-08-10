@@ -1,10 +1,17 @@
 ﻿.container {
     display: flex;
     justify-content: center;
-    color: #3F4D54;
 }
 
 .spinner-grow {
     width: 3rem;
     height: 3rem;
+}
+
+.light-mode .colorI {
+    color: #3F4D54;
+}
+
+.dark-mode .colorI {
+    color: #F6F6F6;
 }

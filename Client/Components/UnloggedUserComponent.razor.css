@@ -5,16 +5,25 @@
     padding-left: 5%;
     padding-right: 5%;
     text-align: center;
+}
+
+.light-mode .content-color {
     border: #3F4D54 solid 1px;
     border-radius: 25px;
     background-color: white;
+}
+
+.dark-mode .content-color {
+    border: #F6F6F6 solid 1px;
+    border-radius: 25px;
+    background-color: #3F4D54;
 }
 
 .create-account {
     background: -webkit-linear-gradient(left,#ED746E, #F7D964);
     border-radius: 25px;
     width: 66%;
-    color: white;
+    color: #F6F6F6;
     padding: 10px;
     font-size: 20px;
     font-family: 'Sen', sans-serif;
@@ -26,8 +35,8 @@
 
 .log-in {
     font-size: 18px;
-    font-family: 'Roboto', sans-serif;
-    color: #878787;
 }
 
-
+.light-mode .gray {
+    color: #878787;
+}
