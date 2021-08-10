@@ -1,7 +1,7 @@
 ﻿@page "/questions"
 @using Quanda.Shared.Enums
 @inject IQuestionsReposiotry _questionsReposiotry
-@inject ICategoriesReposiotry _categoriesReposiotry
+@inject ITagsReposiotry _categoriesReposiotry
 <div class="questions-list-container">
     <h1>Pytania</h1>
     <div class="questions-header" style="margin-bottom: 0;">
@@ -64,7 +64,7 @@
             {
                 <div class="questions-tag">
                     <div class="questions-tag-val">
-                        @categories.Where(cate => cate.IdCategory == cat).First().Name
+                        @categories.Where(cate => cate.IdTag == cat).First().Name
                     </div>
                     <div class="questions-tag-close" @onclick="() => CategoryDeSelected(cat)">
                         x
@@ -124,7 +124,7 @@
     /// <summary>
     ///     Lista wszystkich kategorii w BD
     /// </summary>
-    private List<CategoriesResponseDTO> categories { get; set; }
+    private List<TagResponseDTO> categories { get; set; }
 
     /// <summary>
     ///     Lista pytań na danej stronie posortowana według wybranej opcji opisanej po przez zmienną activeSorting
@@ -139,7 +139,7 @@
     protected override async Task OnInitializedAsync()
     {
         await GetQuestions();
-        categories = await _categoriesReposiotry.GetCategories();
+        categories = await _categoriesReposiotry.GetTags();
         await GetQuestionsAmount();
     }
 

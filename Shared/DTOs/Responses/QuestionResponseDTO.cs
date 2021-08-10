@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Quanda.Shared.DTOs.Responses
 {
-    public class GetQuestionsDTO
+    public class QuestionResponseDTO
     {
         public int IdQuestion { get; set; }
         public string Header { get; set; }
@@ -12,10 +12,9 @@ namespace Quanda.Shared.DTOs.Responses
         public int Views { get; set; }
         public bool IsFinished { get; set; }
         public bool IsModified { get; set; }
-        public int IdUser { get; set; }
-        public string Nickname { get; set; }
-        public string Avatar { get; set; }
         public int AnswersCount { get; set; }
-        public List<string> Tags { get; set; }
+        public UserResponseDTO User { get; set; }
+        public List<TagResponseDTO> Tags { get; set; }
+        public List<AnswerResponseDTO> Answers { get; set; }
     }
 }

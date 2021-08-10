@@ -1,88 +1,88 @@
 ﻿@inject IAnswerRepository answerRepository
 @inject IJSRuntime js
-<div class="row">
-    <div class="column" style="width:5%">
-        <div >
-            <div class="answer-rating"> 
-                <div>
-                    @if (Answer.Mark == 1)
-                    {
-                        <button class="triangle-up" style="color:orange" disabled="disabled" />
-                    }
-                    else
-                    {
-                        <button class="triangle-up" @onclick="@(async() => await IncreaseRating())" disabled="@isNonInteractive" />
-                    }
-                </div>
-                <div>
-                    @Answer.Rating
-                </div>
-                <div>
-                    @if (Answer.Mark == -1)
-                    {
-                        <button class="triangle-down" style="color:orange" disabled="disabled" />
-                    }
-                    else
-                    {
-                        <button class="triangle-down" @onclick="@(async() => await DecreaseRating())" disabled="@isNonInteractive" />
-                    }
-                </div>
-            </div>
-            <div style="flex-direction:row">
-                <div>
-                    @Answer.UserResponseDTO.Nickname
-                </div>
-                @if (Answer.IsModified)
-            {
-                <div>
-                    Modifed
-                </div>
-            }
-                
-            </div>
+@inject NavigationManager navigationManager
+
+
+<div class="header-info">
+    <div class="publish-date">
+        @Answer.PublishDate.ToShortDateString()
+    </div>
+    <div>
+        answered by
+    </div>
+    <div>
+        <a href="/users/@Answer.User.IdUser">
+            <img class="user-avatar" src="@Answer.User.Avatar" alt="Avatar" />
+        </a> 
+    </div>
+    <div>
+        <div class="user-nickname">
+            @Answer.User.Nickname
+        </div>
+        <div>
+            @Answer.User.Points points
         </div>
     </div>
-
-
-    @if (EditMode)  
+</div>
+<div class="grid-container">
+    @if (ActiveUser == null)
     {
-        <AnswerTextComponent Text="@Answer.Text" Publish="UpdateAnswer" Discard="SetEditMode"></AnswerTextComponent>
+        <div class="row-line">
+        </div>
+        <div class="row-unloggedUser">
+            <UnloggedUserComponent></UnloggedUserComponent>
+        </div>
     }
-    else
-    {
-        <div class="answer-text">
-            @if (Answer.IdAnswer == ActiveResponse)
+    <div class="row-answer">
+        <div class="text @(ActiveUser==null?"blur":"")">
+            @Answer.Text
+        </div>
+
+        <div class="footer @(ActiveUser==null?"blur":"")">
+            <button class="quanda-icon icon-arrowup answer-rating-arrow @(Answer.IsLiked==1?"liked-answer":"")" @onclick="@(async() => await IncreaseRating())" disabled="@(isNonInteractive || OwnerOfAnswer || Answer.IsLiked == 1)" />
+            <div class="answer-rating-text">
+                @Answer.Rating
+            </div>
+            <button class="quanda-icon icon-arrowdown answer-rating-arrow @(Answer.IsLiked==-1?"liked-answer":"")" @onclick="@(async() => await DecreaseRating())" disabled="@(isNonInteractive || OwnerOfAnswer || Answer.IsLiked == -1)" />
+            @if (Answer.IdRootAnswer == null)
             {
-                <div style="background-color:lightgoldenrodyellow; color: black">
-                    @Answer.Text
+                <div class="black-action" @onclick="@(async () =>await SetReplayActive())">
+                    replay
+                </div>
+            }
+            @if (OwnerOfAnswer)
+            {
+                <div class="black-action" @onclick="@(async () =>await EditAnswer())">
+                    <button class="quanda-icon icon-edit" />
+                    <div>
+                        edit
+                    </div>
+                </div>
+                <div class="red-action" @onclick="@(()=> DeleteAnswer.InvokeAsync(Answer))">
+                    <button class="quanda-icon icon-delete red" />
+                    <div>
+                        delete
+                    </div>
                 </div>
             }
             else
             {
-                <div >
-                    @Answer.Text
+                <div class="red-action" @onclick="@(async () =>await ReportAnswer())">
+                    <button class="quanda-icon icon-report red" />
+                    <div>
+                        Report answer
+                    </div>
                 </div>
             }
         </div>
 
-
-        <div class="edit-option-text">
-            @if (OwnerOfAnswer)
-            {
-                <div>
-                    <button @onclick="@SetEditMode">E</button>
-                </div>
-                <div>
-                    <button @onclick="@(async () =>await DeleteAnswer())">X</button>
-                </div>
-
-            }
-            <div>
-                <button @onclick="@(() => OnSetReplyAnswer.InvokeAsync(Answer.IdAnswer))">R</button>
+        @if (IsReplayActive)
+        {
+            <div class="replay-component">
+                <input />
             </div>
-        </div>
-    }
-
+        }
+    </div>
 </div>
 
 @code {
@@ -92,42 +92,31 @@
     /// EventCallback odpowiedzialny za aktualizacje listy odpowiedzi.
     /// </summary>
     [Parameter]
-    public EventCallback<AnswerResponseDTO> RemoveAnswer { get; set; }
-    /// <summary>
-    /// EventCallback odpowiedzialny za ustawienie odpowiedzi, na którą użytkownik chce odpowiedzieć.
-    /// </summary>
-    [Parameter]
-    public EventCallback<int> OnSetReplyAnswer { get; set; }
-    /// <summary>
-    /// Id odpowiedzi, do którego odnosić się będzie nowa odpowiedź.
-    /// </summary>
-    [Parameter]
-    public int ActiveResponse { get; set; }
+    public EventCallback<AnswerResponseDTO> DeleteAnswer { get; set; }
     /// <summary>
     /// Id użytkownika aktywnie przeglądającego pytania użytkownika.
     /// </summary>
     [Parameter]
-    public int ActiveUser { get; set; }
+    public int? ActiveUser { get; set; }
     /// <summary>
-    /// Property informująca czy właścicielem odpowiedzi jest aktualnie przeglądajacy użytkownik. 
+    /// Property informująca czy właścicielem odpowiedzi jest aktualnie przeglądajacy użytkownik.
     /// </summary>
     public bool OwnerOfAnswer { get; set; }
-    /// <summary>
-    /// Property odpowiedzialny za zmianę trybu z wyświetlania treści odpowiedzi na jego edycję.
-    /// </summary>
-    public bool EditMode { get; set; }
     /// <summary>
     /// Property uniemożliwiające zmiany oceny odpowiedzi przez ich właścicieli lub w trakcie przetwarzania zapytania.
     /// </summary>
     public bool isNonInteractive { get; set; }
-
+    /// <summary>
+    /// Property informujące czy tryb odpowiadania do odpowiedzi jest widoczny
+    /// </summary>
+    public bool IsReplayActive { get; set; }
 
     /// <summary>
     /// Pobiera Id aktywnie przeglądającego pytanie z odpowiedziami. Ustawia zmienną na wartość 'true' w celu zablokowania funkcjonalności edycji i usuwania odpowiedzi.
     /// </summary>
     protected override void OnInitialized()
     {
-        if (ActiveUser == Answer.UserResponseDTO.IdUser)
+        if (ActiveUser == Answer.User.IdUser)
         {
             OwnerOfAnswer = true;
             isNonInteractive = true;
@@ -140,10 +129,10 @@
     private async Task IncreaseRating()
     {
         isNonInteractive = true;
-        var result = await answerRepository.UpdateRatingAnswerAsync(Answer.IdAnswer, Answer.Mark + 1);
+        var result = await answerRepository.UpdateRatingAnswerAsync(Answer.IdAnswer, Answer.IsLiked + 1);
         if (result.Item1)
         {
-            Answer.Mark += 1;
+            Answer.IsLiked += 1;
             Answer.Rating += 1;
         }
         isNonInteractive = false;
@@ -155,55 +144,37 @@
     private async Task DecreaseRating()
     {
         isNonInteractive = true;
-        var result = await answerRepository.UpdateRatingAnswerAsync(Answer.IdAnswer, Answer.Mark - 1);
+        var result = await answerRepository.UpdateRatingAnswerAsync(Answer.IdAnswer, Answer.IsLiked - 1);
         if (result.Item1)
         {
-            Answer.Mark -= 1;
+            Answer.IsLiked -= 1;
             Answer.Rating -= 1;
         }
         isNonInteractive = false;
     }
+
     /// <summary>
-    /// Metoda odpowiedzialna za usunięcie odpowiedzi po wcześniejszym potwierdzeniu decyzji. W przypadku błędu wyświetlany zostaje komunikat.
+    /// Metoda przenosi do strony edycji odpowiedzi.
+    /// </summary>
+    private async Task EditAnswer()
+    {
+        navigationManager.NavigateTo($"/answers/{Answer.IdAnswer}/edit");
+    }
+
+    /// <summary>
+    /// Metoda odpowiedzialna za zmianę trybu odpowiedzialnego za wyświetlania komponentu do utworzenia tekstu odpowiedzi do odpowiedzi.
+    /// </summary>
+    private async Task SetReplayActive()
+    {
+        IsReplayActive = !IsReplayActive;
+    }
+
+    /// <summary>
+    /// Metoda odpowiedzialna za zgłoszenie odpowiedzi.
     /// </summary>
     /// <returns></returns>
-    private async Task DeleteAnswer()
+    private async Task ReportAnswer()
     {
-        var confirmed = await js.InvokeAsync<bool>("confirm", "Do want to delete answer?");
-        if (confirmed)
-        {
-            var result = await answerRepository.DeleteAnswer(Answer.IdAnswer);
-            if (!result.Item1)
-                await js.InvokeVoidAsync("alert", result.Item2);
-            else
-                await RemoveAnswer.InvokeAsync(Answer);
-        }
 
-    }
-    /// <summary>
-    /// Metoda zmienia property EditMode na wartość przeciwną, w celu umożliwienia edycji tekstu lub powrotu do stanu wyświetlania tekstu.
-    /// </summary>
-    private void SetEditMode()
-    {
-        EditMode = !EditMode;
-    }
-    /// <summary>
-    /// Metoda odpowiedzialna za aktualizacje tekstu odpowiedzi.
-    /// </summary>
-    /// <param name="text"> Parametr zawierający nowy tekst odpowiedzi.</param>
-    /// <returns></returns>
-    private async Task UpdateAnswer(String text)
-    {
-        var tmpText = Answer.Text;
-        Answer.Text = text;
-        var result = await answerRepository.UpdateAnswer(Answer.IdAnswer, text);
-
-        if (!result.Item1)
-        {
-            Answer.Text = tmpText;
-            await js.InvokeVoidAsync("alert", result.Item2);
-        }
-        Answer.IsModified = true;
-        EditMode = !EditMode;
     }
 }

@@ -1,0 +1,10 @@
+﻿.container {
+    display: flex;
+    justify-content: center;
+    color: #3F4D54;
+}
+
+.spinner-grow {
+    width: 3rem;
+    height: 3rem;
+}

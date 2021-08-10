@@ -25,26 +25,20 @@ namespace Quanda.Server.Repositories.Implementations
         }
 
         public async Task<List<GetQuestionsDTO>> GetQuestions(int skip, SortOptionEnum sortOption,
-            List<int>? categories)
+            List<int>? tags)
         {
-            if (categories.Count == 0)
+            if (tags.Count == 0)
                 return sortOption switch
                 {
                     SortOptionEnum.Views => await _context.Questions
-                        .Include(question => question.IdUserNavigation)
-                        .OrderBy(question => question.Views)
                         .Skip(skip)
                         .Take(_takeAmount)
                         .Select(question => new GetQuestionsDTO
                         {
                             IdQuestion = question.IdQuestion,
-                            AnswersCount = _context.Answers
-                                .Where(answer => answer.IdQuestion == question.IdQuestion)
-                                .Count(),
+                            AnswersCount = question.Answers.Count,
                             Avatar = question.IdUserNavigation.Avatar,
-                            Categories = _context.QuestionTags
-                                .Where(qc => qc.IdQuestion == question.IdQuestion)
-                                .Select(qc => qc.IdTagNavigation.Name).ToList(),
+                            Tags = question.QuestionTags.Select(qt => qt.IdTagNavigation.Name).ToList(),
                             Description = question.Description,
                             Header = question.Header,
                             IdUser = question.IdUser,
@@ -56,20 +50,15 @@ namespace Quanda.Server.Repositories.Implementations
                         })
                         .ToListAsync(),
                     SortOptionEnum.Answers => await _context.Questions
-                        .Include(question => question.IdUserNavigation)
                         .OrderBy(question => question.Answers.Count)
                         .Skip(skip)
                         .Take(_takeAmount)
                         .Select(question => new GetQuestionsDTO
                         {
                             IdQuestion = question.IdQuestion,
-                            AnswersCount = _context.Answers
-                                .Where(answer => answer.IdQuestion == question.IdQuestion)
-                                .Count(),
+                            AnswersCount = question.Answers.Count,
                             Avatar = question.IdUserNavigation.Avatar,
-                            Categories = _context.QuestionTags
-                                .Where(qc => qc.IdQuestion == question.IdQuestion)
-                                .Select(qc => qc.IdTagNavigation.Name).ToList(),
+                            Tags = question.QuestionTags.Select(qt => qt.IdTagNavigation.Name).ToList(),
                             Description = question.Description,
                             Header = question.Header,
                             IdUser = question.IdUser,
@@ -81,20 +70,15 @@ namespace Quanda.Server.Repositories.Implementations
                         })
                         .ToListAsync(),
                     SortOptionEnum.Date => await _context.Questions
-                        .Include(question => question.IdUserNavigation)
                         .OrderBy(question => question.PublishDate)
                         .Skip(skip)
                         .Take(_takeAmount)
                         .Select(question => new GetQuestionsDTO
                         {
                             IdQuestion = question.IdQuestion,
-                            AnswersCount = _context.Answers
-                                .Where(answer => answer.IdQuestion == question.IdQuestion)
-                                .Count(),
+                            AnswersCount = question.Answers.Count,
                             Avatar = question.IdUserNavigation.Avatar,
-                            Categories = _context.QuestionTags
-                                .Where(qc => qc.IdQuestion == question.IdQuestion)
-                                .Select(qc => qc.IdTagNavigation.Name).ToList(),
+                            Tags = question.QuestionTags.Select(qt => qt.IdTagNavigation.Name).ToList(),
                             Description = question.Description,
                             Header = question.Header,
                             IdUser = question.IdUser,
@@ -110,12 +94,10 @@ namespace Quanda.Server.Repositories.Implementations
             return sortOption switch
             {
                 SortOptionEnum.Views => await _context.Questions
-                    .Include(question => question.QuestionTags)
-                    .Include(question => question.IdUserNavigation)
                     .Where(
                         question => _context.QuestionTags
-                            .Where(qc => qc.IdQuestion == question.IdQuestion)
-                            .Any(qc => categories.Any(cat => cat == qc.IdTag))
+                            .Where(qt => qt.IdQuestion == question.IdQuestion)
+                            .Any(qt => tags.Any(tag => tag == qt.IdTag))
                     )
                     .OrderBy(question => question.Views)
                     .Skip(skip)
@@ -123,13 +105,9 @@ namespace Quanda.Server.Repositories.Implementations
                     .Select(question => new GetQuestionsDTO
                     {
                         IdQuestion = question.IdQuestion,
-                        AnswersCount = _context.Answers
-                            .Where(answer => answer.IdQuestion == question.IdQuestion)
-                            .Count(),
+                        AnswersCount = question.Answers.Count,
                         Avatar = question.IdUserNavigation.Avatar,
-                        Categories = _context.QuestionTags
-                            .Where(qc => qc.IdQuestion == question.IdQuestion)
-                            .Select(qc => qc.IdTagNavigation.Name).ToList(),
+                        Tags = question.QuestionTags.Select(qt => qt.IdTagNavigation.Name).ToList(),
                         Description = question.Description,
                         Header = question.Header,
                         IdUser = question.IdUser,
@@ -141,12 +119,10 @@ namespace Quanda.Server.Repositories.Implementations
                     })
                     .ToListAsync(),
                 SortOptionEnum.Answers => await _context.Questions
-                    .Include(question => question.QuestionTags)
-                    .Include(question => question.IdUserNavigation)
                     .Where(
                         question => _context.QuestionTags
-                            .Where(qc => qc.IdQuestion == question.IdQuestion)
-                            .Any(qc => categories.Any(cat => cat == qc.IdTag))
+                            .Where(qt => qt.IdQuestion == question.IdQuestion)
+                            .Any(qt => tags.Any(tag => tag == qt.IdTag))
                     )
                     .OrderBy(question => question.Answers.Count)
                     .Skip(skip)
@@ -154,13 +130,9 @@ namespace Quanda.Server.Repositories.Implementations
                     .Select(question => new GetQuestionsDTO
                     {
                         IdQuestion = question.IdQuestion,
-                        AnswersCount = _context.Answers
-                            .Where(answer => answer.IdQuestion == question.IdQuestion)
-                            .Count(),
+                        AnswersCount = question.Answers.Count,
                         Avatar = question.IdUserNavigation.Avatar,
-                        Categories = _context.QuestionTags
-                            .Where(qc => qc.IdQuestion == question.IdQuestion)
-                            .Select(qc => qc.IdTagNavigation.Name).ToList(),
+                        Tags = question.QuestionTags.Select(qt => qt.IdTagNavigation.Name).ToList(),
                         Description = question.Description,
                         Header = question.Header,
                         IdUser = question.IdUser,
@@ -172,12 +144,10 @@ namespace Quanda.Server.Repositories.Implementations
                     })
                     .ToListAsync(),
                 SortOptionEnum.Date => await _context.Questions
-                    .Include(question => question.QuestionTags)
-                    .Include(question => question.IdUserNavigation)
                     .Where(
                         question => _context.QuestionTags
-                            .Where(qc => qc.IdQuestion == question.IdQuestion)
-                            .Any(qc => categories.Any(cat => cat == qc.IdTag))
+                            .Where(qt => qt.IdQuestion == question.IdQuestion)
+                            .Any(qt => tags.Any(tag => tag == qt.IdTag))
                     )
                     .OrderBy(question => question.PublishDate)
                     .Skip(skip)
@@ -185,13 +155,9 @@ namespace Quanda.Server.Repositories.Implementations
                     .Select(question => new GetQuestionsDTO
                     {
                         IdQuestion = question.IdQuestion,
-                        AnswersCount = _context.Answers
-                            .Where(answer => answer.IdQuestion == question.IdQuestion)
-                            .Count(),
+                        AnswersCount = question.Answers.Count,
                         Avatar = question.IdUserNavigation.Avatar,
-                        Categories = _context.QuestionTags
-                            .Where(qc => qc.IdQuestion == question.IdQuestion)
-                            .Select(qc => qc.IdTagNavigation.Name).ToList(),
+                        Tags = question.QuestionTags.Select(qt => qt.IdTagNavigation.Name).ToList(),
                         Description = question.Description,
                         Header = question.Header,
                         IdUser = question.IdUser,
@@ -206,13 +172,105 @@ namespace Quanda.Server.Repositories.Implementations
             };
         }
 
-        public async Task<Question> GetQuestion(int questionId)
+        public async Task<QuestionResponseDTO> GetQuestion(int idQuestion, int? idUserLogged)
         {
-            var Question = await _context.Questions.Where(question => question.IdQuestion == questionId).SingleAsync();
-            if (Question != null)
-                Question.Views++;
-            await _context.SaveChangesAsync();
-            return Question;
+            QuestionResponseDTO question;
+            if (idUserLogged == null)
+            {
+                question = await _context.Questions.Where(question => question.IdQuestion == idQuestion).Select(q => new QuestionResponseDTO
+                {
+                    Header = q.Header,
+                    Description = q.Description,
+                    PublishDate = q.PublishDate,
+                    Views = q.Views,
+                    IsFinished = q.IsFinished,
+                    IsModified = q.IsModified,
+                    User = new UserResponseDTO
+                    {
+                        IdUser = q.IdUser,
+                        Nickname = q.IdUserNavigation.Nickname,
+                        Avatar = q.IdUserNavigation.Avatar
+                    },
+                    AnswersCount = q.Answers.Count,
+                    Tags = q.QuestionTags.Select(qc => new TagResponseDTO
+                    {
+                        IdTag = qc.IdTagNavigation.IdTag,
+                        Name = qc.IdTagNavigation.Name
+                    }).ToList(),
+                    Answers = q.Answers.Where(a => a.IdRootAnswer == null).Select(a => new AnswerResponseDTO
+                    {
+                        IdAnswer = 0,
+                        Text = "We invite you to create an account.",
+                        Rating = a.RatingAnswers.Select(ra => new { ValueAns = ra.Value == false ? -1 : 1 }).Sum(r => r.ValueAns),
+                        IsModified = a.IsModified,
+                        User = new UserResponseDTO
+                        {
+                            Nickname = a.IdUserNavigation.Nickname,
+                            Avatar = a.IdUserNavigation.Avatar
+                        },
+                        AnswerChildren = new List<AnswerResponseDTO>(),
+                        IsLiked = a.RatingAnswers.Any(ra => ra.IdUser == idUserLogged) == false ? 0 : a.RatingAnswers.SingleOrDefault(ra => ra.IdUser == idUserLogged).Value ? 1 : -1
+                    }).OrderByDescending(a => a.Rating).ThenBy(a => a.IdAnswer).ToList()
+                }).SingleOrDefaultAsync();
+            }
+            else
+            {
+                question = await _context.Questions.Where(question => question.IdQuestion == idQuestion).Select(q => new QuestionResponseDTO
+                {
+                    IdQuestion = q.IdQuestion,
+                    Header = q.Header,
+                    Description = q.Description,
+                    PublishDate = q.PublishDate,
+                    Views = q.Views,
+                    IsFinished = q.IsFinished,
+                    IsModified = q.IsModified,
+                    User = new UserResponseDTO
+                    {
+                        IdUser = q.IdUser,
+                        Nickname = q.IdUserNavigation.Nickname,
+                        Avatar = q.IdUserNavigation.Avatar
+                    },
+                    AnswersCount = q.Answers.Count,
+                    Tags = q.QuestionTags.Select(qc => new TagResponseDTO
+                    {
+                        IdTag = qc.IdTagNavigation.IdTag,
+                        Name = qc.IdTagNavigation.Name
+                    }).ToList(),
+                    Answers = q.Answers.Where(a => a.IdRootAnswer == null).Select(a => new AnswerResponseDTO
+                    {
+                        IdAnswer = a.IdAnswer,
+                        Text = a.Text,
+                        Rating = a.RatingAnswers.Select(ra => new { ValueAns = ra.Value == false ? -1 : 1 }).Sum(r => r.ValueAns),
+                        IsModified = a.IsModified,
+                        User = new UserResponseDTO
+                        {
+                            IdUser = a.IdUserNavigation.IdUser,
+                            Nickname = a.IdUserNavigation.Nickname,
+                            Avatar = a.IdUserNavigation.Avatar
+                        },
+                        IdRootAnswer = a.IdRootAnswer,
+                        AnswerChildren = new List<AnswerResponseDTO>(),
+                        IsLiked = a.RatingAnswers.Any(ra => ra.IdUser == idUserLogged) == false ? 0 : a.RatingAnswers.SingleOrDefault(ra => ra.IdUser == idUserLogged).Value ? 1 : -1,
+                        AmountOfAnswerChildren = a.InverseIdRootAnswersNavigation.Count
+                    }).OrderByDescending(a => a.Rating).ThenBy(a => a.IdAnswer).ToList()
+                }).SingleOrDefaultAsync();
+            }
+
+            if (question != null)
+            {
+                question.Answers = question.Answers.Skip(0).Take(idUserLogged != null ? Config.ANSWERS_PAGE_SIZE : 1).ToList();
+                question.Views++;
+                var questionUpd = new Question
+                {
+                    IdQuestion = idQuestion,
+                    Views = question.Views
+                };
+                _context.Questions.Attach(questionUpd);
+                _context.Entry(questionUpd).Property(q => q.Views).IsModified = true;
+                await _context.SaveChangesAsync();
+            }
+
+            return question;
         }
 
         public async Task<QuestionStatusResult> AddQuestion(AddQuestionDTO question)
@@ -236,7 +294,7 @@ namespace Quanda.Server.Repositories.Implementations
 
         public async Task<QuestionStatusResult> UpdateQuestion(int questionId, UpdateQuestionDTO question)
         {
-            var Question = await _context.Questions.Where(question => question.IdQuestion == questionId).SingleAsync();
+            var Question = await _context.Questions.Where(question => question.IdQuestion == questionId).SingleOrDefaultAsync();
             if (Question == null) return QuestionStatusResult.QUESTION_NOT_FOUND;
             Question.Description = question.Description;
             Question.IsModified = true;
@@ -247,7 +305,7 @@ namespace Quanda.Server.Repositories.Implementations
 
         public async Task<QuestionStatusResult> RemoveQuestion(int questionId)
         {
-            var Question = await _context.Questions.Where(question => question.IdQuestion == questionId).SingleAsync();
+            var Question = await _context.Questions.Where(question => question.IdQuestion == questionId).SingleOrDefaultAsync();
             if (Question == null) return QuestionStatusResult.QUESTION_NOT_FOUND;
             _context.Remove(Question);
 
@@ -258,7 +316,7 @@ namespace Quanda.Server.Repositories.Implementations
 
         public async Task<QuestionStatusResult> SetToCheck(int questionId, bool value)
         {
-            var Question = await _context.Questions.Where(question => question.IdQuestion == questionId).SingleAsync();
+            var Question = await _context.Questions.Where(question => question.IdQuestion == questionId).SingleOrDefaultAsync();
             if (Question == null) return QuestionStatusResult.QUESTION_NOT_FOUND;
             Question.ToCheck = value;
             ;
@@ -269,7 +327,7 @@ namespace Quanda.Server.Repositories.Implementations
 
         public async Task<QuestionStatusResult> SetFinished(int questionId)
         {
-            var Question = await _context.Questions.Where(question => question.IdQuestion == questionId).SingleAsync();
+            var Question = await _context.Questions.Where(question => question.IdQuestion == questionId).SingleOrDefaultAsync();
             if (Question == null) return QuestionStatusResult.QUESTION_NOT_FOUND;
             Question.IsFinished = true;
             return await _context.SaveChangesAsync() == 1
@@ -282,8 +340,8 @@ namespace Quanda.Server.Repositories.Implementations
             if (category.Count == 0)
                 return await _context.Questions.CountAsync();
             return await _context.QuestionTags
-                .Where(qc => category.Any(cat => qc.IdTag == cat))
-                .GroupBy(qc => qc.IdQuestion)
+                .Where(qt => category.Any(tag => qt.IdTag == tag))
+                .GroupBy(qt => qt.IdQuestion)
                 .Select(qcg => qcg.Key)
                 .CountAsync();
         }

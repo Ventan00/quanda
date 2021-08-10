@@ -7,5 +7,6 @@ namespace Quanda.Shared.DTOs.Responses
         public int IdUser { get; set; }
         public String Nickname { get; set; }
         public string Avatar { get; set; }
+        public int Points { get; set; }
     }
 }

@@ -1,0 +1,33 @@
+﻿.content {
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    padding-left: 5%;
+    padding-right: 5%;
+    text-align: center;
+    border: #3F4D54 solid 1px;
+    border-radius: 25px;
+    background-color: white;
+}
+
+.create-account {
+    background: -webkit-linear-gradient(left,#ED746E, #F7D964);
+    border-radius: 25px;
+    width: 66%;
+    color: white;
+    padding: 10px;
+    font-size: 20px;
+    font-family: 'Sen', sans-serif;
+    font-weight: bold;
+    flex-wrap: nowrap;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.log-in {
+    font-size: 18px;
+    font-family: 'Roboto', sans-serif;
+    color: #878787;
+}
+
+

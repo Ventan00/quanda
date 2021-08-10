@@ -1,0 +1,107 @@
+﻿@inject NavigationManager navigationManager
+
+<div class="question-container">
+    <div class="question-row question-header-text">
+        @Question.Header
+    </div>
+    <div class="header-info" style="margin-bottom: 5px;">
+        <div class="question-header-info">
+            <div class="black">
+                @Question.PublishDate.ToShortDateString()
+            </div>
+            <div>
+                Views: @Question.Views
+            </div>
+            <div>
+                Answers: @Question.AnswersCount
+            </div>
+            <div class="text-t">
+                Asked by
+            </div>
+        </div>
+        <div>
+            <a href="/users/@Question.User.IdUser">
+                <img class="user-avatar" src="@Question.User.Avatar" alt="Avatar" />
+            </a>
+        </div>
+        <div class="user-nickname">
+            @Question.User.Nickname
+        </div>
+    </div>
+    <div class="text">
+        @Question.Description
+    </div>
+    <div class="tag-row">
+        <div class="tag-title">
+            tags:
+        </div>
+        @foreach (var tag in Question.Tags)
+        {
+            <a href="/tags/@tag.IdTag" class="tag">
+                #@tag.Name
+            </a>
+        }
+    </div>
+    <div class="footer">
+        @if (OwnerOfAnswer)
+        {
+            <div class="black-action" @onclick="@(async () =>await EditQuestion())">
+                <button class="quanda-icon icon-edit" />
+                <div>
+                    edit
+                </div>
+            </div>
+            <div class="red-action" @onclick="@(async () =>await ReportQuestionToDelete())">
+                <button class="quanda-icon icon-delete red" />
+                <div>
+                    delete question
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="red-action" @onclick="@(async () =>await ReportQuestion())">
+                <button class="quanda-icon icon-report red" />
+                <div>
+                    Report question
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    /// <summary>
+    ///     Property infomujące czy aktualnie przeglądający użytkownik jest właścicielem pytania.
+    /// </summary>
+    [Parameter]
+    public bool OwnerOfAnswer { get; set; }
+    /// <summary>
+    ///     Pytanie z potrzebnymi danymi
+    /// </summary>
+    [Parameter]
+    public QuestionResponseDTO Question { get; set; }
+
+    /// <summary>
+    ///     Metoda odpowiedzialna za zgłoszenie pytania.
+    /// </summary>
+    private async Task ReportQuestion()
+    {
+
+    }
+
+    /// <summary>
+    ///     Metoda odpowiedzialna za zgłoszenie odpowiedzi do usunięcia.
+    /// </summary>
+    private async Task ReportQuestionToDelete()
+    {
+
+    }
+    /// <summary>
+    ///     Metoda przenosi do strony edycji pytania.
+    /// </summary>
+    private async Task EditQuestion()
+    {
+        navigationManager.NavigateTo($"/questions/{Question.IdQuestion}/edit");
+    }
+}

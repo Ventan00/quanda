@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 namespace Quanda.Client.Repositories.Interfaces
 {
     /// <summary>
-    /// Repozytorium odpowiedzialne za odpowiedzi.
+    ///     Repozytorium odpowiedzialne za odpowiedzi.
     /// </summary>
     public interface IAnswerRepository
     {
         /// <summary>
-        /// Zwraca listę odpowiedzi do konkretnego pytania.
+        ///     Zwraca listę odpowiedzi do konkretnego pytania.
         /// </summary>
         /// <param name="idQuestion"></param>
         /// <param name="productParams">Zakres odpowiedzi.</param>
@@ -20,14 +20,14 @@ namespace Quanda.Client.Repositories.Interfaces
         Task<List<AnswerResponseDTO>> GetAnswersAsync(int idQuestion, AnswersPageDTO productParams);
 
         /// <summary>
-        /// Zwraca konkrętną odpowiedź.
+        ///     Zwraca listę pododpowiedzi.
         /// </summary>
-        /// <param name="idAnswer">Id odpowiedzi żądanej.</param>
-        /// <returns>AnswerResponseDTO</returns>
-        Task<AnswerResponseDTO> GetAnswerAsync(int idAnswer);
+        /// <param name="idAnswer">Id głównej odpowiedzi.</param>
+        /// <returns>List<AnswerResponseDTO></returns>
+        Task<List<AnswerResponseDTO>> GetAnswerChildrenAsync(int idAnswer);
 
         /// <summary>
-        /// Metoda odpowiedzialna za wysłanie żądania dodania odpowiedzi.Zwraca sukces dodania do bazy wraz ewentualną trecią komunikatu odpowiedzi. 
+        ///     Metoda odpowiedzialna za wysłanie żądania dodania odpowiedzi.Zwraca sukces dodania do bazy wraz ewentualną trecią komunikatu odpowiedzi. 
         /// </summary>
         /// <param name="text">Treść nowo dodanej odpowiedzi.</param>
         /// <param name="idQuestion">Id pytania do którego odnosi się odpowiedź.</param>
@@ -36,7 +36,7 @@ namespace Quanda.Client.Repositories.Interfaces
         Task<Tuple<bool, string>> AddAnswer(string text, int idQuestion, int idRootAnswer);
 
         /// <summary>
-        /// Metoda odpowiedzialna za wysłanie żądania zaktualizowania odpowiedzi.Zwraca sukces aktulizacji w bazie wraz ewentualną trecią komunikatu odpowiedzi. 
+        ///     Metoda odpowiedzialna za wysłanie żądania zaktualizowania odpowiedzi.Zwraca sukces aktulizacji w bazie wraz ewentualną trecią komunikatu odpowiedzi. 
         /// </summary>
         /// <param name="idAnswer">Id odpowiedzi do aktualizacji.</param>
         /// <param name="text">Treść zaktualizowanej odpowiedzi.</param>
@@ -44,14 +44,14 @@ namespace Quanda.Client.Repositories.Interfaces
         Task<Tuple<bool, string>> UpdateAnswer(int idAnswer, string text);
 
         /// <summary>
-        /// Metoda odpowiedzialna za wysłanie żądania usunięcia odpowiedzi.Zwraca sukces usunięcia z bazy wraz ewentualną trecią komunikatu odpowiedzi. 
+        ///     Metoda odpowiedzialna za wysłanie żądania usunięcia odpowiedzi.Zwraca sukces usunięcia z bazy wraz ewentualną trecią komunikatu odpowiedzi. 
         /// </summary>
         /// <param name="idAnswer">Id odpowiedzi do usunięcia.</param>
         /// <returns>Tuple<bool, string></returns>
         Task<Tuple<bool, string>> DeleteAnswer(int idAnswer);
 
         /// <summary>
-        /// Metoda odpowiedzialna za wysłanie żądania zaktulizowania ratingu odpowiedzi.Zwraca sukces zaktualizowania z bazy wraz ewentualną trecią komunikatu odpowiedzi. 
+        ///     Metoda odpowiedzialna za wysłanie żądania zaktulizowania ratingu odpowiedzi.Zwraca sukces zaktualizowania z bazy wraz ewentualną trecią komunikatu odpowiedzi. 
         /// </summary>
         /// <param name="idAnswer">Id odpowiedzi do zaktulizowania ratingu.</param>
         /// <param name="rating">Nowy rating odpowiedzi.</param>
