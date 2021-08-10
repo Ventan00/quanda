@@ -1,12 +1,15 @@
-﻿@page "/recover/password"
+﻿@page "/recover/confirmation-email"
+
 @inject IUsersRepository _usersRepository
 @inject IToastService _toastService
 
 <TopSemicircleComponent />
-<RecoveryContainerComponent Title="Password recovery" Description="Forgot your account’s password and can't login? Enter your email address and we'll send you a mail, that can help you.">
-    <GenericFormComponent Model="@_recoverDto" @ref="_form" OnValidSubmit="@RecoverPasswordAsync" IsAutoCompleteOn="false" RequireCaptcha="true">
+<RecoveryContainerComponent Title="Confirmation email recovery" Description="Did you not receive the e-mail needed to confirm your registration? Enter your email address and we'll send you a mail, that can help you.">
+    <GenericFormComponent Model="@_recoverDto" @ref="_form" OnValidSubmit="@RecoverConfirmationEmailAsync" IsAutoCompleteOn="false" RequireCaptcha="true">
         <FormInputComponent Type="text" @bind-Value="@_recoverDto.Email" Placeholder="Email address" />
-        <FormSubmitComponent IsPending="@_isPending" SubmitText="Recover password" PendingSubmitText="Processing..." />
+        <div class="mb-2 w-100">
+            <FormSubmitComponent IsPending="@_isPending" SubmitText="Recover password" PendingSubmitText="Processing..." />
+        </div>
     </GenericFormComponent>
 </RecoveryContainerComponent>
 
@@ -27,29 +30,28 @@
     /// </summary>
     private GenericFormComponent<RecoverDTO> _form;
 
+
     /// <summary>
-    ///     Metoda wysyłająca oraz obsługująca żądanie odzyskania hasła - wywoływana przy potwierdzeniu prawidłowo
-    ///     wypełnionego formularza
+    ///     Metoda wysyłająca oraz obsługująca żądanie - wywoływana po zatwierdzeniu poprawnie wypełnionego formularza
     /// </summary>
-    /// <param></param>
     /// <returns></returns>
-    private async Task RecoverPasswordAsync()
+    public async Task RecoverConfirmationEmailAsync()
     {
         _isPending = true;
         _recoverDto.CaptchaResponseToken = await _form.CaptchaComponent.GetCaptchaResponseAsync();
 
-        var isRecovered = await _usersRepository.RecoverPasswordAsync(_recoverDto);
+        var isRecovered = await _usersRepository.RecoverConfirmationEmailAsync(_recoverDto);
         if (!isRecovered)
         {
             _toastService.ShowError("Invalid reCaptcha.");
-            await _form.CaptchaComponent.ResetCaptchaAsync();
         }
         else
         {
-            _toastService.ShowSuccess("Password recovery email has been send.");
+            _toastService.ShowSuccess("Confirmation email has been re-send.");
             _recoverDto = new RecoverDTO();
         }
 
+        await _form.CaptchaComponent.ResetCaptchaAsync();
         _isPending = false;
     }
 
