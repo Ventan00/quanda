@@ -3,7 +3,7 @@
 @inject NavigationManager navigationManager
 @inject IJSRuntime js
 
-<div class="main-container">
+<div class="main-container main-container-background">
     @if (Question != null)
     {
         <QuestionForAnswersComponent Question="Question" OwnerOfAnswer="OwnerOfQuestion" />
@@ -14,20 +14,20 @@
             }
             else if (Answers.Count == 0)
             {
-                <div class="answers-empty">
+                <h1 class="answers-empty">
                     No answers. Do you know the answer to this question? Reply!
-                </div>
+                </h1>
             }
             else
             {
-                <div class="header">
+                <h1 class="header">
                     Answers
-                </div>
+                </h1>
                 @foreach (var answer in Answers)
                 {
                     <div class="answer">
                         <SingleAnswerComponent Answer="answer" ActiveUser="ActiveUser" DeleteAnswer="DeleteAnswer" />
-                        @if (answer.AmountOfAnswerChildren > 0)
+                        @if (answer.AmountOfAnswerChildren > 0 && ActiveUser != null)
                         {
                             <div class="answer-child-explorer" @onclick="() => GetChildAnswers(answer.IdAnswer)">
                                 <div class="arrow-down"> </div>
@@ -49,9 +49,6 @@
                     }
                 </div>
             }
-
-
-
         </div>
     }
     else
@@ -106,7 +103,7 @@
         protected async override Task OnInitializedAsync()
         {
             var auth = await AuthenticationState;
-            var idUser = auth.User.FindFirst(ClaimTypes.NameIdentifier);
+            var idUser = auth.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (idUser != null)
                 ActiveUser = int.Parse(idUser.ToString());
             else
@@ -158,7 +155,6 @@
                         rootAnswer.AmountOfAnswerChildren -= 1;
                     }
                 }
-
             }
 
         }
@@ -209,5 +205,4 @@
                 mainAnswer.AnswerChildren = new List<AnswerResponseDTO>();
             }
         }
-
     }
