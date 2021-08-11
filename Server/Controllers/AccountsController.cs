@@ -81,7 +81,7 @@ namespace Quanda.Server.Controllers
                     return Conflict(response);
                 case USER_DB_ERROR:
                     response.RegisterStatus = RegisterStatusEnum.SERVER_ERROR;
-                    return StatusCode((int) HttpStatusCode.InternalServerError);
+                    return StatusCode((int)HttpStatusCode.InternalServerError);
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -135,7 +135,7 @@ namespace Quanda.Server.Controllers
             if (updateStatus == USER_DB_ERROR)
             {
                 response.LoginStatus = LoginStatusEnum.SERVER_ERROR;
-                return StatusCode((int) HttpStatusCode.InternalServerError,
+                return StatusCode((int)HttpStatusCode.InternalServerError,
                     response.LoginStatus == LoginStatusEnum.SERVER_ERROR);
             }
 
@@ -162,7 +162,7 @@ namespace Quanda.Server.Controllers
             {
                 TEMP_USER_NOT_FOUND => NotFound("Wrong confirmation code"),
                 TEMP_USER_DELETED => Redirect($"https://{HttpContext.Request.Host}/login"),
-                TEMP_USER_DB_ERROR => StatusCode((int) HttpStatusCode.InternalServerError),
+                TEMP_USER_DB_ERROR => StatusCode((int)HttpStatusCode.InternalServerError),
                 _ => throw new ArgumentOutOfRangeException()
             };
         }
@@ -184,7 +184,7 @@ namespace Quanda.Server.Controllers
 
             var isExtended = await _tempUsersRepository.ExtendValidityAsync(recoverDto.Email);
             if (!isExtended)
-                return StatusCode((int) HttpStatusCode.InternalServerError);
+                return StatusCode((int)HttpStatusCode.InternalServerError);
 
             await _smtpService.SendRegisterConfirmationEmailAsync(recoverDto.Email, code);
 
@@ -227,7 +227,7 @@ namespace Quanda.Server.Controllers
             var isCaptchaCorrect = await _captchaService.VerifyCaptchaAsync(passwordResetDto.CaptchaResponseToken);
             if (!isCaptchaCorrect) return Unauthorized();
 
-            var providedUser = await _usersRepository.GetUserByIdAsync((int) passwordResetDto.IdUser);
+            var providedUser = await _usersRepository.GetUserByIdAsync((int)passwordResetDto.IdUser);
             if (providedUser is null || providedUser.IdTempUserNavigation is not null)
                 return Forbid();
 
@@ -247,7 +247,7 @@ namespace Quanda.Server.Controllers
 
             var isChanged = await _usersRepository.SetNewPasswordForUser(providedUser, passwordResetDto.RawPassword);
             if (!isChanged)
-                return StatusCode((int) HttpStatusCode.InternalServerError);
+                return StatusCode((int)HttpStatusCode.InternalServerError);
 
             return NoContent();
         }
@@ -277,7 +277,7 @@ namespace Quanda.Server.Controllers
             var updateStatus =
                 await _usersRepository.UpdateRefreshTokenForUserAsync(user, refreshToken, expirationDate);
             if (updateStatus != USER_REFRESH_TOKEN_UPDATED)
-                return StatusCode((int) HttpStatusCode.InternalServerError);
+                return StatusCode((int)HttpStatusCode.InternalServerError);
 
             var accessToken = _jwtService.GenerateAccessToken(user);
 
@@ -301,12 +301,12 @@ namespace Quanda.Server.Controllers
             if (user == null)
                 return NotFound();
 
-            if (user.IdUser != HttpContext.Request.GetUserId())
+            if (user.IdUser != HttpContext.User.GetId())
                 return NotFound();
 
             var updateStatus = await _usersRepository.UpdateRefreshTokenForUserAsync(user, null, null);
             if (updateStatus != USER_REFRESH_TOKEN_UPDATED)
-                return StatusCode((int) HttpStatusCode.InternalServerError);
+                return StatusCode((int)HttpStatusCode.InternalServerError);
 
             return NoContent();
         }

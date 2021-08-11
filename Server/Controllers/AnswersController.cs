@@ -37,7 +37,7 @@ namespace Quanda.Server.Controllers
         [HttpGet("{idQuestion}")]
         public async Task<IActionResult> GetAnswers(int idQuestion, [FromQuery] AnswersPageDTO answersPage)
         {
-            var requestIdUser = HttpContext.Request.GetUserId();
+            var requestIdUser = HttpContext.User.GetId();
             var result = await _repository.GetAnswersAsync(idQuestion, requestIdUser, answersPage);
             return Ok(result);
         }
@@ -50,7 +50,7 @@ namespace Quanda.Server.Controllers
         [HttpGet("{idAnswer}/children")]
         public async Task<IActionResult> GetAnswerChildrenAsync(int idAnswer)
         {
-            var requestIdUser = HttpContext.Request.GetUserId();
+            var requestIdUser = HttpContext.User.GetId();
             var result = await _repository.GetAnswerChildrenAsync(idAnswer, requestIdUser);
             return Ok(result);
         }
@@ -63,7 +63,7 @@ namespace Quanda.Server.Controllers
         [HttpPost]
         public async Task<IActionResult> AddAnswer([FromBody] AddAnswerDTO answerDTO)
         {
-            var requestIdUser = HttpContext.Request.GetUserId();
+            var requestIdUser = HttpContext.User.GetId();
             var result = await _repository.AddAnswerAsync(answerDTO, requestIdUser);
             if (result == AnswerResult.QUESTION_DELETED || result == AnswerResult.USER_DELETED)
                 return BadRequest(result.ToString());
@@ -97,7 +97,7 @@ namespace Quanda.Server.Controllers
         [HttpDelete("{idAnswer}")]
         public async Task<IActionResult> DeleteAnswer(int idAnswer)
         {
-            var requestIdUser = HttpContext.Request.GetUserId();
+            var requestIdUser = HttpContext.User.GetId();
             var result = await _repository.DeleteAnswerAsync(idAnswer);
             if (result == AnswerResult.ANSWER_DELETED)
                 return NotFound(result.ToString());
@@ -115,7 +115,7 @@ namespace Quanda.Server.Controllers
         [HttpPost("{idAnswer}/rating")]
         public async Task<IActionResult> UpdateRatingAnswer(int idAnswer, [FromBody] UpdateRatingAnswerDTO updateRatingAnswer)
         {
-            var requestIdUser = HttpContext.Request.GetUserId();
+            var requestIdUser = HttpContext.User.GetId();
             var result = await _repository.UpdateRatingAnswerAsync(idAnswer, requestIdUser, updateRatingAnswer);
             if (result == AnswerResult.ANSWER_DELETED || result == AnswerResult.USER_DELETED)
                 return BadRequest(result.ToString());

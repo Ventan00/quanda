@@ -14,6 +14,7 @@ using Quanda.Server.Repositories.Interfaces;
 using Quanda.Server.Services.Implementations;
 using Quanda.Server.Services.Interfaces;
 using System;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -64,8 +65,7 @@ namespace Quanda.Server
                     {
                         try
                         {
-                            tokenValidatedContext.HttpContext.Request
-                                .SetUserId(tokenValidatedContext.Principal);
+                            tokenValidatedContext.HttpContext.User = tokenValidatedContext.Principal ?? throw new InvalidOperationException();
                         }
                         catch
                         {

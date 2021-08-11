@@ -68,7 +68,7 @@ namespace Quanda.Server.Controllers
         [HttpGet("{idQuestion}")]
         public async Task<IActionResult> GetQuestion([FromRoute] int idQuestion)
         {
-            var requestIdUser = HttpContext.Request.GetUserId();
+            var requestIdUser = HttpContext.User.GetId();
             var question = await _repository.GetQuestion(idQuestion, requestIdUser);
             return question != null ? Ok(question) : NotFound();
         }
