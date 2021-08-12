@@ -1,10 +1,10 @@
-﻿@inherits LayoutComponentBase
-@using Quanda.Client.Authentication
+﻿@using Quanda.Client.Authentication
+@inherits LayoutComponentBase
 @inject IAuthenticationService _authenticationService
 @inject NavigationManager _navManager
 @inject IToastService _toastService
 <div>
-    <img class="logo" aria-hidden="true" src="img/logo_lightbg_wthtext.svg" />
+    <img class="logo" aria-hidden="true" src="img/logo_lightbg_wthtext.svg"/>
 </div>
 <NavLink href="" Match="NavLinkMatch.All" class="side-menu-item">
     <div class="quanda-icon icon-home" aria-hidden="true"></div>
@@ -34,7 +34,7 @@
     </NotAuthorized>
 </AuthorizeView>
 
-<DarkModeSwitcherComponent EventCallback="HandleThemeChange" />
+<DarkModeSwitcherComponent EventCallback="HandleThemeChange"/>
 
 @code {
 

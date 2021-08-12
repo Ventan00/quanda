@@ -4,8 +4,8 @@
 
 <div class="search-bar-container">
     <div class="bar-content">
-        <img src="img/magnifing-glass.svg" />
-        <input type="text" class="search-bar" placeholder="Search..." />
+        <img src="img/magnifing-glass.svg"/>
+        <input type="text" class="search-bar" placeholder="Search..."/>
     </div>
 </div>
 <AuthorizeView>
@@ -27,9 +27,9 @@
                 Ask question
             </div>
         </NavLink>
-        <div class="icon icon-mail" />
-        <div class="icon icon-notification" />
-        <img src="@Avatar" class="profile-logo" />
+        <div class="icon icon-mail"/>
+        <div class="icon icon-notification"/>
+        <img src="@Avatar" class="profile-logo"/>
     </Authorized>
 </AuthorizeView>
 
@@ -51,13 +51,12 @@
 
     private void MyListener(object? sender, LocationChangedEventArgs e)
     {
-        Console.WriteLine("called: "+sender.ToString()+" ; "+e.IsNavigationIntercepted );
-        base.InvokeAsync(async () =>
+        Console.WriteLine("called: " + sender + " ; " + e.IsNavigationIntercepted);
+        InvokeAsync(async () =>
         {
             Avatar = await _localStorageService.GetItemAsync<string>("avatar");
             StateHasChanged();
         });
-
     }
 
 }

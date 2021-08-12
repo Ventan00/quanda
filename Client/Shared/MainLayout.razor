@@ -9,7 +9,7 @@
 </div>
 <div class="page @(isWhiteTheme ? "light-mode" : "dark-mode")">
     <div class="topbar @(isWhiteTheme ? "light-mode" : "dark-mode")">
-        <TopBarComponent />
+        <TopBarComponent/>
     </div>
     <div class="page-content">
         <div class="main-page">
@@ -34,7 +34,7 @@
     /// </summary>
     public bool isWhiteTheme = true;
 
-    protected async override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
         _interceptorService.RegisterEvents();
     }

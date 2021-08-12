@@ -1,6 +1,7 @@
 ﻿.background {
     background-color: #54656E;
     border-radius: 19px;
+    cursor: pointer;
     display: flex;
     height: 37px;
     margin-bottom: 20px;
@@ -9,7 +10,6 @@
     margin-top: auto;
     padding: 4px;
     width: 75px;
-    cursor: pointer;
 }
 
 .toggle {
