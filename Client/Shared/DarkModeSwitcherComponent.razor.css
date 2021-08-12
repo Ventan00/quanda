@@ -9,6 +9,7 @@
     margin-top: auto;
     padding: 4px;
     width: 75px;
+    cursor: pointer;
 }
 
 .toggle {

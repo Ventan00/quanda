@@ -61,7 +61,7 @@
         {
             case LoginStatusEnum.LOGIN_ACCEPTED:
                 _toastService.ShowSuccess("You have logged in.");
-                await _localStorageService.SetItemAsStringAsync("avatar", loginResponseDto.Avatar);
+                await _localStorageService.SetItemAsync("avatar", loginResponseDto.Avatar);
                 _navManager.NavigateTo("");
                 return;
             case LoginStatusEnum.INVALID_CREDENTIALS:

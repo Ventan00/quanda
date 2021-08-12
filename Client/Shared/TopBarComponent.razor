@@ -1,9 +1,11 @@
 ﻿@using Blazored.LocalStorage
 @inject ILocalStorageService _localStorageService
-<div class="search-bar-container @(isWhiteTheme ? "" : "search-bar-container-dark")">
-    <div class="bar-content @(isWhiteTheme ? "" : "bar-content-dark")">
-        <img src="img/magnifing-glass.svg"/>
-        <input type="text" class="search-bar @(isWhiteTheme ? "" : "search-bar-dark")" placeholder="Search..."/>
+@inject NavigationManager _navManager
+
+<div class="search-bar-container">
+    <div class="bar-content">
+        <img src="img/magnifing-glass.svg" />
+        <input type="text" class="search-bar" placeholder="Search..." />
     </div>
 </div>
 <AuthorizeView>
@@ -25,31 +27,37 @@
                 Ask question
             </div>
         </NavLink>
-        <div class="icon icon-mail @(isWhiteTheme ? "" : "icon-dark")"/>
-        <div class="icon icon-notification @(isWhiteTheme ? "" : "icon-dark")"/>
-        <img src="@Avatar" class="profile-logo"/>
-
+        <div class="icon icon-mail" />
+        <div class="icon icon-notification" />
+        <img src="@Avatar" class="profile-logo" />
     </Authorized>
 </AuthorizeView>
 
 
 @code {
 
-    /// <summary>
-    ///     Zmienna informująca jaki jest aktualny theme
-    /// </summary>
-    [CascadingParameter]
-    protected bool isWhiteTheme { get; set; }
 
     /// <summary>
     ///     Zmienna przechowująca Awatar
     /// </summary>
     private string Avatar;
 
-
     protected override async Task OnInitializedAsync()
     {
         Avatar = await _localStorageService.GetItemAsync<string>("avatar");
+        _navManager.LocationChanged += MyListener;
+        Console.WriteLine("IA:" + Avatar);
+    }
+
+    private void MyListener(object? sender, LocationChangedEventArgs e)
+    {
+        Console.WriteLine("called: "+sender.ToString()+" ; "+e.IsNavigationIntercepted );
+        base.InvokeAsync(async () =>
+        {
+            Avatar = await _localStorageService.GetItemAsync<string>("avatar");
+            StateHasChanged();
+        });
+
     }
 
 }

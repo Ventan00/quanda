@@ -15,16 +15,17 @@
 }
 
 .topbar {
-    background: white;
-    box-shadow: -3px -13px 15px 13px #ccc;
     display: flex;
     height: 90px;
     position: fixed;
     width: calc(100% - 90px);
     z-index: 2;
 }
-
-.topbar-dark {
+.light-mode .topbar {
+    background: white;
+    box-shadow: -3px -13px 15px 13px #ccc;
+}
+.dark-mode .topbar {
     background: #3F4D54;
     box-shadow: -3px -13px 15px 13px #333F44;
 }
@@ -33,8 +34,15 @@
     min-height: 100vh;
     padding-top: 90px;
     width: 100%;
+    display: flex;
 }
-
+.main-page {
+    display: block;
+    width: 100%;
+}
+.main-page-reduced {
+    width: calc(100% - 300px);
+}
 .page-footer {
     background-color: #3F4D54;
     height: 300px;
