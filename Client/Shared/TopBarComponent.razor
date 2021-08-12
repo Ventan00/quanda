@@ -46,12 +46,10 @@
     {
         Avatar = await _localStorageService.GetItemAsync<string>("avatar");
         _navManager.LocationChanged += MyListener;
-        Console.WriteLine("IA:" + Avatar);
     }
 
     private void MyListener(object? sender, LocationChangedEventArgs e)
     {
-        Console.WriteLine("called: " + sender + " ; " + e.IsNavigationIntercepted);
         InvokeAsync(async () =>
         {
             Avatar = await _localStorageService.GetItemAsync<string>("avatar");
