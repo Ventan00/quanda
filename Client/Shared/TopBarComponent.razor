@@ -48,6 +48,12 @@
         _navManager.LocationChanged += MyListener;
     }
 
+    /// <summary>
+    ///     Listnener który słucha na zmianę strony i ładuje zdjęcie z localstorage do shared komponentu po nastąpieniu takowej
+    ///     zmiany
+    /// </summary>
+    /// <param name="sender">byt który generuje zmianę strony</param>
+    /// <param name="e">argumenty zmiany strony</param>
     private void MyListener(object? sender, LocationChangedEventArgs e)
     {
         InvokeAsync(async () =>
