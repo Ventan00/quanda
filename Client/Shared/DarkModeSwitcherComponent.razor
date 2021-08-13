@@ -1,5 +1,6 @@
-﻿<div class="background">
-    <img class="@style toggle" src="img/@img" @onclick="changeMode"/>
+﻿@inherits LayoutComponentBase
+<div class="background" @onclick="changeMode">
+    <img class="@style toggle" src="img/@img"/>
 </div>
 
 @code {

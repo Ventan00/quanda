@@ -1,15 +1,9 @@
-﻿<div class="input-container @(!IsWhiteTheme ? "input-container-dark" : "")">
-    <InputText @bind-Value="Value" type="@Type" placeholder="@Placeholder" @oninput="OnInputValueChanged" />
+﻿<div class="input-container">
+    <InputText @bind-Value="Value" type="@Type" placeholder="@Placeholder" @oninput="OnInputValueChanged"/>
 </div>
 
 
 @code {
-
-    /// <summary>
-    ///     Zmienna informująca jaki jest aktualny theme
-    /// </summary>
-    [CascadingParameter]
-    public bool IsWhiteTheme { get; set; }
 
     /// <summary>
     ///     Zmienna zawierająca wartość pola input
