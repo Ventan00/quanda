@@ -6,7 +6,7 @@
     height: 57px;
     margin: 0.8rem 0;
     outline: none;
-    padding-left: 1.75rem;
+    padding: 0 1.75rem;
     width: 100%;
 }
 .light-mode ::deep input {
