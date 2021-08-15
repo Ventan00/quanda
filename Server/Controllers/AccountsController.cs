@@ -143,6 +143,7 @@ namespace Quanda.Server.Controllers
 
             response.RefreshToken = refreshToken;
             response.AccessToken = _jwtService.WriteToken(accessToken);
+            response.Avatar = user.Avatar;
             response.LoginStatus = LoginStatusEnum.LOGIN_ACCEPTED;
 
             return Ok(response);
