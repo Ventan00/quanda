@@ -9,7 +9,7 @@
                     @question.Header
                 </div>
                 <div class="question-date">
-                    @question.PublishDate.ToString("dd.MM.yyyy") @finished
+                    @question.PublishDate.ToString("dd.MM.yyyy") @finished @modified
                 </div>
             </div>
             <div class="question-tags">
@@ -68,6 +68,11 @@
     private string finished = string.Empty;
 
     /// <summary>
+    ///     Wyliczalny parametr mówiący czy pytanie jest zmodfikowane
+    /// </summary>
+    private string modified = string.Empty;
+
+    /// <summary>
     ///     Wyliczalny parametr który opisuje ściezkę do pytania
     /// </summary>
     private string questionURL = string.Empty;
@@ -88,6 +93,7 @@
         questionURL = $"questions/{question.IdQuestion}";
         userURL = $"users/{question.IdUser}";
         finished = question.IsFinished ? "#closed" : "";
+        modified = question.IsModified ? "#modified" : "";
     }
 
 }
