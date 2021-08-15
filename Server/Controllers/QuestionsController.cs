@@ -1,12 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Quanda.Server.Extensions;
 using Quanda.Server.Repositories.Interfaces;
 using Quanda.Server.Utils;
 using Quanda.Shared.DTOs.Requests;
 using Quanda.Shared.Enums;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Quanda.Server.Controllers
 {
@@ -47,16 +47,15 @@ namespace Quanda.Server.Controllers
         ///     Opcjonalna lista tagów służąca do filtracji pytań
         ///     po przez przypisane do nich tagi
         /// </param>
-        /// <returns>List(GetQuestionsDTO)</returns>
+        /// <returns>GetQuestionsDTO</returns>
         [HttpGet]
         public async Task<IActionResult> GetQuestions([FromQuery] int skip, [FromQuery] string sortOption,
-            [FromQuery] List<int> tags = null)
+            [FromQuery] List<int> tag = null)
         {
-            if (tags == null)
-                tags = new List<int>();
+            if (tag == null)
+                tag = new List<int>();
             var questions = await _repository.GetQuestions(skip,
-                (SortOptionEnum)Enum.Parse(typeof(SortOptionEnum), sortOption), tags);
-            questions.Reverse();
+                (SortOptionEnum) Enum.Parse(typeof(SortOptionEnum), sortOption), tag);
             return Ok(questions);
         }
 

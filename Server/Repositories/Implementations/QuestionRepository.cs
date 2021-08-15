@@ -1,4 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Quanda.Server.Data;
 using Quanda.Server.Repositories.Interfaces;
 using Quanda.Server.Utils;
@@ -7,10 +11,6 @@ using Quanda.Shared.DTOs.Requests;
 using Quanda.Shared.DTOs.Responses;
 using Quanda.Shared.Enums;
 using Quanda.Shared.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Quanda.Server.Repositories.Implementations
 {
@@ -24,85 +24,79 @@ namespace Quanda.Server.Repositories.Implementations
             _context = context;
         }
 
-        public async Task<List<GetQuestionsDTO>> GetQuestions(int skip, SortOptionEnum sortOption,
+        public async Task<GetQuestionsDTO> GetQuestions(int skip, SortOptionEnum sortOption,
             List<int>? tags)
         {
-            if (tags.Count == 0)
-                return sortOption switch
-                {
-                    SortOptionEnum.Views => await _context.Questions
-                        .Skip(skip)
-                        .Take(_takeAmount)
-                        .Select(question => new GetQuestionsDTO
-                        {
-                            IdQuestion = question.IdQuestion,
-                            AnswersCount = question.Answers.Count,
-                            Avatar = question.IdUserNavigation.Avatar,
-                            Tags = question.QuestionTags.Select(qt => qt.IdTagNavigation.Name).ToList(),
-                            Description = question.Description,
-                            Header = question.Header,
-                            IdUser = question.IdUser,
-                            IsFinished = question.IsFinished,
-                            IsModified = question.IsModified,
-                            Nickname = question.IdUserNavigation.Nickname,
-                            Views = question.Views,
-                            PublishDate = question.PublishDate
-                        })
-                        .ToListAsync(),
-                    SortOptionEnum.Answers => await _context.Questions
-                        .OrderBy(question => question.Answers.Count)
-                        .Skip(skip)
-                        .Take(_takeAmount)
-                        .Select(question => new GetQuestionsDTO
-                        {
-                            IdQuestion = question.IdQuestion,
-                            AnswersCount = question.Answers.Count,
-                            Avatar = question.IdUserNavigation.Avatar,
-                            Tags = question.QuestionTags.Select(qt => qt.IdTagNavigation.Name).ToList(),
-                            Description = question.Description,
-                            Header = question.Header,
-                            IdUser = question.IdUser,
-                            IsFinished = question.IsFinished,
-                            IsModified = question.IsModified,
-                            Nickname = question.IdUserNavigation.Nickname,
-                            Views = question.Views,
-                            PublishDate = question.PublishDate
-                        })
-                        .ToListAsync(),
-                    SortOptionEnum.Date => await _context.Questions
-                        .OrderBy(question => question.PublishDate)
-                        .Skip(skip)
-                        .Take(_takeAmount)
-                        .Select(question => new GetQuestionsDTO
-                        {
-                            IdQuestion = question.IdQuestion,
-                            AnswersCount = question.Answers.Count,
-                            Avatar = question.IdUserNavigation.Avatar,
-                            Tags = question.QuestionTags.Select(qt => qt.IdTagNavigation.Name).ToList(),
-                            Description = question.Description,
-                            Header = question.Header,
-                            IdUser = question.IdUser,
-                            IsFinished = question.IsFinished,
-                            IsModified = question.IsModified,
-                            Nickname = question.IdUserNavigation.Nickname,
-                            Views = question.Views,
-                            PublishDate = question.PublishDate
-                        })
-                        .ToListAsync(),
-                    _ => null
-                };
-            return sortOption switch
+            var standardQuestionQuery = _context.Questions.AsQueryable();
+            var extraQuestionQuery = _context.Questions.AsQueryable();
+            int count;
+            if (tags.Count != 0)
             {
-                SortOptionEnum.Views => await _context.Questions
-                    .Where(
-                        question => _context.QuestionTags
-                            .Where(qt => qt.IdQuestion == question.IdQuestion)
-                            .Any(qt => tags.Any(tag => tag == qt.IdTag))
+                foreach (var tag in tags)
+                    standardQuestionQuery = standardQuestionQuery
+                        .Where(question => question.QuestionTags
+                            .Select(qt => qt.IdTag)
+                            .Contains(tag)
+                        );
+
+                var parentTags = await _context.Tags
+                    .Where(tag => tags.Contains(tag.IdTag) && tag.IdMainTag != null)
+                    .Select(tag => tag.IdMainTagNavigation.IdTag).ToListAsync();
+                tags.AddRange(parentTags);
+
+                extraQuestionQuery = extraQuestionQuery
+                    .Where(question => question.QuestionTags
+                        .Select(qt => qt.IdTag)
+                        .Any(qt => tags.Contains(qt))
                     )
-                    .OrderBy(question => question.Views)
-                    .Skip(skip)
-                    .Take(_takeAmount)
-                    .Select(question => new GetQuestionsDTO
+                    .OrderByDescending(question => question.QuestionTags
+                        .Count());
+            }
+
+            count = await standardQuestionQuery.CountAsync();
+            switch (sortOption)
+            {
+                case SortOptionEnum.Views:
+                    standardQuestionQuery = standardQuestionQuery.OrderByDescending(question => question.Views);
+                    extraQuestionQuery = extraQuestionQuery.OrderByDescending(question => question.Views);
+                    break;
+                case SortOptionEnum.Answers:
+                    standardQuestionQuery = standardQuestionQuery.OrderByDescending(question => question.Answers.Count);
+                    extraQuestionQuery = extraQuestionQuery.OrderByDescending(question => question.Answers.Count);
+                    break;
+                case SortOptionEnum.Date:
+                    standardQuestionQuery = standardQuestionQuery.OrderByDescending(question => question.PublishDate);
+                    extraQuestionQuery = extraQuestionQuery.OrderByDescending(question => question.PublishDate);
+                    break;
+            }
+
+            standardQuestionQuery = standardQuestionQuery.Skip(skip).Take(_takeAmount);
+            extraQuestionQuery = extraQuestionQuery.Skip(skip).Take(_takeAmount);
+
+            var standardQuestions = await standardQuestionQuery.Select(question => new QuestionGetQuestionsDTO
+            {
+                IdQuestion = question.IdQuestion,
+                AnswersCount = question.Answers.Count,
+                Avatar = question.IdUserNavigation.Avatar,
+                Tags = question.QuestionTags.Select(qt => qt.IdTagNavigation.Name).ToList(),
+                Description = question.Description,
+                Header = question.Header,
+                IdUser = question.IdUser,
+                IsFinished = question.IsFinished,
+                IsModified = question.IsModified,
+                Nickname = question.IdUserNavigation.Nickname,
+                Views = question.Views,
+                PublishDate = question.PublishDate
+            }).ToListAsync();
+            return new GetQuestionsDTO
+            {
+                StandardQuestions = standardQuestions,
+                ExtraQuestions = await extraQuestionQuery
+                    .Where(question => !standardQuestions
+                        .Select(sq => sq.IdQuestion)
+                        .Contains(question.IdQuestion)
+                    )
+                    .Select(question => new QuestionGetQuestionsDTO
                     {
                         IdQuestion = question.IdQuestion,
                         AnswersCount = question.Answers.Count,
@@ -118,57 +112,7 @@ namespace Quanda.Server.Repositories.Implementations
                         PublishDate = question.PublishDate
                     })
                     .ToListAsync(),
-                SortOptionEnum.Answers => await _context.Questions
-                    .Where(
-                        question => _context.QuestionTags
-                            .Where(qt => qt.IdQuestion == question.IdQuestion)
-                            .Any(qt => tags.Any(tag => tag == qt.IdTag))
-                    )
-                    .OrderBy(question => question.Answers.Count)
-                    .Skip(skip)
-                    .Take(_takeAmount)
-                    .Select(question => new GetQuestionsDTO
-                    {
-                        IdQuestion = question.IdQuestion,
-                        AnswersCount = question.Answers.Count,
-                        Avatar = question.IdUserNavigation.Avatar,
-                        Tags = question.QuestionTags.Select(qt => qt.IdTagNavigation.Name).ToList(),
-                        Description = question.Description,
-                        Header = question.Header,
-                        IdUser = question.IdUser,
-                        IsFinished = question.IsFinished,
-                        IsModified = question.IsModified,
-                        Nickname = question.IdUserNavigation.Nickname,
-                        Views = question.Views,
-                        PublishDate = question.PublishDate
-                    })
-                    .ToListAsync(),
-                SortOptionEnum.Date => await _context.Questions
-                    .Where(
-                        question => _context.QuestionTags
-                            .Where(qt => qt.IdQuestion == question.IdQuestion)
-                            .Any(qt => tags.Any(tag => tag == qt.IdTag))
-                    )
-                    .OrderBy(question => question.PublishDate)
-                    .Skip(skip)
-                    .Take(_takeAmount)
-                    .Select(question => new GetQuestionsDTO
-                    {
-                        IdQuestion = question.IdQuestion,
-                        AnswersCount = question.Answers.Count,
-                        Avatar = question.IdUserNavigation.Avatar,
-                        Tags = question.QuestionTags.Select(qt => qt.IdTagNavigation.Name).ToList(),
-                        Description = question.Description,
-                        Header = question.Header,
-                        IdUser = question.IdUser,
-                        IsFinished = question.IsFinished,
-                        IsModified = question.IsModified,
-                        Nickname = question.IdUserNavigation.Nickname,
-                        Views = question.Views,
-                        PublishDate = question.PublishDate
-                    })
-                    .ToListAsync(),
-                _ => null
+                QuestionsCount = count
             };
         }
 
@@ -176,89 +120,92 @@ namespace Quanda.Server.Repositories.Implementations
         {
             QuestionResponseDTO question;
             if (idUserLogged == null)
-            {
-                question = await _context.Questions.Where(question => question.IdQuestion == idQuestion).Select(q => new QuestionResponseDTO
-                {
-                    Header = q.Header,
-                    Description = q.Description,
-                    PublishDate = q.PublishDate,
-                    Views = q.Views,
-                    IsFinished = q.IsFinished,
-                    IsModified = q.IsModified,
-                    User = new UserResponseDTO
+                question = await _context.Questions.Where(question => question.IdQuestion == idQuestion).Select(q =>
+                    new QuestionResponseDTO
                     {
-                        IdUser = q.IdUser,
-                        Nickname = q.IdUserNavigation.Nickname,
-                        Avatar = q.IdUserNavigation.Avatar
-                    },
-                    AnswersCount = q.Answers.Count,
-                    Tags = q.QuestionTags.Select(qc => new TagResponseDTO
-                    {
-                        IdTag = qc.IdTagNavigation.IdTag,
-                        Name = qc.IdTagNavigation.Name
-                    }).ToList(),
-                    Answers = q.Answers.Where(a => a.IdRootAnswer == null).Select(a => new AnswerResponseDTO
-                    {
-                        IdAnswer = 0,
-                        Text = "We invite you to create an account.",
-                        Rating = a.RatingAnswers.Select(ra => new { ValueAns = ra.Value == false ? -1 : 1 }).Sum(r => r.ValueAns),
-                        IsModified = a.IsModified,
+                        Header = q.Header,
+                        Description = q.Description,
+                        PublishDate = q.PublishDate,
+                        Views = q.Views,
+                        IsFinished = q.IsFinished,
+                        IsModified = q.IsModified,
                         User = new UserResponseDTO
                         {
-                            Nickname = a.IdUserNavigation.Nickname,
-                            Avatar = a.IdUserNavigation.Avatar
+                            IdUser = q.IdUser,
+                            Nickname = q.IdUserNavigation.Nickname,
+                            Avatar = q.IdUserNavigation.Avatar
                         },
-                        AnswerChildren = new List<AnswerResponseDTO>(),
-                        IsLiked = a.RatingAnswers.Any(ra => ra.IdUser == idUserLogged) == false ? 0 : a.RatingAnswers.SingleOrDefault(ra => ra.IdUser == idUserLogged).Value ? 1 : -1
-                    }).OrderByDescending(a => a.Rating).ThenBy(a => a.IdAnswer).ToList()
-                }).SingleOrDefaultAsync();
-            }
+                        AnswersCount = q.Answers.Count,
+                        Tags = q.QuestionTags.Select(qc => new TagResponseDTO
+                        {
+                            IdTag = qc.IdTagNavigation.IdTag,
+                            Name = qc.IdTagNavigation.Name
+                        }).ToList(),
+                        Answers = q.Answers.Where(a => a.IdRootAnswer == null).Select(a => new AnswerResponseDTO
+                        {
+                            IdAnswer = 0,
+                            Text = "We invite you to create an account.",
+                            Rating = a.RatingAnswers.Select(ra => new {ValueAns = ra.Value == false ? -1 : 1})
+                                .Sum(r => r.ValueAns),
+                            IsModified = a.IsModified,
+                            User = new UserResponseDTO
+                            {
+                                Nickname = a.IdUserNavigation.Nickname,
+                                Avatar = a.IdUserNavigation.Avatar
+                            },
+                            AnswerChildren = new List<AnswerResponseDTO>(),
+                            IsLiked = a.RatingAnswers.Any(ra => ra.IdUser == idUserLogged) == false ? 0 :
+                                a.RatingAnswers.SingleOrDefault(ra => ra.IdUser == idUserLogged).Value ? 1 : -1
+                        }).OrderByDescending(a => a.Rating).ThenBy(a => a.IdAnswer).ToList()
+                    }).SingleOrDefaultAsync();
             else
-            {
-                question = await _context.Questions.Where(question => question.IdQuestion == idQuestion).Select(q => new QuestionResponseDTO
-                {
-                    IdQuestion = q.IdQuestion,
-                    Header = q.Header,
-                    Description = q.Description,
-                    PublishDate = q.PublishDate,
-                    Views = q.Views,
-                    IsFinished = q.IsFinished,
-                    IsModified = q.IsModified,
-                    User = new UserResponseDTO
+                question = await _context.Questions.Where(question => question.IdQuestion == idQuestion).Select(q =>
+                    new QuestionResponseDTO
                     {
-                        IdUser = q.IdUser,
-                        Nickname = q.IdUserNavigation.Nickname,
-                        Avatar = q.IdUserNavigation.Avatar
-                    },
-                    AnswersCount = q.Answers.Count,
-                    Tags = q.QuestionTags.Select(qc => new TagResponseDTO
-                    {
-                        IdTag = qc.IdTagNavigation.IdTag,
-                        Name = qc.IdTagNavigation.Name
-                    }).ToList(),
-                    Answers = q.Answers.Where(a => a.IdRootAnswer == null).Select(a => new AnswerResponseDTO
-                    {
-                        IdAnswer = a.IdAnswer,
-                        Text = a.Text,
-                        Rating = a.RatingAnswers.Select(ra => new { ValueAns = ra.Value == false ? -1 : 1 }).Sum(r => r.ValueAns),
-                        IsModified = a.IsModified,
+                        IdQuestion = q.IdQuestion,
+                        Header = q.Header,
+                        Description = q.Description,
+                        PublishDate = q.PublishDate,
+                        Views = q.Views,
+                        IsFinished = q.IsFinished,
+                        IsModified = q.IsModified,
                         User = new UserResponseDTO
                         {
-                            IdUser = a.IdUserNavigation.IdUser,
-                            Nickname = a.IdUserNavigation.Nickname,
-                            Avatar = a.IdUserNavigation.Avatar
+                            IdUser = q.IdUser,
+                            Nickname = q.IdUserNavigation.Nickname,
+                            Avatar = q.IdUserNavigation.Avatar
                         },
-                        IdRootAnswer = a.IdRootAnswer,
-                        AnswerChildren = new List<AnswerResponseDTO>(),
-                        IsLiked = a.RatingAnswers.Any(ra => ra.IdUser == idUserLogged) == false ? 0 : a.RatingAnswers.SingleOrDefault(ra => ra.IdUser == idUserLogged).Value ? 1 : -1,
-                        AmountOfAnswerChildren = a.InverseIdRootAnswersNavigation.Count
-                    }).OrderByDescending(a => a.Rating).ThenBy(a => a.IdAnswer).ToList()
-                }).SingleOrDefaultAsync();
-            }
+                        AnswersCount = q.Answers.Count,
+                        Tags = q.QuestionTags.Select(qc => new TagResponseDTO
+                        {
+                            IdTag = qc.IdTagNavigation.IdTag,
+                            Name = qc.IdTagNavigation.Name
+                        }).ToList(),
+                        Answers = q.Answers.Where(a => a.IdRootAnswer == null).Select(a => new AnswerResponseDTO
+                        {
+                            IdAnswer = a.IdAnswer,
+                            Text = a.Text,
+                            Rating = a.RatingAnswers.Select(ra => new {ValueAns = ra.Value == false ? -1 : 1})
+                                .Sum(r => r.ValueAns),
+                            IsModified = a.IsModified,
+                            User = new UserResponseDTO
+                            {
+                                IdUser = a.IdUserNavigation.IdUser,
+                                Nickname = a.IdUserNavigation.Nickname,
+                                Avatar = a.IdUserNavigation.Avatar
+                            },
+                            IdRootAnswer = a.IdRootAnswer,
+                            AnswerChildren = new List<AnswerResponseDTO>(),
+                            IsLiked = a.RatingAnswers.Any(ra => ra.IdUser == idUserLogged) == false ? 0 :
+                                a.RatingAnswers.SingleOrDefault(ra => ra.IdUser == idUserLogged).Value ? 1 : -1,
+                            AmountOfAnswerChildren = a.InverseIdRootAnswersNavigation.Count
+                        }).OrderByDescending(a => a.Rating).ThenBy(a => a.IdAnswer).ToList()
+                    }).SingleOrDefaultAsync();
 
             if (question != null)
             {
-                question.Answers = question.Answers.Skip(0).Take(idUserLogged != null ? Config.ANSWERS_PAGE_SIZE : 1).ToList();
+                question.Answers = question.Answers.Skip(0).Take(idUserLogged != null ? Config.ANSWERS_PAGE_SIZE : 1)
+                    .ToList();
                 question.Views++;
                 var questionUpd = new Question
                 {
@@ -294,7 +241,8 @@ namespace Quanda.Server.Repositories.Implementations
 
         public async Task<QuestionStatusResult> UpdateQuestion(int questionId, UpdateQuestionDTO question)
         {
-            var Question = await _context.Questions.Where(question => question.IdQuestion == questionId).SingleOrDefaultAsync();
+            var Question = await _context.Questions.Where(question => question.IdQuestion == questionId)
+                .SingleOrDefaultAsync();
             if (Question == null) return QuestionStatusResult.QUESTION_NOT_FOUND;
             Question.Description = question.Description;
             Question.IsModified = true;
@@ -305,7 +253,8 @@ namespace Quanda.Server.Repositories.Implementations
 
         public async Task<QuestionStatusResult> RemoveQuestion(int questionId)
         {
-            var Question = await _context.Questions.Where(question => question.IdQuestion == questionId).SingleOrDefaultAsync();
+            var Question = await _context.Questions.Where(question => question.IdQuestion == questionId)
+                .SingleOrDefaultAsync();
             if (Question == null) return QuestionStatusResult.QUESTION_NOT_FOUND;
             _context.Remove(Question);
 
@@ -316,7 +265,8 @@ namespace Quanda.Server.Repositories.Implementations
 
         public async Task<QuestionStatusResult> SetToCheck(int questionId, bool value)
         {
-            var Question = await _context.Questions.Where(question => question.IdQuestion == questionId).SingleOrDefaultAsync();
+            var Question = await _context.Questions.Where(question => question.IdQuestion == questionId)
+                .SingleOrDefaultAsync();
             if (Question == null) return QuestionStatusResult.QUESTION_NOT_FOUND;
             Question.ToCheck = value;
             ;
@@ -327,7 +277,8 @@ namespace Quanda.Server.Repositories.Implementations
 
         public async Task<QuestionStatusResult> SetFinished(int questionId)
         {
-            var Question = await _context.Questions.Where(question => question.IdQuestion == questionId).SingleOrDefaultAsync();
+            var Question = await _context.Questions.Where(question => question.IdQuestion == questionId)
+                .SingleOrDefaultAsync();
             if (Question == null) return QuestionStatusResult.QUESTION_NOT_FOUND;
             Question.IsFinished = true;
             return await _context.SaveChangesAsync() == 1
