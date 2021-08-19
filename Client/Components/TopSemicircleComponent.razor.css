@@ -2,9 +2,12 @@
     height: 160px;
     overflow: hidden;
     position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-    .img-container img {
+    .img-container .img-background {
         height: 250px;
         left: -90px;
         object-fit: cover;
@@ -12,4 +15,11 @@
         position: absolute;
         top: -90px;
         width: calc(100% + 270px);
+        z-index: 0;
+    }
+
+    .img-container .img-logo {
+        width: 66px;
+        height: 66px;
+        z-index: 1;
     }
