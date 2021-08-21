@@ -1,11 +1,11 @@
-﻿using Quanda.Client.Helpers;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Quanda.Client.Helpers;
 using Quanda.Client.Repositories.Interfaces;
 using Quanda.Shared;
 using Quanda.Shared.DTOs.Responses;
 using Quanda.Shared.Enums;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Quanda.Client.Repositories.Implementations
 {
@@ -36,11 +36,11 @@ namespace Quanda.Client.Repositories.Implementations
             return response.Response;
         }
 
-        public async Task<List<GetQuestionsDTO>> GetQuestions(int page, SortOptionEnum sortingBy, List<int> tags)
+        public async Task<GetQuestionsDTO> GetQuestions(int page, SortOptionEnum sortingBy, List<int> tags)
         {
             var url = $"{ApiUrl}?skip={page * _skipAmount}&sortOption={Enum.GetName(sortingBy)}";
             if (tags.Count != 0) url += $"&tag={string.Join("&tag=", tags)}";
-            var response = await _httpService.Get<List<GetQuestionsDTO>>(url);
+            var response = await _httpService.Get<GetQuestionsDTO>(url);
 
             return response.Response;
         }

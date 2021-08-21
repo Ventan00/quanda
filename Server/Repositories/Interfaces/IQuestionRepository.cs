@@ -1,9 +1,9 @@
-﻿using Quanda.Server.Utils;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Quanda.Server.Utils;
 using Quanda.Shared.DTOs.Requests;
 using Quanda.Shared.DTOs.Responses;
 using Quanda.Shared.Enums;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Quanda.Server.Repositories.Interfaces
 {
@@ -27,14 +27,17 @@ namespace Quanda.Server.Repositories.Interfaces
         ///     Opcjonalna lista tagów służąca do filtracji pytań
         ///     po przez przypisane do nich kategorie
         /// </param>
-        /// <returns>List(GetQuestionsDTO)</returns>
-        Task<List<GetQuestionsDTO>> GetQuestions(int skip, SortOptionEnum sortOption, List<int>? tags);
+        /// <returns>GetQuestionsDTO</returns>
+        Task<GetQuestionsDTO> GetQuestions(int skip, SortOptionEnum sortOption, List<int>? tags);
 
         /// <summary>
         ///     Końcówka która zwraca Question o podanym idQuestion z listą odpowiedzi z zakresu ANSWERS_PAGE_SIZE.
         /// </summary>
         /// <param name="idQuestion">ID pytania w BD</param>
-        /// <param name="idUserLogged">Id użytkownika przeglądającego pytanie. Używane w celu wyznaczenia informacji o głosach oddanych na odpowiedzi.</param>
+        /// <param name="idUserLogged">
+        ///     Id użytkownika przeglądającego pytanie. Używane w celu wyznaczenia informacji o głosach
+        ///     oddanych na odpowiedzi.
+        /// </param>
         /// <returns>QuestionResponseDTO</returns>
         Task<QuestionResponseDTO> GetQuestion(int idQuestion, int? idUserLogged);
 

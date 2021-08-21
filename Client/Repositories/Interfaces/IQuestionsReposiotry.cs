@@ -1,7 +1,7 @@
-﻿using Quanda.Shared.DTOs.Responses;
-using Quanda.Shared.Enums;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Quanda.Shared.DTOs.Responses;
+using Quanda.Shared.Enums;
 
 namespace Quanda.Client.Repositories.Interfaces
 {
@@ -17,8 +17,8 @@ namespace Quanda.Client.Repositories.Interfaces
         /// <param name="page">Strona którą ma zwrócić repozytorium</param>
         /// <param name="sortingBy">Typ sortowania pytań</param>
         /// <param name="tags">Wybrane tagi pytań</param>
-        /// <returns>List(GetQuestionsDTO)</returns>
-        public Task<List<GetQuestionsDTO>> GetQuestions(int page, SortOptionEnum sortingBy, List<int> tags);
+        /// <returns>GetQuestionsDTO</returns>
+        public Task<GetQuestionsDTO> GetQuestions(int page, SortOptionEnum sortingBy, List<int> tags);
 
         /// <summary>
         ///     Zwraca liczbę pytań w które są danych kategorii

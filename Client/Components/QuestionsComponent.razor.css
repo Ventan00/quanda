@@ -1,0 +1,59 @@
+﻿.questions {
+    padding: 50px 0 50px 100px;
+    width: calc(100% - 400px);
+}
+
+.right-menu {
+    height: 100%;
+    position: fixed;
+    right: 0;
+    top: 90px;
+    width: 400px;
+}
+
+.sorting-button {
+    border-radius: 33px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-left: 5px;
+    margin-right: 0;
+    padding: 4px 25px;
+}
+
+.dark-mode .sorting-button {
+    background-color: #3F4D54;
+    color: white;
+}
+
+.light-mode .sorting-button {
+    background-color: white;
+    color: #292F36;
+}
+
+.sorting-buttons-containter {
+    display: flex;
+    padding-bottom: 10px;
+    padding-right: 5px;
+}
+
+.soring-label {
+    font-size: 13px;
+    margin-bottom: auto;
+    margin-left: auto;
+    margin-top: auto;
+}
+
+.light-mode .soring-label { color: #878787; }
+
+.sorting-active {
+    background-image: linear-gradient(75deg, rgba(251, 228, 138, 1) 0%, rgba(247, 217, 100, 1) 26.4%, rgba(240, 135, 130, 1) 70.3%, rgba(237, 116, 110, 1) 100%) !important;
+    color: white !important;
+    font-weight: bold;
+}
+
+.pagination-component {
+    margin-left: auto;
+    margin-right: 0;
+}
+
+.notbold { font-weight: initial; }

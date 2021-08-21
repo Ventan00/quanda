@@ -9,43 +9,45 @@
                     @question.Header
                 </div>
                 <div class="question-date">
-                    @question.PublishDate.ToString("dd-MM-yyyy") @finished
+                    @question.PublishDate.ToString("dd.MM.yyyy") @finished @modified
                 </div>
             </div>
-            <div class="question-categories">
-                <div class="question-category-label">
-                    Categories:
+            <div class="question-tags">
+                <div class="question-tags-label">
+                    tags:
                 </div>
-                <div class="question-categories-containter">
-                    @foreach (var category in question.Tags)
-                    {
-                        <div class="question-category">
-                            @category
-                        </div>
-                    }
-                </div>
+                @foreach (var tag in question.Tags)
+                {
+                    <div class="question-tag">
+                        #@tag
+                    </div>
+                }
             </div>
+            <div class="question-separator" />
             <div class="question-description">
                 @description
             </div>
+            <div class="question-separator" />
             <div class="question-footer">
-                <a href="@userURL">
+                <a href="@userURL" class="user-profile">
                     <div class="question-user-info">
                         <div class="question-user-image">
-                            <img src="@question.Avatar"/>
+                            <img src="@question.Avatar" />
                         </div>
                         <div class="question-user-nick">
                             @question.Nickname
                         </div>
                     </div>
                 </a>
-                <div class="question-user-views">
-                    <div class="question-user-views-text">Views: </div>
-                    <div class="question-user-views-value">@question.Views</div>
-                </div>
-                <div class="question-user-answers">
-                    <div class="question-user-answers-text">Answers: </div>
-                    <div class="question-user-answers-value">@question.AnswersCount</div>
+                <div class="question-details">
+                    <div class="question-user-views">
+                        <div class="question-user-views-text">Views: </div>
+                        <div class="question-user-views-value">@question.Views</div>
+                    </div>
+                    <div class="question-user-answers">
+                        <div class="question-user-answers-text">Answers: </div>
+                        <div class="question-user-answers-value">@question.AnswersCount</div>
+                    </div>
                 </div>
             </div>
         </a>
@@ -58,12 +60,17 @@
     ///     Parametr opisujący pytanie
     /// </summary>
     [Parameter]
-    public GetQuestionsDTO question { get; set; }
+    public QuestionGetQuestionsDTO question { get; set; }
 
     /// <summary>
     ///     Wyliczalny parametr mówiący czy pytanie jest zakończone
     /// </summary>
     private string finished = string.Empty;
+
+    /// <summary>
+    ///     Wyliczalny parametr mówiący czy pytanie jest zmodfikowane
+    /// </summary>
+    private string modified = string.Empty;
 
     /// <summary>
     ///     Wyliczalny parametr który opisuje ściezkę do pytania
@@ -86,6 +93,7 @@
         questionURL = $"questions/{question.IdQuestion}";
         userURL = $"users/{question.IdUser}";
         finished = question.IsFinished ? "#closed" : "";
+        modified = question.IsModified ? "#modified" : "";
     }
 
 }
