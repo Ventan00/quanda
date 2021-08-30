@@ -1,21 +1,22 @@
 ﻿@page "/login"
 
-
-<TopSemicircleComponent />
-<div class="center-container">
-    <h1 class="title">Log in</h1>
-    <LoginFormComponent />
-    <div class="line">
-        <span class="line-text">OR</span>
+<AuthenticationPageDisplay>
+    <TopSemicircleComponent />
+    <div class="center-container">
+        <h1 class="title">Log in</h1>
+        <LoginFormComponent />
+        <div class="line">
+            <span class="line-text">OR</span>
+        </div>
+        <ExternalServicesComponent FacebookText="Log in with Facebook" GoogleText="Log in with Google" />
+        <div>
+            <p class="bottom-text">Don't have an account?</p>
+            <NavLink href="/register">
+                <p class="bottom-link">Sign up!</p>
+            </NavLink>
+        </div>
     </div>
-    <ExternalServicesComponent FacebookText="Log in with Facebook" GoogleText="Log in with Google" />
-    <div>
-        <p class="bottom-text">Don't have an account?</p>
-        <NavLink href="/register">
-            <p class="bottom-link">Sign up!</p>
-        </NavLink>
-    </div>
-</div>
+</AuthenticationPageDisplay>
 
 @code {
 
