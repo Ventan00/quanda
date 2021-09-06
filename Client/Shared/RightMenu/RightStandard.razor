@@ -1,0 +1,54 @@
+﻿@inject IUsersRepository _usersRepository
+<div class="box">
+    <h4>About</h4>
+    <p>
+        Do you ever find yourself in need of some information but don't know where to find it?
+        Quanda is the answer.
+        Quanda is a questions and answers page for information exchange.
+        It allows you to ask questions and other to answer it.
+        Main purpose of page is to share knowlege.
+        It's a place where you can share your questions and get answers.
+    </p>
+</div>
+<div class="box">
+    <h4>Top 3 users</h4>
+    @if (Top3Users != null)
+    {
+        @foreach (var user in Top3Users.Select((value, index) => new { index, value }))
+        {
+            <a class="user-container" href="users/@user.value.IdUser">
+                <div class="icon-cup user-icon @($"user-icon{user.index}")"></div>
+                <img class="top3avatar" src="@user.value.Avatar" />
+                <b class="usernick">@user.value.Nickname</b>
+                <div class="userpoints"> - @user.value.Points points</div>
+            </a>
+            if (user.index != 2)
+            {
+                <div class="user-separator"></div>
+            }
+        }
+    }
+    else
+    {
+        <LoadingIndicatorComponent/>
+    }
+</div>
+<div class="premium-box box">
+    <h4>Dont't like limits?</h4>
+    <i>Unlock your potential with limitless access to knowledge.</i>
+    <div class="premium-scope">
+        <div class="icon-check icon-premium"></div>
+        <b>Ask as many questions a day as you want!</b>
+    </div>
+    <div class="premium-scope">
+        <div class="icon-check icon-premium"></div>
+        <div>Got into doubt? Ask a user about it in a private message!</div>
+    </div>
+    <div class="premium-scope">
+        <div class="icon-check icon-premium"></div>
+        <b>Annoyed by ads? Get rid of them!</b>
+    </div>
+    <a class="premium-button">
+        Buy premium
+    </a>
+</div>

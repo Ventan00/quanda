@@ -7,8 +7,11 @@ using Quanda.Server.Utils;
 using Quanda.Shared.DTOs.Requests;
 using Quanda.Shared.Models;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Quanda.Shared.DTOs.Responses;
 using static Quanda.Server.Utils.UserStatus;
 
 namespace Quanda.Server.Repositories.Implementations
@@ -93,6 +96,22 @@ namespace Quanda.Server.Repositories.Implementations
         public async Task<User> GetUserByEmailAsync(string email)
         {
             return await GetUserWithDetailsByAsync(u => u.Email == email);
+        }
+
+        public async Task<List<Top3UserResponseDTO>> GetTop3Users()
+        {
+            return await _context.TagUsers
+                .GroupBy(tag => tag.IdUser)
+                .OrderByDescending(tag => tag.Sum(t => t.Points))
+                .Take(3)
+                .Select(tag => new Top3UserResponseDTO()
+                {
+                    Avatar = _context.Users.Where(user => user.IdUser == tag.Key).First().Avatar,
+                    IdUser = tag.Key,
+                    Nickname = _context.Users.Where(user => user.IdUser == tag.Key).First().Nickname,
+                    Points = tag.Sum(t => t.Points)
+                })
+                .ToListAsync();
         }
 
         private async Task<User> GetUserWithDetailsByAsync(Expression<Func<User, bool>> predicate)

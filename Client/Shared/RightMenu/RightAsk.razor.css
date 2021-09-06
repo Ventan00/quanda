@@ -1,0 +1,7 @@
+﻿.box-link {
+    color: #007bff;
+    text-decoration: underline !important;
+}
+.box-link:hover {
+    color: #0050f0;
+}

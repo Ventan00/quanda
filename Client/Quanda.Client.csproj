@@ -19,6 +19,12 @@
   <ItemGroup>
     <ProjectReference Include="..\Shared\Quanda.Shared.csproj" />
   </ItemGroup>
+  <!-- Right menu components-->
+  <ItemGroup>
+    <None Update="Shared\RightMenu\RightShared.razor.css" CssScope="shared-right-menu" />
+    <None Update="Shared\RightMenu\RightStandard.razor.css" CssScope="shared-right-menu" />
+    <None Update="Shared\RightMenu\RightAsk.razor.css" CssScope="shared-right-menu" />
+  </ItemGroup>
 
   <ItemGroup>
     <ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />

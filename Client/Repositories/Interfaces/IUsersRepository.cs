@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 using Quanda.Shared.DTOs.Requests;
 using Quanda.Shared.DTOs.Responses;
@@ -42,5 +43,11 @@ namespace Quanda.Client.Repositories.Interfaces
         /// <param name="passwordResetDto"></param>
         /// <returns></returns>
         public Task<HttpStatusCode> ResetPasswordAsync(PasswordResetDTO passwordResetDto);
+
+        /// <summary>
+        ///     Funkcja która zwraca listę 3 użytkowników z największą ilością punktów
+        /// </summary>
+        /// <returns></returns>
+        public Task<List<Top3UserResponseDTO>> GetTop3Users();
     }
 }

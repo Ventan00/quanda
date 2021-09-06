@@ -1,0 +1,11 @@
+﻿<div class="right-shared @(RightMenuType==RightMenuType.NONE ? "right-hidden" : "")">
+    @switch (RightMenuType)
+    {
+        case RightMenuType.STANDARD:
+            <RightStandard />
+            break;
+        case RightMenuType.QUESTIONS:
+            <RightAsk />
+            break;
+    }
+</div>

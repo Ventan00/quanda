@@ -1,0 +1,67 @@
+﻿.right-shared {
+    width: 470px;
+    margin-top: 50px;
+    right: 0;
+}
+.right-hidden {
+    width: 0 !important;
+}
+
+.box {
+    margin-left: 50px;
+    padding: 30px;
+    width: 370px;
+    margin-bottom: 30px;
+    border-radius: 25px;
+    font-size: smaller;
+}
+
+.premium-box {
+    background-color: #F8EAB0 !important;
+    color: #3F4D54 !important;
+}
+
+.premium-box h4, .premium-box p {
+    background-color: #F8EAB0 !important;
+    color: #3F4D54 !important;
+    margin-bottom: 0;
+}
+
+.light-mode .box {
+    background-color: #FFF;
+    color: #3F4D54;
+}
+
+.dark-mode .box {
+    background-color: #3F4D54;
+    color: #FFF;
+}
+
+.premium-scope {
+    display: flex;
+    margin-top: 7px;
+}
+
+.icon-premium {
+    color: #E8C125 !important;
+    margin-top: auto;
+    margin-bottom: auto;
+    font-size: 23px;
+    margin-right: 12px;
+}
+
+.premium-button {
+    margin-top: 13px;
+    width: 75%;
+    padding-left: 75px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-left: auto;
+    margin-right: auto;
+    color: white !important;
+    background-color: #e8c125;
+    border-radius: 29px;
+    display: flex;
+    font-weight: bolder;
+
+}
