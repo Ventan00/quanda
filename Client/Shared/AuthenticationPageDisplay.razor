@@ -1,0 +1,37 @@
+﻿@inject NavigationManager _navigationManager
+@inject IToastService _toastService
+
+<AuthorizeView>
+    <NotAuthorized>
+        @ChildContent
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    /// <summary>
+    /// Authentication page to render
+    /// </summary>
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    /// <summary>
+    /// Current user authentication state
+    /// </summary>
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthenticationStateTask { get; set; }
+
+    /// <summary>
+    /// Method that redirects authorized users to home page
+    /// </summary>
+    /// <returns></returns>
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateTask;
+        if (authState.User.Identity is { IsAuthenticated: true })
+        {
+            _navigationManager.NavigateTo("/");
+            _toastService.ShowError("You can't perform this operation while logged in.");
+        }
+    }
+
+}
