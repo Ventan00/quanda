@@ -3,12 +3,15 @@
 @inject IUsersRepository _usersRepository
 @inject IToastService _toastService
 
-<TopSemicircleComponent />
-<RecoveryContainerComponent Title="Confirmation email recovery" Description="Did you not receive the e-mail needed to confirm your registration? Enter your email address and we'll send you a mail, that can help you.">
-    <GenericFormComponent Model="@_recoverDto" @ref="_form" OnValidSubmit="@RecoverConfirmationEmailAsync" IsAutoCompleteOn="false" RequireCaptcha="true">
-        <FormInputComponent Type="text" @bind-Value="@_recoverDto.Email" Placeholder="Email address" />
-        <div class="mb-2 w-100">
-            <FormSubmitComponent IsPending="@_isPending" SubmitText="Recover password" PendingSubmitText="Processing..." />
-        </div>
-    </GenericFormComponent>
-</RecoveryContainerComponent>
+
+<AuthenticationPageDisplay>
+    <TopSemicircleComponent />
+    <RecoveryContainerComponent Title="Confirmation email recovery" Description="Did you not receive the e-mail needed to confirm your registration? Enter your email address and we'll send you a mail, that can help you.">
+        <GenericFormComponent Model="@_recoverDto" @ref="_form" OnValidSubmit="@RecoverConfirmationEmailAsync" IsAutoCompleteOn="false" RequireCaptcha="true">
+            <FormInputComponent Type="text" @bind-Value="@_recoverDto.Email" Placeholder="Email address" />
+            <div class="mb-2 w-100">
+                <FormSubmitComponent IsPending="@_isPending" SubmitText="Recover password" PendingSubmitText="Processing..." />
+            </div>
+        </GenericFormComponent>
+    </RecoveryContainerComponent>
+</AuthenticationPageDisplay>

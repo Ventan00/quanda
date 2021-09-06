@@ -1,4 +1,6 @@
-﻿@inject IJSRuntime _js
+﻿@using Blazored.LocalStorage
+@implements IAsyncDisposable
+@inject IJSRuntime _js
 
 <div @ref="_captchaElement"></div>
 
@@ -18,7 +20,7 @@
     /// <summary>
     ///     Google API - publiczny klucz captcha
     /// </summary>
-        private const string SiteKey = "6LcAdJYbAAAAAPKLVRM3QTVqqv05ylLQO03sgX3w";
+    private const string SiteKey = "6LcAdJYbAAAAAPKLVRM3QTVqqv05ylLQO03sgX3w";
 
     /// <summary>
     ///     Metoda renderująca captche
@@ -63,4 +65,12 @@
         await _js.InvokeAsync<object>("grecaptcha.reset", _widgetUniqueId);
     }
 
+    /// <summary>
+    ///     Method called after component dispose in order to delete captcha data
+    /// </summary>
+    /// <returns></returns>
+    public async ValueTask DisposeAsync()
+    {
+        await ResetCaptchaAsync();
+    }
 }
