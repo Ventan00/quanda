@@ -1,0 +1,22 @@
+﻿<div class="tag-box tag-box-background">
+    <a href="/tags/@Tag.IdTag" class="tag-name">
+        #@Tag.Name
+    </a>
+    <span class="tag-description">
+        @Tag.Description
+    </span>
+    <span class="tag-questions light-grey">
+        Amount of question: @Tag.AmountOfQuestions
+    </span>
+    <a href="@(IsMainTag==true? $"/tags/{@Tag.IdTag}" : $"/tags/{@Tag.IdTag}/questions")" class="tag-subtags tag-subtags-box">
+        @(IsMainTag==true? "Go to subtags > >" : "Show all questions >>")
+    </a>
+</div>
+
+@code {
+    [Parameter]
+    public TagResponseDTO Tag { get; set; }
+
+    [Parameter]
+    public bool IsMainTag { get; set; }
+}

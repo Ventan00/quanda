@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Quanda.Shared.DTOs.Requests;
+﻿using Quanda.Shared.DTOs.Requests;
 using Quanda.Shared.DTOs.Responses;
 using Quanda.Shared.Enums;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Quanda.Server.Repositories.Interfaces
 {
@@ -12,10 +12,19 @@ namespace Quanda.Server.Repositories.Interfaces
     public interface ITagRepository
     {
         /// <summary>
-        ///     Zwraca listę wszystkich tagów
+        ///     Zwraca tagi z podanej strony.
         /// </summary>
-        /// <returns>List(TagResponseDTO)</returns>
-        Task<List<TagResponseDTO>> GetTagsAsync();
+        /// <param name="page">Aktualna strona przeglądanych tagów.</param>
+        /// <returns>TagsPageResponseDTO</returns>
+        Task<TagsPageResponseDTO> GetTagsAsync(int page);
+
+        /// <summary>
+        ///     Zwraca subtagi z podanej strony.
+        /// </summary>
+        /// <param name="idMainTag">Id nadrzędnego tagu.</param>
+        /// <param name="page">Aktualna strona przeglądanych subtagów.</param>
+        /// <returns>SubTagsPageResponseDTO</returns>
+        Task<SubTagsPageResponseDTO> GetSubTagsAsync(int idMainTag, int page);
 
         /// <summary>
         ///     Zwraca listę tagów danego pytania

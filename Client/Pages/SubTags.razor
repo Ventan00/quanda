@@ -1,0 +1,115 @@
+﻿@page "/tags/{IdMainTag:int}"
+@inject ITagsReposiotry tagRepository
+@inject NavigationManager navManager
+
+<div class="page-container">
+    @if (SubTagPage != null)
+    {
+        <h1 class="header">#@SubTagPage.NameMainTag</h1>
+        <span class="header-amount-tags light-grey">
+            Amount of subtags: @SubTagPage.TotalAmountOfSubTags
+        </span>
+        <span class="header-info">
+            You choose tag that you interested in! Now you can search for more specific topic for you or watch all question in this tag.
+        </span>
+        <span class="main-tags-questions">
+            Show me all questions in this tag>>
+        </span>
+        <span class="grey">
+            Filter by tag name
+        </span>
+        <div class="search-sort-row">
+            <input type="text" class="tag-searcher tag-searcher-text" placeholder="Enter name of tag that interest you..." />
+            <div class="sort-container">
+                <span class="light-grey">
+                    Sort:
+                </span>
+                <div class="button-container">
+                    <div class="sort-button @(ActiveSorting==0?"active-sort":"inactive-sort")" @onclick="@(async () =>await ChangeSorting())">
+                        Popular
+                    </div>
+                    <div class="sort-button @(ActiveSorting==1?"active-sort":"inactive-sort")" @onclick="@(async () =>await ChangeSorting())">
+                        Name
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tags-container">
+            @foreach (var tag in SubTagPage.SubTags)
+            {
+                <div class="single-tag">
+                    <SingleTagComponent Tag="tag" IsMainTag="false"></SingleTagComponent>
+                </div>
+            }
+        </div>
+        <div>
+            <PaginationComponent ElementsSize="@SubTagPage.TotalAmountOfSubTags" PageSelectedListener="SetPage" PageSize="@Config.TAGS_PAGE_SIZE" ActualPage="activePage"></PaginationComponent>
+        </div>
+    }
+    else
+    {
+        <LoadingIndicatorComponent></LoadingIndicatorComponent>
+    }
+</div>
+
+
+@code {
+    /// <summary>
+    ///     Id nadrzędnego tagu.
+    /// </summary>
+    [Parameter]
+    public int IdMainTag { get; set; }
+    /// <summary>
+    ///     Aktualnie przeglądana strona
+    /// </summary>
+    private int activePage = 0;
+    /// <summary>
+    ///     SubTagi.
+    /// </summary>
+    public SubTagsPageResponseDTO SubTagPage { get; set; }
+    /// <summary>
+    ///     Aktywna opcja sortowania subtagów.
+    /// </summary>
+    public int ActiveSorting { get; set; }
+
+    /// <summary>
+    ///     Metoda odpowiedzialna za odczytanie strony z URI oraz pobranie subtagów.
+    /// </summary>
+    protected async override Task OnInitializedAsync()
+    {
+        var uri = navManager.ToAbsoluteUri(navManager.Uri);
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("page", out var initPage))
+        {
+            activePage = Convert.ToInt32(initPage);
+        }
+        await GetSubTags();
+    }
+
+    /// <summary>
+    ///     Metoda odpowiedzialna za pobranie subtagów z danej strony.
+    /// </summary>
+    private async Task GetSubTags()
+    {
+        SubTagPage = await tagRepository.GetSubTagsAsync(IdMainTag, activePage);
+    }
+
+    /// <summary>
+    ///     Metoda odpowiedzialna za zmianę trybu sortowania subtagów.
+    /// </summary>
+    private async Task ChangeSorting()
+    {
+        ActiveSorting = ActiveSorting == 0 ? 1 : 0;
+    }
+
+    /// <summary>
+    ///     Metoda odpowiedzialna za aktualizację subtagów dla nowej strony.
+    /// </summary>
+    /// <param name="page">Nowa strona.</param>
+    private async Task SetPage(int page)
+    {
+        activePage = page;
+        StateHasChanged();
+        await GetSubTags();
+    }
+
+}

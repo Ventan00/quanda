@@ -51,7 +51,7 @@ namespace Quanda.Client.Repositories.Implementations
             return new(true, null);
         }
 
-        public async Task<Tuple<bool, string>> DeleteAnswer(int idAnswer)
+        public async Task<Tuple<bool, string>> DeleteAnswerAsync(int idAnswer)
         {
             var response = await _httpService.Delete($"{url}/{idAnswer}");
             if (!response.Success)
@@ -59,7 +59,7 @@ namespace Quanda.Client.Repositories.Implementations
             return new(true, null);
         }
 
-        public async Task<Tuple<bool, string>> UpdateAnswer(int idAnswer, String text)
+        public async Task<Tuple<bool, string>> UpdateAnswerAsync(int idAnswer, String text)
         {
             UpdateAnswerDTO updateAnswerDTO = new()
             {
@@ -72,7 +72,7 @@ namespace Quanda.Client.Repositories.Implementations
             return new(true, null);
         }
 
-        public async Task<Tuple<bool, string>> AddAnswer(string text, int idQuestion, int idRootAnswer)
+        public async Task<Tuple<bool, string>> AddAnswerAsync(string text, int idQuestion, int idRootAnswer)
         {
             AddAnswerDTO addAnswerDTO = new()
             {

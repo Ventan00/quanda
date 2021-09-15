@@ -1,0 +1,105 @@
+﻿@page "/tags"
+@inject ITagsReposiotry tagRepository
+@inject NavigationManager navManager
+
+
+<div class="page-container">
+    <h1 class="header">Tags</h1>
+    @if (TagPage != null)
+    {
+        <span class="header-amount-tags light-grey">
+            Amount of tags: @TagPage.TotalAmountOfTags
+        </span>
+        <span class="header-info">
+            Here you can find all main category that we have. Find a topic that interest you and scroll throught it or go to subcategories and find more specific topic for you!
+        </span>
+        <span class="grey">
+            Filter by tag name
+        </span>
+        <div class="search-sort-row">
+            <input type="text" class="tag-searcher tag-searcher-text" placeholder="Enter name of tag that interest you..." />
+            <div class="sort-container">
+                <span class="light-grey">
+                    Sort:
+                </span>
+                <div class="button-container">
+                    <div class="sort-button @(ActiveSorting==0?"active-sort":"inactive-sort")" @onclick="@(async () =>await ChangeSorting())">
+                        Popular
+                    </div>
+                    <div class="sort-button @(ActiveSorting==1?"active-sort":"inactive-sort")" @onclick="@(async () =>await ChangeSorting())">
+                        Name
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tags-container">
+            @foreach (var tag in TagPage.Tags)
+            {
+                <div class="single-tag">
+                    <SingleTagComponent Tag="tag" IsMainTag="true"></SingleTagComponent>
+                </div>
+
+            }
+        </div>
+        <div>
+            <PaginationComponent ElementsSize="@TagPage.TotalAmountOfTags" PageSelectedListener="SetPage" PageSize="@Config.TAGS_PAGE_SIZE" ActualPage="activePage" ></PaginationComponent>
+        </div>
+    }
+    else
+    {
+        <LoadingIndicatorComponent></LoadingIndicatorComponent>
+    }
+</div>
+
+
+@code {
+    /// <summary>
+    ///     Aktualnie przeglądana strona
+    /// </summary>
+    private int activePage = 0;
+    /// <summary>
+    ///     Tagi.
+    /// </summary>
+    public TagsPageResponseDTO TagPage { get; set; }
+    /// <summary>
+    ///     Aktywna opcja sortowania tagów.
+    /// </summary>
+    public int ActiveSorting { get; set; }
+
+    /// <summary>
+    ///     Metoda odpowiedzialna za odczytanie strony z URI oraz pobranie tagów.
+    /// </summary>
+    protected async override Task OnInitializedAsync()
+    {
+        var uri = navManager.ToAbsoluteUri(navManager.Uri);
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("page", out var initPage))
+        {
+            activePage = Convert.ToInt32(initPage);
+        }
+        await GetTags();
+    }
+
+    /// <summary>
+    ///     Metoda odpowiedzialna za pobranie tagów z danej strony.
+    /// </summary>
+    private async Task GetTags()
+    {
+        TagPage = await tagRepository.GetTagsAsync(activePage);
+    }
+
+    /// <summary>
+    ///     Metoda odpowiedzialna za zmianę trybu sortowania tagów.
+    /// </summary>
+    private async Task ChangeSorting()
+    {
+        ActiveSorting = ActiveSorting == 0 ? 1 : 0;
+    }
+
+    private async Task SetPage(int page)
+    {
+        activePage = page;
+        StateHasChanged();
+        await GetTags();
+    }
+
+}

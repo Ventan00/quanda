@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Quanda.Server.Data;
 using Quanda.Server.Repositories.Interfaces;
+using Quanda.Shared;
 using Quanda.Shared.DTOs.Requests;
 using Quanda.Shared.DTOs.Responses;
 using Quanda.Shared.Enums;
@@ -20,16 +21,47 @@ namespace Quanda.Server.Repositories.Implementations
             _context = context;
         }
 
-        public async Task<List<TagResponseDTO>> GetTagsAsync()
+        public async Task<TagsPageResponseDTO> GetTagsAsync(int page)
         {
-            return await _context.Tags
+            var totalAmountOfTags = _context.Tags.Count();
+            var tags = await _context.Tags
                 .Select(tag => new TagResponseDTO
                 {
                     IdTag = tag.IdTag,
                     IdMainTag = tag.IdMainTag,
-                    Name = tag.Name
-                })
+                    Name = tag.Name,
+                    Description = tag.Description,
+                    AmountOfQuestions = tag.QuestionTags.Count
+                }).Skip(page * Config.TAGS_PAGE_SIZE).Take((page + 1) * Config.TAGS_PAGE_SIZE)
                 .ToListAsync();
+
+            return new TagsPageResponseDTO
+            {
+                Tags = tags,
+                TotalAmountOfTags = totalAmountOfTags
+            };
+        }
+
+        public async Task<SubTagsPageResponseDTO> GetSubTagsAsync(int idMainTag, int page)
+        {
+            var subTags = await _context.Tags.Where(t => t.IdMainTag == idMainTag)
+                .Select(tag => new TagResponseDTO
+                {
+                    IdTag = tag.IdTag,
+                    Name = tag.Name,
+                    Description = tag.Description,
+                    AmountOfQuestions = tag.QuestionTags.Count
+                }).ToListAsync();
+
+            var mainTag = await _context.Tags.SingleOrDefaultAsync(t => t.IdMainTag == idMainTag);
+
+            return new SubTagsPageResponseDTO
+            {
+                IdMainTag = idMainTag,
+                NameMainTag = mainTag.Name,
+                SubTags = subTags.Skip(page * Config.TAGS_PAGE_SIZE).Take((page + 1) * Config.TAGS_PAGE_SIZE).ToList(),
+                TotalAmountOfSubTags = subTags.Count
+            };
         }
 
         public async Task<List<TagResponseDTO>> GetTagsOfQuestionAsync(int idTag)
@@ -82,5 +114,6 @@ namespace Quanda.Server.Repositories.Implementations
                 ? TagResultEnum.TAG_DELETED
                 : TagResultEnum.TAG_DATABASE_ERROR;
         }
+
     }
 }

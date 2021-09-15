@@ -1,7 +1,6 @@
 ﻿using Quanda.Client.Helpers;
 using Quanda.Client.Repositories.Interfaces;
 using Quanda.Shared.DTOs.Responses;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Quanda.Client.Repositories.Implementations
@@ -20,9 +19,16 @@ namespace Quanda.Client.Repositories.Implementations
             _httpService = httpService;
         }
 
-        public async Task<List<TagResponseDTO>> GetTags()
+        public async Task<TagsPageResponseDTO> GetTagsAsync(int page)
         {
-            var response = await _httpService.Get<List<TagResponseDTO>>(ApiUrl);
+            var response = await _httpService.Get<TagsPageResponseDTO>($"{ApiUrl}?page={page}");
+
+            return response.Response;
+        }
+
+        public async Task<SubTagsPageResponseDTO> GetSubTagsAsync(int idMainTag, int page)
+        {
+            var response = await _httpService.Get<SubTagsPageResponseDTO>($"{ApiUrl}/{idMainTag}?page={page}");
 
             return response.Response;
         }

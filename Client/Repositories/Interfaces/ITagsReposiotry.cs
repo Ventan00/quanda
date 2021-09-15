@@ -1,18 +1,27 @@
 ﻿using Quanda.Shared.DTOs.Responses;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Quanda.Client.Repositories.Interfaces
 {
     /// <summary>
-    ///     Repozytorium odpowiedzialne za tagi
+    ///     Repozytorium odpowiedzialne za tagi.
     /// </summary>
     public interface ITagsReposiotry
     {
         /// <summary>
-        ///     Zwraca listę wszystkich tagów w BD
+        ///     Zwraca tagi z danej strony.
         /// </summary>
-        /// <returns>List(TagResponseDTO)</returns>
-        public Task<List<TagResponseDTO>> GetTags();
+        /// <param name="page">Aktualnie przeglądana strona tagów.</param>
+        /// <returns>TagsPageResponseDTO</returns>
+        public Task<TagsPageResponseDTO> GetTagsAsync(int page);
+
+        /// <summary>
+        ///     Zwraca subtagi z danej strony.
+        /// </summary>
+        /// <param name="idMainTag">Id tagu nadrzędnego.</param>
+        /// <param name="page">Aktualnie przeglądana strona subtagów.</param>
+        /// <returns>SubTagsPageResponseDTO</returns>
+        public Task<SubTagsPageResponseDTO> GetSubTagsAsync(int idMainTag, int page);
+
     }
 }
