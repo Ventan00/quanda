@@ -6,7 +6,7 @@ namespace Quanda.Client.Repositories.Interfaces
     /// <summary>
     ///     Repozytorium odpowiedzialne za tagi.
     /// </summary>
-    public interface ITagsReposiotry
+    public interface ITagsRepository
     {
         /// <summary>
         ///     Zwraca tagi z danej strony.

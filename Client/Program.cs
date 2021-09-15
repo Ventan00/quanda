@@ -42,7 +42,7 @@ namespace Quanda.Client
             services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();
             services.AddScoped<IRefreshTokenService, RefreshTokenService>();
             services.AddScoped<IQuestionsReposiotry, QuestionsRepository>();
-            services.AddScoped<ITagsReposiotry, TagsRepository>();
+            services.AddScoped<ITagsRepository, TagsRepository>();
 
             services.AddScoped<IUsersRepository, UsersRepository>();
             services.AddScoped<IHttpService, HttpService>();

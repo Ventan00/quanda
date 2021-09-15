@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Quanda.Client.Repositories.Implementations
 {
-    public class TagsRepository : ITagsReposiotry
+    public class TagsRepository : ITagsRepository
     {
         /// <summary>
         ///     Ścieżka do api kontrolera
