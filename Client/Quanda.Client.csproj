@@ -4,6 +4,7 @@
     <TargetFramework>net5.0</TargetFramework>
     <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
     <UserSecretsId>c5d5a83f-d25d-4c2e-89f3-c62829c1d5ca</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,6 +13,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="5.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="5.0.4" PrivateAssets="all" />
     <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.2.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.13" />
     <PackageReference Include="System.Net.Http.Json" Version="5.0.0" />
     <PackageReference Include="Toolbelt.Blazor.HttpClientInterceptor" Version="9.2.1" />
   </ItemGroup>
@@ -21,7 +23,7 @@
   </ItemGroup>
   <!-- Right menu components-->
   <ItemGroup>
-    <None Update="Shared\RightMenu\RightShared.razor.css" CssScope="shared-right-menu" />
+    <None Update="Shared\RightMenu\RightMenu.razor.css" CssScope="shared-right-menu" />
     <None Update="Shared\RightMenu\RightStandard.razor.css" CssScope="shared-right-menu" />
     <None Update="Shared\RightMenu\RightAsk.razor.css" CssScope="shared-right-menu" />
   </ItemGroup>

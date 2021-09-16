@@ -1,7 +1,5 @@
 ﻿.right-shared {
-    width: 470px;
     margin-top: 50px;
-    right: 0;
 }
 .right-hidden {
     width: 0 !important;

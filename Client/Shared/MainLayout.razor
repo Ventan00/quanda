@@ -4,7 +4,6 @@
 @using Blazored.Toast.Configuration
 @using Quanda.Client.Shared.RightMenu
 @implements IDisposable
-
 <div class="sidebar">
     <NavMenuComponent EventCallback="HandleThemeChange"/>
 </div>
@@ -13,18 +12,14 @@
         <TopBarComponent/>
     </div>
     <div class="page-content">
-        <div class="main-page @(selectedMenu == RightMenuType.NONE ? "": "main-page-reduced")">
-            <CascadingValue Value="callbackToRightMenuComponetAsValue">
-                @Body
-            </CascadingValue>
+        <div class="main-page @(RightMenuStateService.RightMenuType == RightMenuType.NONE ? "": "main-page-reduced")">
+            @Body
         </div>
-        <RightShared RightMenuType="selectedMenu" />
+        <RightMenu />
     </div>
     <footer class="page-footer">
     </footer>
 </div>
-
-
 <BlazoredToasts Position="ToastPosition.BottomRight" Timeout="3" IconType="IconType.FontAwesome"
                 SuccessClass="success-toast-override"
                 ShowProgressBar="true"

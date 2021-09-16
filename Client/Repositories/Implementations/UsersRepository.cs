@@ -57,7 +57,7 @@ namespace Quanda.Client.Repositories.Implementations
 
         public async Task<List<Top3UserResponseDTO>> GetTop3Users()
         {
-            var response = await _httpService.Get<List<Top3UserResponseDTO>>($"{ApiUrl}/get-top3-users");
+            var response = await _httpService.Get<List<Top3UserResponseDTO>>($"{ApiUrl}/top3-users");
             return response.Response;
         }
     }

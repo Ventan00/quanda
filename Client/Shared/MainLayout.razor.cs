@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
+using Quanda.Client.Services;
 using Quanda.Client.Shared.RightMenu;
 
 namespace Quanda.Client.Shared
@@ -15,30 +16,16 @@ namespace Quanda.Client.Shared
         public bool isWhiteTheme = true;
 
         /// <summary>
-        ///     Zmienna która opisuje czy na danej stronie ma wygenerować prawe menu, a jeśli tak to jakie
+        ///     Odnośnik do stanu prawego menu
         /// </summary>
-        public RightMenuType selectedMenu = RightMenuType.NONE;
-
-        /// <summary>
-        ///     Zmienna callbackowa służąca do ustawienia widoczności prawego menu
-        /// </summary>
-        public EventCallback<RightMenuType> callbackToRightMenuComponetAsValue;
-
-        /// <summary>
-        ///     Callback zmieniający widoczność prawego menu
-        /// </summary>
-        /// <param name="menuType"></param>
-        public void changeMenuType(RightMenuType menuType)
-        {
-            selectedMenu = menuType;
-            StateHasChanged();
-        }
+        [Inject]
+        public RightMenuStateService RightMenuStateService { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
-            callbackToRightMenuComponetAsValue = new EventCallback<RightMenuType>(this, (Action<RightMenuType>)changeMenuType);
             _interceptorService.RegisterEvents();
         }
+
 
         public void Dispose()
         {

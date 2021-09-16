@@ -27,17 +27,6 @@ namespace Quanda.Client.Pages.Recover
         private GenericFormComponent<RecoverDTO> _form;
 
         /// <summary>
-        ///     Zmienna która jest callbackiem main layoutu informująca czy i jakie prawe menu powinno być pokazane
-        /// </summary>
-        [CascadingParameter]
-        public EventCallback<RightMenuType> RightMenuTypeCallback { get; set; }
-
-        protected async override Task OnInitializedAsync()
-        {
-            await RightMenuTypeCallback.InvokeAsync(RightMenuType.NONE);
-        }
-
-        /// <summary>
         ///     Metoda wysyłająca oraz obsługująca żądanie - wywoływana po zatwierdzeniu poprawnie wypełnionego formularza
         /// </summary>
         /// <returns></returns>

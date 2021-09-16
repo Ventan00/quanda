@@ -308,7 +308,7 @@ namespace Quanda.Server.Controllers
         ///     Końcówka zwracająca top 3 użytkowników względem punktów
         /// </summary>
         /// <returns></returns>
-        [HttpGet("get-top3-users")]
+        [HttpGet("top3-users")]
         public async Task<IActionResult> GetTop3Users()
         {
             var list = await _usersRepository.GetTop3Users();

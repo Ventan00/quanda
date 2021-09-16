@@ -3,9 +3,9 @@
 # Endpoints authorization
 ...
 # Right menu
-To add right menu to your page, You need to add ```[CascadingParameter]``` of type ```EventCallback<RightMenuType>```.
-Then invoke callback in ```protected async override Task OnInitializedAsync()```
-passing the Enum ```RightMenuType``` as an argument.
+The Right menu is hidden by default.
+To add right menu to your page, You need to inject ```RightMenuStateService```.
+Then set RightMenuType of injected service to desired menu in ```protected async override Task OnParametersSetAsync()```.
 
 ### Create new shared RightMenuType
 1. Add enum to `Quanda.Client\Shared\RightMenu\RightMenuType.cs`.

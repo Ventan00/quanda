@@ -13,15 +13,6 @@ namespace Quanda.Client.Pages.Recover
 {
     public partial class ResetPassword
     {
-        /// <summary>
-        ///     Zmienna która jest callbackiem main layoutu informująca czy i jakie prawe menu powinno być pokazane
-        /// </summary>
-        [CascadingParameter]
-        public EventCallback<RightMenuType> RightMenuTypeCallback { get; set; }
-        protected async override Task OnInitializedAsync()
-        {
-            await RightMenuTypeCallback.InvokeAsync(RightMenuType.NONE);
-        }
 
         /// <summary>
         ///     Model formularza

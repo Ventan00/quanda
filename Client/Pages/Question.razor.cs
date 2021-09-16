@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
+using Quanda.Client.Services;
 using Quanda.Client.Shared.RightMenu;
 
 namespace Quanda.Client.Pages
@@ -11,15 +12,17 @@ namespace Quanda.Client.Pages
     {
         [Parameter]
         public int IdQuestion { get; set; }
+
         /// <summary>
         ///     Zmienna która jest callbackiem main layoutu informująca czy i jakie prawe menu powinno być pokazane
         /// </summary>
-        [CascadingParameter]
-        public EventCallback<RightMenuType> RightMenuTypeCallback { get; set; }
+        [Inject]
+        public RightMenuStateService RightMenuStateService { get; set; }
 
-        protected async override Task OnInitializedAsync()
+        protected async override Task OnParametersSetAsync()
         {
-            await RightMenuTypeCallback.InvokeAsync(RightMenuType.STANDARD);
+            RightMenuStateService.RightMenuType = RightMenuType.STANDARD;
+            await base.OnParametersSetAsync();
         }
 
     }

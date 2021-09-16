@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Quanda.Client.Services;
 using Quanda.Client.Shared.RightMenu;
 
 namespace Quanda.Client.Pages
@@ -17,19 +19,22 @@ namespace Quanda.Client.Pages
         private Task<AuthenticationState> authenticationStateTask { get; set; }
 
         /// <summary>
-        ///     Zmienna która jest callbackiem main layoutu informująca czy i jakie prawe menu powinno być pokazane
+        ///     Zmienna która jest odnośnikiem do serwisu prawego menu
         /// </summary>
-        [CascadingParameter]
-        protected EventCallback<RightMenuType> RightMenuTypeCallback { get; set; }
+        [Inject]
+        public RightMenuStateService RightMenuStateService { get; set; }
 
-        protected async override Task OnInitializedAsync()
+        public ClaimsPrincipal user;
+
+        protected async override Task OnParametersSetAsync()
         {
             var authState = await authenticationStateTask;
-            var user = authState.User;
-            if (!user.Identity.IsAuthenticated)
+            user = authState.User;
+            if (user.Identity.IsAuthenticated)
             {
-                await RightMenuTypeCallback.InvokeAsync(RightMenuType.NONE);
+                RightMenuStateService.RightMenuType = RightMenuType.STANDARD;
             }
         }
+
     }
 }
