@@ -11,7 +11,7 @@ Then set RightMenuType of injected service to desired menu in ```protected async
 1. Add enum to `Quanda.Client\Shared\RightMenu\RightMenuType.cs`.
 2. Add new razor component to `Quanda.Client\Shared\RightMenu`. You must also create css file (it can be empty).
 3. Add your component to `Quanda.Client\Shared\RightMenu\RightShared.razor` to switch using your enum.
-4. Add your component css file to `Quanda.Client.csproj` in _<ItemGroup>_ section under `_<!-- Right menu components-->_`
+4. Add your component css file to `Quanda.Client.csproj` in _<ItemGroup>_ section under `<!-- Right menu components-->`
 
 ### Existing RightMenuTypes
 - STANDARD (used in most pages)
