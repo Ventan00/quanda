@@ -1,138 +1,120 @@
 @font-face {
-    font-display: block;
-    font-family: 'Quanda';
-    font-style: normal;
-    font-weight: normal;
-    src: url('fonts/Quanda.eot?6pcmsz');
-    src: url('fonts/Quanda.eot?6pcmsz#iefix') format('embedded-opentype'), url('fonts/Quanda.ttf?6pcmsz') format('truetype'), url('fonts/Quanda.woff?6pcmsz') format('woff'), url('fonts/Quanda.svg?6pcmsz#Quanda') format('svg');
+  font-family: 'Quanda';
+  src:  url('fonts/Quanda.eot?z57hmn');
+  src:  url('fonts/Quanda.eot?z57hmn#iefix') format('embedded-opentype'),
+    url('fonts/Quanda.ttf?z57hmn') format('truetype'),
+    url('fonts/Quanda.woff?z57hmn') format('woff'),
+    url('fonts/Quanda.svg?z57hmn#Quanda') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
 }
 
 [class^="icon-"], [class*=" icon-"] {
-    -moz-osx-font-smoothing: grayscale;
-    /* Better Font Rendering =========== */
-    -webkit-font-smoothing: antialiased;
-    /* use !important to prevent issues with browser extensions that change fonts */
-    font-family: 'Quanda' !important;
-    font-style: normal;
-    font-variant: normal;
-    font-weight: normal;
-    line-height: 1;
-    speak: never;
-    text-transform: none;
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'Quanda' !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .icon-arrowdown:before {
-    content: "\e900";
+  content: "\e900";
 }
-
 .icon-arrowup:before {
-    content: "\e901";
+  content: "\e901";
 }
-
 .icon-bold:before {
-    content: "\e902";
+  content: "\e902";
 }
-
 .icon-check:before {
-    content: "\e903";
+  content: "\e903";
 }
-
+.icon-crown:before {
+  content: "\e904";
+}
 .icon-cup:before {
-    content: "\e904";
+  content: "\e905";
 }
-
 .icon-delete:before {
-    content: "\e905";
+  content: "\e906";
 }
-
 .icon-edit:before {
-    content: "\e906";
+  content: "\e907";
 }
-
 .icon-facebook:before {
-    content: "\e907";
+  content: "\e908";
 }
-
 .icon-home:before {
-    content: "\e908";
+  content: "\e909";
 }
-
 .icon-instagram:before {
-    content: "\e909";
+  content: "\e90a";
 }
-
 .icon-italic:before {
-    content: "\e90a";
+  content: "\e90b";
 }
-
 .icon-link:before {
-    content: "\e90b";
+  content: "\e90c";
 }
-
 .icon-list:before {
-    content: "\e90c";
+  content: "\e90d";
 }
-
 .icon-listnr:before {
-    content: "\e90d";
+  content: "\e90e";
 }
-
 .icon-location:before {
-    content: "\e90e";
+  content: "\e90f";
 }
-
 .icon-login:before {
-    content: "\e90f";
+  content: "\e910";
 }
-
 .icon-logout:before {
-    content: "\e910";
+  content: "\e911";
 }
-
 .icon-mail:before {
-    content: "\e911";
+  content: "\e912";
 }
-
 .icon-notification:before {
-    content: "\e912";
+  content: "\e913";
 }
-
 .icon-picture:before {
-    content: "\e913";
+  content: "\e914";
 }
-
 .icon-quote:before {
-    content: "\e914";
+  content: "\e915";
 }
-
 .icon-redo:before {
-    content: "\e915";
+  content: "\e916";
 }
-
 .icon-report:before {
-    content: "\e916";
+  content: "\e917";
 }
-
+.icon-search:before {
+  content: "\e918";
+}
 .icon-tag:before {
-    content: "\e917";
+  content: "\e919";
 }
-
 .icon-time:before {
-    content: "\e918";
+  content: "\e91a";
 }
-
 .icon-underline:before {
-    content: "\e919";
+  content: "\e91b";
 }
-
 .icon-undo:before {
-    content: "\e91a";
+  content: "\e91c";
 }
-
 .icon-user:before {
-    content: "\e91b";
+  content: "\e91d";
 }
-
 .icon-views:before {
-    content: "\e91c";
+  content: "\e91e";
 }
