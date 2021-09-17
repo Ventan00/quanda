@@ -25,7 +25,7 @@
   <ItemGroup>
     <None Update="Shared\RightMenu\RightMenu.razor.css" CssScope="shared-right-menu" />
     <None Update="Shared\RightMenu\RightStandard.razor.css" CssScope="shared-right-menu" />
-    <None Update="Shared\RightMenu\RightAsk.razor.css" CssScope="shared-right-menu" />
+    <None Update="Shared\RightMenu\RightAskQuestion.razor.css" CssScope="shared-right-menu" />
   </ItemGroup>
 
   <ItemGroup>

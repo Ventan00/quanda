@@ -48,6 +48,6 @@ namespace Quanda.Client.Repositories.Interfaces
         ///     Funkcja która zwraca listę 3 użytkowników z największą ilością punktów
         /// </summary>
         /// <returns></returns>
-        public Task<List<Top3UserResponseDTO>> GetTop3Users();
+        public Task<IEnumerable<Top3UserResponseDTO>> GetTop3UsersAsync();
     }
 }

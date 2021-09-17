@@ -55,9 +55,9 @@ namespace Quanda.Client.Repositories.Implementations
             return response.HttpResponseMessage.StatusCode;
         }
 
-        public async Task<List<Top3UserResponseDTO>> GetTop3Users()
+        public async Task<IEnumerable<Top3UserResponseDTO>> GetTop3UsersAsync()
         {
-            var response = await _httpService.Get<List<Top3UserResponseDTO>>($"{ApiUrl}/top3-users");
+            var response = await _httpService.Get<IEnumerable<Top3UserResponseDTO>>($"{ApiUrl}/top3-users");
             return response.Response;
         }
     }

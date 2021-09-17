@@ -98,7 +98,7 @@ namespace Quanda.Server.Repositories.Implementations
             return await GetUserWithDetailsByAsync(u => u.Email == email);
         }
 
-        public async Task<List<Top3UserResponseDTO>> GetTop3Users()
+        public async Task<IEnumerable<Top3UserResponseDTO>> GetTop3UsersAsync()
         {
             return await _context.TagUsers
                 .GroupBy(tag => tag.IdUser)

@@ -311,7 +311,7 @@ namespace Quanda.Server.Controllers
         [HttpGet("top3-users")]
         public async Task<IActionResult> GetTop3Users()
         {
-            var list = await _usersRepository.GetTop3Users();
+            var list = await _usersRepository.GetTop3UsersAsync();
             return Ok(list);
         }
 

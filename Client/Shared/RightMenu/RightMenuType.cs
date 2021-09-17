@@ -10,6 +10,6 @@ namespace Quanda.Client.Shared.RightMenu
     /// </summary>
     public enum RightMenuType
     {
-        STANDARD, QUESTIONS, NONE
+        STANDARD, ASKQUESTION, NONE
     }
 }

@@ -21,6 +21,6 @@ namespace Quanda.Server.Repositories.Interfaces
         ///     Funkcja zwracająca top 3 użytkowników
         /// </summary>
         /// <returns></returns>
-        public Task<List<Top3UserResponseDTO>> GetTop3Users();
+        public Task<IEnumerable<Top3UserResponseDTO>> GetTop3UsersAsync();
     }
 }
