@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Quanda.Client.Authentication;
 using Quanda.Client.Helpers;
+using Quanda.Client.Repositories;
 using Quanda.Client.Repositories.Implementations;
 using Quanda.Client.Repositories.Interfaces;
 using System;

@@ -20,10 +20,10 @@
                     Sort:
                 </span>
                 <div class="button-container">
-                    <div class="sort-button @(ActiveSorting==0?"active-sort":"inactive-sort")" @onclick="@(async () =>await ChangeSorting())">
+                    <div class="sort-button @(ActiveSorting== SortTagsEnum.Popular?"active-sort":"inactive-sort")" @onclick="@(async () =>await ChangeSorting())">
                         Popular
                     </div>
-                    <div class="sort-button @(ActiveSorting==1?"active-sort":"inactive-sort")" @onclick="@(async () =>await ChangeSorting())">
+                    <div class="sort-button @(ActiveSorting== SortTagsEnum.Name?"active-sort":"inactive-sort")" @onclick="@(async () =>await ChangeSorting())">
                         Name
                     </div>
                 </div>

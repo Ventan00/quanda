@@ -10,39 +10,48 @@
         <span class="header-info">
             You choose tag that you interested in! Now you can search for more specific topic for you or watch all question in this tag.
         </span>
-        <span class="main-tags-questions">
+        <a href="/questions?tags=@SubTagPage.IdMainTag" class="main-tags-questions">
             Show me all questions in this tag>>
-        </span>
-        <span class="grey">
-            Filter by tag name
-        </span>
-        <div class="search-sort-row">
-            <input type="text" class="tag-searcher tag-searcher-text" placeholder="Enter name of tag that interest you..." />
-            <div class="sort-container">
-                <span class="light-grey">
-                    Sort:
-                </span>
-                <div class="button-container">
-                    <div class="sort-button @(ActiveSorting==0?"active-sort":"inactive-sort")" @onclick="@(async () =>await ChangeSorting())">
-                        Popular
-                    </div>
-                    <div class="sort-button @(ActiveSorting==1?"active-sort":"inactive-sort")" @onclick="@(async () =>await ChangeSorting())">
-                        Name
+        </a>
+        @if (SubTagPage.TotalAmountOfSubTags > 0)
+        {
+            <span class="grey">
+                Filter by tag name
+            </span>
+            <div class="search-sort-row">
+                <input type="text" class="tag-searcher tag-searcher-text" placeholder="Enter name of tag that interest you..." />
+                <div class="sort-container">
+                    <span class="light-grey">
+                        Sort:
+                    </span>
+                    <div class="button-container">
+                        <div class="sort-button @(ActiveSorting==SortTagsEnum.Popular?"active-sort":"inactive-sort")" @onclick="@(async () =>await ChangeSorting())">
+                            Popular
+                        </div>
+                        <div class="sort-button @(ActiveSorting==SortTagsEnum.Name?"active-sort":"inactive-sort")" @onclick="@(async () =>await ChangeSorting())">
+                            Name
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="tags-container">
-            @foreach (var tag in SubTagPage.SubTags)
-            {
-                <div class="single-tag">
-                    <SingleTagComponent Tag="tag" IsMainTag="false"></SingleTagComponent>
-                </div>
-            }
-        </div>
-        <div class="pagination-row">
-            <PaginationComponent ElementsSize="@SubTagPage.TotalAmountOfSubTags" PageSelectedListener="SetPage" PageSize="@Config.TAGS_PAGE_SIZE" ActualPage="activePage"></PaginationComponent>
-        </div>
+            <div class="tags-container">
+                @foreach (var tag in SubTagPage.SubTags)
+                {
+                    <div class="single-tag">
+                        <SingleTagComponent Tag="tag" IsMainTag="false"></SingleTagComponent>
+                    </div>
+                }
+            </div>
+            <div class="pagination-row">
+                <PaginationComponent ElementsSize="@SubTagPage.TotalAmountOfSubTags" PageSelectedListener="SetPage" PageSize="@Config.TAGS_PAGE_SIZE" ActualPage="activePage"></PaginationComponent>
+            </div>
+                }
+                else
+                {
+                    <h1>
+                        Any subtag not assigned yet.
+                    </h1>
+                }
     }
     else
     {
