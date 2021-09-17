@@ -1,0 +1,10 @@
+﻿@inject NavigationManager _navManager
+@inject IToastService _toastService
+
+@code {
+    protected override void OnInitialized()
+    {
+        _toastService.ShowError("You must log in first.");
+        _navManager.NavigateTo($"/login?returnUrl={Uri.EscapeDataString(_navManager.Uri)}");
+    }
+}

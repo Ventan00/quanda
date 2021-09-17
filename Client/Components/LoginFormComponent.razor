@@ -7,9 +7,9 @@
 @inject IToastService _toastService
 
 <GenericFormComponent @ref="@_form" Model="@_loginDto" OnValidSubmit="@LoginAsync" IsAutoCompleteOn="false" RequireCaptcha="true">
-    <FormInputComponent Type="text" @bind-Value="@_loginDto.NicknameOrEmail" Placeholder="Login or e-mail"/>
-    <FormInputComponent Type="password" @bind-Value="@_loginDto.RawPassword" Placeholder="Password"/>
-    <FormSubmitComponent SubmitText="Log In" PendingSubmitText="Logging in..." IsPending="@_isPending"/>
+    <FormInputComponent Type="text" @bind-Value="@_loginDto.NicknameOrEmail" Placeholder="Login or e-mail" />
+    <FormInputComponent Type="password" @bind-Value="@_loginDto.RawPassword" Placeholder="Password" />
+    <FormSubmitComponent SubmitText="Log In" PendingSubmitText="Logging in..." IsPending="@_isPending" />
     <NavLink href="recover/password">
         <span class="forgot-password-link">
             Forgot password?
@@ -34,6 +34,11 @@
     ///     Zmienna mowiąca o tym, czy formularz jest w trakcie przetwarzania
     /// </summary>
     private bool _isPending;
+
+    /// <summary>
+    ///     Parametr mówiący na jaki adres url przenieść użytkownika po poprawnym zalogowaniu
+    /// </summary>
+    [Parameter] public string ReturnUrl { get; set; }
 
     /// <summary>
     ///     Metoda wywoływana przy potwierdzeniu prawidłowo wypełnionego formularza logowania
@@ -62,7 +67,7 @@
             case LoginStatusEnum.LOGIN_ACCEPTED:
                 _toastService.ShowSuccess("You have logged in.");
                 await _localStorageService.SetItemAsync("avatar", loginResponseDto.Avatar);
-                _navManager.NavigateTo("");
+                _navManager.NavigateTo(ReturnUrl ?? "/");
                 return;
             case LoginStatusEnum.INVALID_CREDENTIALS:
                 _toastService.ShowError("Invalid credentials. Please try again.");
