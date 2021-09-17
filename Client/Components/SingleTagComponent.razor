@@ -1,8 +1,17 @@
 ﻿<div class="tag-box tag-box-background">
     <div class="tag-box-part">
-        <a href="/tags/@Tag.IdTag" class="tag-name">
-            #@Tag.Name
-        </a>
+        @if (IsMainTag)
+        {
+            <a href="/tags/@Tag.IdTag" class="tag-name">
+                #@Tag.Name
+            </a>
+        }
+        else
+        {
+            <div class="tag-name">
+                #@Tag.Name
+            </div>
+        }
         <span class="tag-description">
             @Tag.Description
         </span>
