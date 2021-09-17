@@ -4,7 +4,7 @@
     <TopSemicircleComponent />
     <div class="center-container">
         <h1 class="title">Log in</h1>
-        <LoginFormComponent />
+        <LoginFormComponent ReturnUrl="@_returnUrl" />
         <div class="line">
             <span class="line-text">OR</span>
         </div>
@@ -17,3 +17,20 @@
         </div>
     </div>
 </AuthenticationPageDisplay>
+
+@code {
+    /// <summary>
+    ///     Zmienna mówiąca na jaki adres URL przenieść użytkownika po poprawnym zalogowaniu
+    /// </summary>
+    private string _returnUrl;
+
+    [Inject] public NavigationManager NavigationManager { get; set; }
+
+    /// <summary>
+    ///     Metoda wyciągająca z QueryStringu wartość pod kluczem returnUrl;
+    /// </summary>
+    protected override void OnInitialized()
+    {
+        _returnUrl = NavigationManager.ExtractQueryStringByKey<string>("returnUrl");
+    }
+}
