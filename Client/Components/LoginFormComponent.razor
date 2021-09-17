@@ -10,7 +10,7 @@
     <FormInputComponent Type="text" @bind-Value="@_loginDto.NicknameOrEmail" Placeholder="Login or e-mail" />
     <FormInputComponent Type="password" @bind-Value="@_loginDto.RawPassword" Placeholder="Password" />
     <FormSubmitComponent SubmitText="Log In" PendingSubmitText="Logging in..." IsPending="@_isPending" />
-    <NavLink href="authentication/recover/password">
+    <NavLink href="recover/password">
         <span class="forgot-password-link">
             Forgot password?
         </span>
