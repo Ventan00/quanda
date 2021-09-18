@@ -1,23 +1,19 @@
-﻿@page "/register"
+@page "/register"
 
-    <AuthenticationPageDisplay>
-        <TopSemicircleComponent />
-        <div class="center-container">
-            <h1 class="title">Sign up</h1>
-            <RegisterFormComponent />
-            <div class="line">
-                <span class="line-text">OR</span>
-            </div>
-            <ExternalServicesComponent FacebookText="Sign up with Facebook" GoogleText="Sign up Google" />
-            <div>
-                <p class="bottom-text">Already have an account?</p>
-                <NavLink href="/login">
-                    <p class="bottom-link">Sign up!</p>
-                </NavLink>
-            </div>
+<AuthenticationPageDisplay>
+    <TopSemicircleComponent />
+    <div class="center-container">
+        <h1 class="title">Sign up</h1>
+        <RegisterFormComponent />
+        <div class="line">
+            <span class="line-text">OR</span>
         </div>
-    </AuthenticationPageDisplay>
-
-    @code {
-
-    }
+        <ExternalServicesComponent FacebookText="Sign up with Facebook" GoogleText="Sign up Google" />
+        <div>
+            <p class="bottom-text">Already have an account?</p>
+            <NavLink href="/login">
+                <p class="bottom-link">Sign up!</p>
+            </NavLink>
+        </div>
+    </div>
+</AuthenticationPageDisplay>

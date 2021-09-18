@@ -10,6 +10,7 @@ using Quanda.Client.Repositories.Interfaces;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Quanda.Client.Services;
 using Toolbelt.Blazor.Extensions.DependencyInjection;
 
 namespace Quanda.Client
@@ -27,6 +28,8 @@ namespace Quanda.Client
             }.EnableIntercept(sp));
 
             ConfigureServices(builder.Services);
+
+            builder.Services.AddSingleton<RightMenuStateService>();
 
             await builder.Build().RunAsync();
         }

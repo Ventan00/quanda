@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Quanda.Server.Utils;
 using Quanda.Shared.DTOs.Requests;
@@ -16,5 +17,10 @@ namespace Quanda.Server.Repositories.Interfaces
         public Task<bool> SetNewPasswordForUser(User user, string rawPassword);
         public Task<User> GetUserByRefreshTokenAsync(string refreshToken);
         public Task<User> GetUserByEmailAsync(string email);
+        /// <summary>
+        ///     Funkcja zwracająca top 3 użytkowników
+        /// </summary>
+        /// <returns></returns>
+        public Task<IEnumerable<Top3UserResponseDTO>> GetTop3UsersAsync();
     }
 }

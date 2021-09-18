@@ -2,8 +2,8 @@
 @inject HttpClientInterceptorService _interceptorService
 @using Quanda.Client.Authentication
 @using Blazored.Toast.Configuration
+@using Quanda.Client.Shared.RightMenu
 @implements IDisposable
-
 <div class="sidebar">
     <NavMenuComponent EventCallback="HandleThemeChange"/>
 </div>
@@ -12,45 +12,16 @@
         <TopBarComponent/>
     </div>
     <div class="page-content">
-        <div class="main-page">
+        <div class="main-page @(RightMenuStateService.RightMenuType == RightMenuType.NONE ? "": "main-page-reduced")">
             @Body
         </div>
+        <RightMenu />
     </div>
     <footer class="page-footer">
     </footer>
 </div>
-
-
 <BlazoredToasts Position="ToastPosition.BottomRight" Timeout="3" IconType="IconType.FontAwesome"
                 SuccessClass="success-toast-override"
                 ShowProgressBar="true"
                 SuccessIcon="fa fa-thumbs-up"
                 ErrorIcon="fa fa-bug"/>
-
-@code
-{
-    /// <summary>
-    ///     Zmienna opisująca jaki jest theme
-    /// </summary>
-    public bool isWhiteTheme = true;
-
-    protected override async Task OnInitializedAsync()
-    {
-        _interceptorService.RegisterEvents();
-    }
-
-    public void Dispose()
-    {
-        _interceptorService.DisposeEvents();
-    }
-
-    /// <summary>
-    ///     Funkcja która zmienia aktualny theme
-    /// </summary>
-    /// <param name="theme">True = light, False = dark</param>
-    /// <returns>void</returns>
-    public async Task HandleThemeChange(bool theme)
-    {
-        isWhiteTheme = theme;
-    }
-}
