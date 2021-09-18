@@ -311,5 +311,23 @@ namespace Quanda.Server.Controllers
 
             return NoContent();
         }
+
+        [Authorize]
+        [HttpGet("{idUser:int}/profile-details")]
+        public async Task<IActionResult> GetUserProfileDetails(
+            [FromRoute] int idUser)
+        {
+            var userDetails = await _usersRepository
+                .GetUserProfileDetailsAsync(idUser);
+
+            if (userDetails is null)
+                return NotFound();
+
+            var requestIdUser = HttpContext.User.GetId();
+            if (requestIdUser != idUser)
+                await _usersRepository.AddViewForUserAsync(idUser);
+
+            return Ok(userDetails);
+        }
     }
 }
