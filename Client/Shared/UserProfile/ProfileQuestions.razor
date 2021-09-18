@@ -1,0 +1,36 @@
+﻿@if (_questions is null)
+{
+    <LoadingIndicatorComponent />
+}
+else
+{
+    @foreach (var question in _questions)
+    {
+        <div class="question-container">
+            <h3 class="header">@question.Header</h3>
+            <div class="tags-container">
+                <span>tags:</span>
+                @foreach (var tag in question.Tags)
+                {
+                    <a href="/tags/@tag.IdTag">
+                        <span class="tag">#@tag.Name</span>
+                    </a>
+                }
+            </div>
+            <div class="h-line"></div>
+            <span class="description">@question.Description</span>
+            <div class="h-line"></div>
+            <div class="extra-info-container">
+                <span>@question.CreatedAt.ToShortDateString()</span>
+                <span class="views">Views: @question.Views</span>
+                <span>Answers: @question.Answers</span>
+            </div>
+        </div>
+    }
+    <div class="pagination-container">
+        <PaginationComponent PageSize="Config.ProfileQuestionsPageSize"
+                             ElementsSize="_amountOfAllQuestions"
+                             ActualPage="_actualPage"
+                             PageSelectedListener="@OnPageChange" />
+    </div>
+}
