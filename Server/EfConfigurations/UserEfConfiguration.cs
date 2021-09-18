@@ -45,6 +45,8 @@ namespace Quanda.Server.EfConfigurations
 
             builder.Property(u => u.ServiceToken).IsRequired(false);
 
+            builder.Property(u => u.Views).HasDefaultValue(0);
+
             builder.HasOne(u => u.IdServiceNavigation)
                 .WithMany(s => s.Users)
                 .HasForeignKey(u => u.IdService)
