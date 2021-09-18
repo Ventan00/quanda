@@ -1,0 +1,30 @@
+﻿@page "/users/{IdUser:int}"
+@attribute [Authorize]
+@using Quanda.Client.Shared.UserProfile
+
+<div class="profile-container">
+    <div class="left-container">
+        <ProfileDetails IdUser="IdUser" OwnProfile="_ownProfile" />
+    </div>
+    <div class="right-container">
+        <div class="display-options">
+            <div class="q-gradient-btn @((!_showQuestions ? "option-disabled-btn" : ""))" @onclick="ShowQuestions">
+                Questions
+            </div>
+            <div class="mx-1"></div>
+            <div class="q-gradient-btn @((_showQuestions ? "option-disabled-btn" : ""))" @onclick="ShowAnswers">
+                Answers
+            </div>
+        </div>
+        <div class="list-container">
+            @if (_showQuestions)
+            {
+                <ProfileQuestions IdUser="IdUser" />
+            }
+            else
+            {
+                <ProfileAnswers />
+            }
+        </div>
+    </div>
+</div>
