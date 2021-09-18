@@ -18,6 +18,7 @@ p, span, a {
 h1, h2, h3, h4, h5, h6 {
     font-family: 'Sen', sans-serif;
     font-weight: bold;
+    margin: 0;
 }
 
 /*Light mode global styles*/
@@ -60,6 +61,33 @@ h1, h2, h3, h4, h5, h6 {
         color: #F6F6F6;
     }
 
+/*global reusable custom (q-...) styles*/
+.q-gradient-btn {
+    display: block;
+    background: linear-gradient( 245.14deg, #fbe48a 0%, #f7d964 8.6%, #f08782 70.3%, #ed746e 100%);
+    border-radius: 35px;
+    text-align: center;
+    font-family: 'Sen', sans-serif;
+    font-weight: bold;
+    color: #ffffff;
+    cursor: pointer;
+}
+
+.q-user-avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+}
+
+.light-mode
+.q-user-avatar {
+    background-color: #ccc;
+}
+
+.dark-mode
+.q-user-avatar {
+    background-color: #58656d;
+}
 
 .btn-primary {
     background-color: #1b6ec2;
