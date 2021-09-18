@@ -145,7 +145,7 @@ namespace Quanda.Server.Repositories.Implementations
                         {
                             IdAnswer = 0,
                             Text = "We invite you to create an account.",
-                            Rating = a.RatingAnswers.Select(ra => new {ValueAns = ra.Value == false ? -1 : 1})
+                            Rating = a.RatingAnswers.Select(ra => new { ValueAns = ra.Value == false ? -1 : 1 })
                                 .Sum(r => r.ValueAns),
                             IsModified = a.IsModified,
                             User = new UserResponseDTO
@@ -185,7 +185,7 @@ namespace Quanda.Server.Repositories.Implementations
                         {
                             IdAnswer = a.IdAnswer,
                             Text = a.Text,
-                            Rating = a.RatingAnswers.Select(ra => new {ValueAns = ra.Value == false ? -1 : 1})
+                            Rating = a.RatingAnswers.Select(ra => new { ValueAns = ra.Value == false ? -1 : 1 })
                                 .Sum(r => r.ValueAns),
                             IsModified = a.IsModified,
                             User = new UserResponseDTO
@@ -294,6 +294,37 @@ namespace Quanda.Server.Repositories.Implementations
                 .Where(qt => category.Any(tag => qt.IdTag == tag))
                 .GroupBy(qt => qt.IdQuestion)
                 .Select(qcg => qcg.Key)
+                .CountAsync();
+        }
+
+        public async Task<IEnumerable<QuestionInProfileResponseDto>> GetUserProfileQuestionsAsync(int idUser, int skip)
+        {
+            return await _context.Questions
+                .Where(q => q.IdUser == idUser)
+                .OrderByDescending(q => q.PublishDate)
+                .Skip(skip)
+                .Take(Config.ProfileQuestionsPageSize)
+                .Select(q => new QuestionInProfileResponseDto
+                {
+                    IdQuestion = q.IdQuestion,
+                    Header = q.Header,
+                    Description = q.Description,
+                    Answers = q.Answers.Count,
+                    Views = q.Views,
+                    CreatedAt = q.PublishDate,
+                    Tags = q.QuestionTags.Select(qt => new TagResponseDTO
+                    {
+                        IdTag = qt.IdTag,
+                        Name = qt.IdTagNavigation.Name
+                    })
+                })
+                .ToListAsync();
+        }
+
+        public Task<int> GetAmountOfUserQuestionsAsync(int idUser)
+        {
+            return _context.Questions
+                .Where(q => q.IdUser == idUser)
                 .CountAsync();
         }
     }

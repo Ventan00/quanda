@@ -3,7 +3,7 @@
     /// <summary>
     ///     Klasa przechowująca wartości współdzielone między Klientem a serwerem
     /// </summary>
-    public class Config
+    public static class Config
     {
         /// <summary>
         ///     Wartość która opisuje ile pytań ma załadować klient na jednej stronie z pytaniami
@@ -18,5 +18,10 @@
         ///     Wartość która opisuje ile odpowiedzi ma załadować klient na jednej stronie.
         /// </summary>
         public static readonly int ANSWERS_PAGE_SIZE = 10;
+
+        /// <summary>
+        ///     Wartość która opisuje ile pytan ma załadować klient na jednej stronie pytan wyswietlanych przy jego profilu.
+        /// </summary>
+        public static readonly int ProfileQuestionsPageSize = 5;
     }
 }

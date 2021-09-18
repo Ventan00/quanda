@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Quanda.Server.Extensions;
 using Quanda.Server.Repositories.Interfaces;
@@ -55,7 +56,7 @@ namespace Quanda.Server.Controllers
             if (tag == null)
                 tag = new List<int>();
             var questions = await _repository.GetQuestions(skip,
-                (SortOptionEnum) Enum.Parse(typeof(SortOptionEnum), sortOption), tag);
+                (SortOptionEnum)Enum.Parse(typeof(SortOptionEnum), sortOption), tag);
             return Ok(questions);
         }
 
@@ -157,6 +158,27 @@ namespace Quanda.Server.Controllers
             if (tags == null)
                 tags = new List<int>();
             return Ok(await _repository.GetAmountOfQuestions(tags));
+        }
+
+        [Authorize]
+        [HttpGet("users/{idUser:int}")]
+        public async Task<IActionResult> GetUserQuestions(
+            [FromRoute] int idUser, [FromQuery] int skip)
+        {
+            var questions = await _repository.GetUserProfileQuestionsAsync(idUser, skip);
+            if (questions is null)
+                return NotFound();
+
+            return Ok(questions);
+        }
+
+        [Authorize]
+        [HttpGet("users/{idUser:int}/amount")]
+        public async Task<IActionResult> GetAmountOfUserQuestions(
+            [FromRoute] int idUser)
+        {
+            var amountOfQuestions = await _repository.GetAmountOfUserQuestionsAsync(idUser);
+            return Ok(amountOfQuestions);
         }
     }
 }
