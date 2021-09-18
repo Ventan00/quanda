@@ -36,6 +36,20 @@ namespace Quanda.Client.Repositories.Implementations
             return response.Response;
         }
 
+        public async Task<IEnumerable<QuestionInProfileResponseDto>> GetUserQuestionsAsync(int idUser, int skip)
+        {
+            var response =
+                await _httpService.Get<IEnumerable<QuestionInProfileResponseDto>>(
+                    $"{ApiUrl}/users/{idUser}?skip={skip}");
+            return !response.Success ? null : response.Response;
+        }
+
+        public async Task<int> GetAmountOfUserQuestionsAsync(int idUser)
+        {
+            var response = await _httpService.Get<int>($"{ApiUrl}/users/{idUser}/amount");
+            return response.Response;
+        }
+
         public async Task<GetQuestionsDTO> GetQuestions(int page, SortOptionEnum sortingBy, List<int> tags)
         {
             var url = $"{ApiUrl}?skip={page * _skipAmount}&sortOption={Enum.GetName(sortingBy)}";

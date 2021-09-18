@@ -33,5 +33,8 @@ namespace Quanda.Client.Repositories.Interfaces
         /// <param name="idQuestion">Id pytania</param>
         /// <returns>GetQuestionsDTO</returns>
         public Task<QuestionResponseDTO> GetQuestion(int idQuestion);
+
+        public Task<IEnumerable<QuestionInProfileResponseDto>> GetUserQuestionsAsync(int idUser, int skip);
+        public Task<int> GetAmountOfUserQuestionsAsync(int idUser);
     }
 }

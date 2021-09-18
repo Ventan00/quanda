@@ -52,5 +52,13 @@ namespace Quanda.Client.Repositories.Implementations
             var response = await _httpService.Post($"{ApiUrl}/reset-password", passwordResetDto);
             return response.HttpResponseMessage.StatusCode;
         }
+
+        public async Task<UserProfileDetailsResponseDto> GetUserProfileDetailsAsync(int idUser)
+        {
+            var response = await _httpService.Get<UserProfileDetailsResponseDto>
+                ($"{ApiUrl}/{idUser}/profile-details");
+
+            return response.Response;
+        }
     }
 }
