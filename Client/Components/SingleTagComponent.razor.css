@@ -66,3 +66,7 @@
 .light-mode .light-grey {
     color: #878787;
 }
+
+.disabled {
+    pointer-events: none;
+}

@@ -45,13 +45,13 @@
             <div class="pagination-row">
                 <PaginationComponent ElementsSize="@SubTagPage.TotalAmountOfSubTags" PageSelectedListener="SetPage" PageSize="@Config.TAGS_PAGE_SIZE" ActualPage="activePage"></PaginationComponent>
             </div>
-                }
-                else
-                {
-                    <h1>
-                        Any subtag not assigned yet.
-                    </h1>
-                }
+        }
+        else
+        {
+            <h1>
+                Any subtag not assigned yet.
+            </h1>
+        }
     }
     else
     {

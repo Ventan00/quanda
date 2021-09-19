@@ -7,7 +7,7 @@ using Quanda.Shared.Enums;
 using System;
 using System.Threading.Tasks;
 
-namespace Quanda.Client.Pages
+namespace Quanda.Client.Pages.Tags
 {
     public partial class Tags : IAsyncDisposable
     {
