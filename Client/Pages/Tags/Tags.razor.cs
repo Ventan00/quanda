@@ -1,31 +1,32 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
-using Microsoft.AspNetCore.WebUtilities;
+using Quanda.Client.Extensions;
 using Quanda.Client.Repositories;
 using Quanda.Shared.DTOs.Responses;
 using Quanda.Shared.Enums;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Quanda.Client.Pages.Tags
 {
     public partial class Tags : IAsyncDisposable
     {
-        [Inject] ITagsRepository TagRepository { get; set; }
-        [Inject] NavigationManager NavManager { get; set; }
+        [Inject] private ITagsRepository TagRepository { get; set; }
+        [Inject] private NavigationManager NavManager { get; set; }
 
         /// <summary>
         ///     Aktualnie przeglądana strona
         /// </summary>
-        private int activePage = 0;
+        private int _activePage = 0;
         /// <summary>
         ///     Tagi.
         /// </summary>
         /// <summary>
-        public TagsPageResponseDTO TagPage { get; set; }
+        private TagsPageResponseDTO _tagPage;
         ///     Aktywna opcja sortowania tagów.
         /// </summary>
-        public SortTagsEnum ActiveSorting { get; set; }
+        private SortTagsEnum _activeSorting;
 
         /// <summary>
         ///     Metoda odczytuje z URI parametry oraz pobiera tagi.
@@ -41,27 +42,28 @@ namespace Quanda.Client.Pages.Tags
         /// </summary>
         private async Task GetQueryValues()
         {
-            var uri = NavManager.ToAbsoluteUri(NavManager.Uri);
-            if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("page", out var initPage))
+            var initPage = NavManager.ExtractQueryStringByKey<int?>("page");
+            if (initPage != null)
             {
-                var page = Convert.ToInt32(initPage);
+                var page = (int)initPage;
                 if (page < 1)
-                    activePage = 0;
+                    _activePage = 0;
                 else
-                    activePage = page - 1;
+                    _activePage = page - 1;
             }
             else
-                activePage = 0;
+                _activePage = 0;
 
-            if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("sortOption", out var initSortOption))
+            var initSortOption = NavManager.ExtractQueryStringByKey<string>("sortOption");
+            if (initSortOption != null)
             {
                 if (Enum.TryParse(initSortOption, out SortTagsEnum activeSorting))
-                    ActiveSorting = activeSorting;
+                    _activeSorting = activeSorting;
                 else
-                    ActiveSorting = SortTagsEnum.Popular;
+                    _activeSorting = SortTagsEnum.Popular;
             }
             else
-                ActiveSorting = SortTagsEnum.Popular;
+                _activeSorting = SortTagsEnum.Popular;
 
             await GetTags();
         }
@@ -71,7 +73,7 @@ namespace Quanda.Client.Pages.Tags
         /// </summary>
         private async Task GetTags()
         {
-            TagPage = await TagRepository.GetTagsAsync(activePage, ActiveSorting);
+            _tagPage = await TagRepository.GetTagsAsync(_activePage, _activeSorting);
         }
 
         /// <summary>
@@ -79,6 +81,7 @@ namespace Quanda.Client.Pages.Tags
         /// </summary>
         private async void HandleLocationChanged(object sender, LocationChangedEventArgs e)
         {
+            _tagPage = null;
             await GetQueryValues();
             StateHasChanged();
         }
@@ -86,17 +89,17 @@ namespace Quanda.Client.Pages.Tags
         /// <summary>
         ///     Metoda odpowiedzialna za zmianę trybu sortowania tagów.
         /// </summary>
-        private async Task ChangeSorting()
+        private void ChangeSorting(SortTagsEnum newSortOption)
         {
-            ActiveSorting = ActiveSorting == SortTagsEnum.Popular ? SortTagsEnum.Name : SortTagsEnum.Popular;
+            _activeSorting = newSortOption;
 
-            var newUri = new Uri(NavManager.Uri).GetLeftPart(UriPartial.Path);
-            var uri = NavManager.ToAbsoluteUri(NavManager.Uri);
-            if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("page", out _))
-                newUri = QueryHelpers.AddQueryString(newUri, "page", (activePage + 1).ToString());
+            var queryParams = new Dictionary<string, string>();
+            var pageUri = NavManager.ExtractQueryStringByKey<int?>("page");
+            if (pageUri != null)
+                queryParams.Add("page", pageUri.ToString());
+            queryParams.Add("sortOption", _activeSorting.ToString());
 
-            newUri = QueryHelpers.AddQueryString(newUri, "sortOption", ActiveSorting.ToString());
-            NavManager.NavigateTo(newUri);
+            NavManager.NavigateTo(NavManager.AddQueryParameters(queryParams));
         }
 
         /// <summary>
@@ -104,16 +107,19 @@ namespace Quanda.Client.Pages.Tags
         /// </summary>
         /// <param name="page"></param>
         /// <returns></returns>
-        private async Task SetPage(int page)
+        private void SetPage(int page)
         {
-            activePage = page;
+            _activePage = page;
 
-            var newUri = new Uri(NavManager.Uri).GetLeftPart(UriPartial.Path);
-            var uri = NavManager.ToAbsoluteUri(NavManager.Uri);
-            newUri = QueryHelpers.AddQueryString(newUri, "page", (activePage + 1).ToString());
-            if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("sortOption", out _))
-                newUri = QueryHelpers.AddQueryString(newUri, "sortOption", ActiveSorting.ToString());
-            NavManager.NavigateTo(newUri);
+            var queryParams = new Dictionary<string, string>
+            {
+                { "page", (_activePage + 1).ToString() }
+            };
+
+            var sortOptionUri = NavManager.ExtractQueryStringByKey<string>("sortOption");
+            if (sortOptionUri != null)
+                queryParams.Add("sortOption", sortOptionUri);
+            NavManager.NavigateTo(NavManager.AddQueryParameters(queryParams));
         }
 
         /// <summary>

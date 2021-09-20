@@ -23,6 +23,6 @@
         /// <summary>
         ///     Wartość która opisuje ile tagów ma załadować klient na jednej stronie.
         /// </summary>
-        public static readonly int TAGS_PAGE_SIZE = 16;
+        public static readonly int TagsPageSize = 16;
     }
 }

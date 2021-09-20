@@ -2,10 +2,10 @@
 
 <div class="page-container">
     <h1 class="header">Tags</h1>
-    @if (TagPage != null)
+    @if (_tagPage != null)
     {
         <span class="header-amount-tags light-grey">
-            Amount of tags: @TagPage.TotalAmountOfTags
+            Amount of tags: @_tagPage.TotalAmountOfTags
         </span>
         <span class="header-info">
             Here you can find all main category that we have. Find a topic that interest you and scroll throught it or go to subcategories and find more specific topic for you!
@@ -20,17 +20,17 @@
                     Sort:
                 </span>
                 <div class="button-container">
-                    <div class="sort-button @(ActiveSorting== SortTagsEnum.Popular?"active-sort":"inactive-sort")" @onclick="@(async () =>await ChangeSorting())">
+                    <div class="sort-button @(_activeSorting== SortTagsEnum.Popular?"active-sort":"inactive-sort")" @onclick="(() =>ChangeSorting(SortTagsEnum.Popular))">
                         Popular
                     </div>
-                    <div class="sort-button @(ActiveSorting== SortTagsEnum.Name?"active-sort":"inactive-sort")" @onclick="@(async () =>await ChangeSorting())">
+                    <div class="sort-button @(_activeSorting== SortTagsEnum.Name?"active-sort":"inactive-sort")" @onclick="(() =>ChangeSorting(SortTagsEnum.Name))">
                         Name
                     </div>
                 </div>
             </div>
         </div>
         <div class="tags-container">
-            @foreach (var tag in TagPage.Tags)
+            @foreach (var tag in _tagPage.Tags)
             {
                 <div class="single-tag">
                     <SingleTagComponent Tag="tag" IsMainTag="true"></SingleTagComponent>
@@ -39,7 +39,7 @@
             }
         </div>
         <div class="pagination-row">
-            <PaginationComponent ElementsSize="@TagPage.TotalAmountOfTags" PageSelectedListener="SetPage" PageSize="@Config.TAGS_PAGE_SIZE" ActualPage="activePage"></PaginationComponent>
+            <PaginationComponent ElementsSize="@_tagPage.TotalAmountOfTags" PageSelectedListener="SetPage" PageSize="@Config.TagsPageSize" ActualPage="_activePage"></PaginationComponent>
         </div>
     }
     else

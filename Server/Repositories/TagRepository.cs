@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Quanda.Server.Data;
-using Quanda.Server.Extensions;
+using Quanda.Shared;
 using Quanda.Shared.DTOs.Requests;
 using Quanda.Shared.DTOs.Responses;
 using Quanda.Shared.Enums;
@@ -74,36 +74,39 @@ namespace Quanda.Server.Repositories
 
         public async Task<TagsPageResponseDTO> GetTagsAsync(int page, SortTagsEnum sortOption)
         {
-            List<TagResponseDTO> tags = null;
-            switch (sortOption)
+            IQueryable<Tag> tagsQuery = _context.Tags;
+            tagsQuery = sortOption switch
             {
-                case SortTagsEnum.Popular:
-                    tags = CustomExtensionMethods.GetTruncatedTags(_context.Tags.OrderByDescending(tag => tag.QuestionTags.Count), page);
-                    break;
-                case SortTagsEnum.Name:
-                    tags = CustomExtensionMethods.GetTruncatedTags(_context.Tags.OrderBy(tag => tag.Name), page);
-                    break;
-            }
+                SortTagsEnum.Popular => tagsQuery.OrderByDescending(tag => tag.QuestionTags.Count),
+                SortTagsEnum.Name => tagsQuery.OrderBy(tag => tag.Name),
+                _ => tagsQuery
+            };
 
             return new TagsPageResponseDTO
             {
-                Tags = tags,
-                TotalAmountOfTags = _context.Tags.Count()
+                Tags = await tagsQuery
+                .Skip(page * Config.TagsPageSize)
+                .Take(Config.TagsPageSize)
+                .Select(tag => new TagResponseDTO
+                {
+                    IdTag = tag.IdTag,
+                    Name = tag.Name,
+                    Description = tag.Description,
+                    AmountOfQuestions = tag.QuestionTags.Count
+                }).ToListAsync(),
+                TotalAmountOfTags = await _context.Tags.CountAsync()
             };
         }
 
         public async Task<SubTagsPageResponseDTO> GetSubTagsAsync(int idMainTag, int page, SortTagsEnum sortOption)
         {
-            List<TagResponseDTO> subTags = null;
-            switch (sortOption)
+            IQueryable<Tag> tagsQuery = _context.Tags.Where(t => t.IdMainTag == idMainTag);
+            tagsQuery = sortOption switch
             {
-                case SortTagsEnum.Popular:
-                    subTags = CustomExtensionMethods.GetTruncatedTags(_context.Tags.Where(t => t.IdMainTag == idMainTag).OrderByDescending(tag => tag.QuestionTags.Count), page);
-                    break;
-                case SortTagsEnum.Name:
-                    subTags = CustomExtensionMethods.GetTruncatedTags(_context.Tags.Where(t => t.IdMainTag == idMainTag).OrderBy(tag => tag.Name), page);
-                    break;
-            }
+                SortTagsEnum.Popular => tagsQuery.OrderByDescending(tag => tag.QuestionTags.Count),
+                SortTagsEnum.Name => tagsQuery.OrderBy(tag => tag.Name),
+                _ => tagsQuery
+            };
 
             var mainTag = await _context.Tags.SingleOrDefaultAsync(t => t.IdTag == idMainTag);
 
@@ -111,8 +114,17 @@ namespace Quanda.Server.Repositories
             {
                 IdMainTag = idMainTag,
                 NameMainTag = mainTag.Name,
-                SubTags = subTags,
-                TotalAmountOfSubTags = _context.Tags.Count(t => t.IdMainTag == idMainTag)
+                SubTags = await tagsQuery
+                .Skip(page * Config.TagsPageSize)
+                .Take(Config.TagsPageSize)
+                .Select(tag => new TagResponseDTO
+                {
+                    IdTag = tag.IdTag,
+                    Name = tag.Name,
+                    Description = tag.Description,
+                    AmountOfQuestions = tag.QuestionTags.Count
+                }).ToListAsync(),
+                TotalAmountOfSubTags = await _context.Tags.CountAsync(t => t.IdMainTag == idMainTag)
             };
         }
 

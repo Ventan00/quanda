@@ -1,19 +1,19 @@
 ﻿@page "/tags/{IdMainTag:int}"
 
 <div class="page-container">
-    @if (SubTagPage != null)
+    @if (_subTagPage != null)
     {
-        <h1 class="header">#@SubTagPage.NameMainTag</h1>
+        <h1 class="header">#@_subTagPage.NameMainTag</h1>
         <span class="header-amount-tags light-grey">
-            Amount of subtags: @SubTagPage.TotalAmountOfSubTags
+            Amount of subtags: @_subTagPage.TotalAmountOfSubTags
         </span>
         <span class="header-info">
             You choose tag that you interested in! Now you can search for more specific topic for you or watch all question in this tag.
         </span>
-        <a href="/questions?tags=@SubTagPage.IdMainTag" class="main-tags-questions">
+        <a href="/questions?tags=@_subTagPage.IdMainTag" class="main-tags-questions">
             Show me all questions in this tag>>
         </a>
-        @if (SubTagPage.TotalAmountOfSubTags > 0)
+        @if (_subTagPage.TotalAmountOfSubTags > 0)
         {
             <span class="grey">
                 Filter by tag name
@@ -25,17 +25,17 @@
                         Sort:
                     </span>
                     <div class="button-container">
-                        <div class="sort-button @(ActiveSorting==SortTagsEnum.Popular?"active-sort":"inactive-sort")" @onclick="@(async () =>await ChangeSorting())">
+                        <div class="sort-button @(_activeSorting== SortTagsEnum.Popular?"active-sort":"inactive-sort")" @onclick="(() =>ChangeSorting(SortTagsEnum.Popular))">
                             Popular
                         </div>
-                        <div class="sort-button @(ActiveSorting==SortTagsEnum.Name?"active-sort":"inactive-sort")" @onclick="@(async () =>await ChangeSorting())">
+                        <div class="sort-button @(_activeSorting== SortTagsEnum.Name?"active-sort":"inactive-sort")" @onclick="(() =>ChangeSorting(SortTagsEnum.Name))">
                             Name
                         </div>
                     </div>
                 </div>
             </div>
             <div class="tags-container">
-                @foreach (var tag in SubTagPage.SubTags)
+                @foreach (var tag in _subTagPage.SubTags)
                 {
                     <div class="single-tag">
                         <SingleTagComponent Tag="tag" IsMainTag="false"></SingleTagComponent>
@@ -43,7 +43,7 @@
                 }
             </div>
             <div class="pagination-row">
-                <PaginationComponent ElementsSize="@SubTagPage.TotalAmountOfSubTags" PageSelectedListener="SetPage" PageSize="@Config.TAGS_PAGE_SIZE" ActualPage="activePage"></PaginationComponent>
+                <PaginationComponent ElementsSize="@_subTagPage.TotalAmountOfSubTags" PageSelectedListener="SetPage" PageSize="@Config.TagsPageSize" ActualPage="_activePage"></PaginationComponent>
             </div>
         }
         else
