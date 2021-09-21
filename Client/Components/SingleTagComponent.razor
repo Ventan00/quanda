@@ -18,7 +18,7 @@
     </div>
     <div class="tag-box-part">
         <span class="tag-questions light-grey">
-            Amount of question: @Tag.AmountOfQuestions
+            Amount of questions: @Tag.AmountOfQuestions
         </span>
         <a href="@(IsMainTag==true? $"/tags/{@Tag.IdTag}" : $"/questions?tags={@Tag.IdTag}")" class="tag-subtags tag-subtags-box @(Tag.AmountOfQuestions == 0&&!IsMainTag?"disabled":"")">
             @(IsMainTag==true? "Go to subtags > >" : "Show all questions >>")
