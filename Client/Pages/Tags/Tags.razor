@@ -1,0 +1,49 @@
+﻿@page "/tags"
+
+<div class="page-container">
+    <h1 class="header">Tags</h1>
+    @if (_tagPage != null)
+    {
+        <span class="header-amount-tags light-grey">
+            Amount of tags: @_tagPage.TotalAmountOfTags
+        </span>
+        <span class="header-info">
+            Here you can find all main tags that we have. Find a topic that interest you and scroll throught it or go to subtags and find more specific topic for you!
+        </span>
+        <span class="grey">
+            Filter by tag name
+        </span>
+        <div class="search-sort-row">
+            <input type="text" class="tag-searcher tag-searcher-text" placeholder="Enter name of tag that interest you..." />
+            <div class="sort-container">
+                <span class="light-grey">
+                    Sort:
+                </span>
+                <div class="button-container">
+                    <div class="sort-button @(_activeSorting== SortTagsEnum.Popular?"active-sort":"inactive-sort")" @onclick="(() =>ChangeSorting(SortTagsEnum.Popular))">
+                        Popular
+                    </div>
+                    <div class="sort-button @(_activeSorting== SortTagsEnum.Name?"active-sort":"inactive-sort")" @onclick="(() =>ChangeSorting(SortTagsEnum.Name))">
+                        Name
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tags-container">
+            @foreach (var tag in _tagPage.Tags)
+            {
+                <div class="single-tag">
+                    <SingleTagComponent Tag="tag" IsMainTag="true"></SingleTagComponent>
+                </div>
+
+            }
+        </div>
+        <div class="pagination-row">
+            <PaginationComponent ElementsSize="@_tagPage.TotalAmountOfTags" PageSelectedListener="SetPage" PageSize="@Config.TagsPageSize" ActualPage="_activePage"></PaginationComponent>
+        </div>
+    }
+    else
+    {
+        <LoadingIndicatorComponent></LoadingIndicatorComponent>
+    }
+</div>

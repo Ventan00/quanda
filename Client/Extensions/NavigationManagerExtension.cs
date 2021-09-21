@@ -1,5 +1,8 @@
-﻿using System.Web;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.WebUtilities;
+using System;
+using System.Collections.Generic;
+using System.Web;
 
 namespace Quanda.Client.Extensions
 {
@@ -25,6 +28,11 @@ namespace Quanda.Client.Extensions
                 return (T)(object)value;
 
             return default;
+        }
+
+        public static string AddQueryParameters(this NavigationManager navManager, Dictionary<string, string> queryParams)
+        {
+            return new Uri(QueryHelpers.AddQueryString(new Uri(navManager.Uri).GetLeftPart(UriPartial.Path), queryParams)).ToString();
         }
     }
 }

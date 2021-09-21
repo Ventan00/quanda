@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Quanda.Server.Repositories.Interfaces;
+using Quanda.Server.Repositories;
 using Quanda.Shared.DTOs.Requests;
 using Quanda.Shared.Enums;
 using System;
@@ -41,13 +41,28 @@ namespace Quanda.Server.Controllers
         }
 
         /// <summary>
-        ///     Końcówka zwracająca wszystkie tagi
+        ///     Końcówka, która zwraca tagi z podanej strony.
         /// </summary>
-        /// <returns>List(TagResponseDTO)</returns>
+        /// <param name="page">Aktualna strona przeglądanych tagów.</param>
+        /// <param name="sortOption">Rodzaj sortowania tagów.</param>
+        /// <returns>TagsPageResponseDTO</returns>
         [HttpGet]
-        public async Task<IActionResult> GetTags()
+        public async Task<IActionResult> GetTags([FromQuery] int page, [FromQuery] int sortOption)
         {
-            return Ok(await _repository.GetTagsAsync());
+            return Ok(await _repository.GetTagsAsync(page, (SortTagsEnum)sortOption));
+        }
+
+        /// <summary>
+        ///     Końcówka, która zwraca subtagi z podanej strony.
+        /// </summary>
+        /// <param name="idMainTag">Id nadrzędnego tagu.</param>
+        /// <param name="page">Aktualna strona przeglądanych subtagów.</param>
+        /// <param name="sortOption">Rodzaj sortowania subtagów.</param>
+        /// <returns>SubTagsPageResponseDTO</returns>
+        [HttpGet("{idMainTag:int}")]
+        public async Task<IActionResult> GetSubTags(int idMainTag, [FromQuery] int page, [FromQuery] int sortOption)
+        {
+            return Ok(await _repository.GetSubTagsAsync(idMainTag, page, (SortTagsEnum)sortOption));
         }
 
         /// <summary>
@@ -101,5 +116,6 @@ namespace Quanda.Server.Controllers
                 _ => throw new ArgumentException()
             };
         }
+
     }
 }

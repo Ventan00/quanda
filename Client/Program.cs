@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Quanda.Client.Authentication;
 using Quanda.Client.Helpers;
+using Quanda.Client.Repositories;
 using Quanda.Client.Repositories.Implementations;
 using Quanda.Client.Repositories.Interfaces;
 using System;
@@ -45,7 +46,7 @@ namespace Quanda.Client
             services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();
             services.AddScoped<IRefreshTokenService, RefreshTokenService>();
             services.AddScoped<IQuestionsReposiotry, QuestionsRepository>();
-            services.AddScoped<ITagsReposiotry, TagsRepository>();
+            services.AddScoped<ITagsRepository, TagsRepository>();
 
             services.AddScoped<IUsersRepository, UsersRepository>();
             services.AddScoped<IHttpService, HttpService>();
