@@ -8,7 +8,18 @@ else
     {
         <span class="top-user @($"top-{_userProfileDetails.TopUsersPlacement}-user")">
             <i class="icon-cup"></i>
-            @($"{_userProfileDetails.TopUsersPlacement}th best user")
+            @switch (_userProfileDetails.TopUsersPlacement)
+            {
+                case 1:
+                    @:@($"{_userProfileDetails.TopUsersPlacement}st best user");
+                    break;
+                case 2:
+                    @:@($"{_userProfileDetails.TopUsersPlacement}nd best user");
+                    break;
+                case 3:
+                    @:@($"{_userProfileDetails.TopUsersPlacement}rd best user")
+                    break;
+            }
         </span>
     }
     @if (_userProfileDetails.IsPremium)
