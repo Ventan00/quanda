@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Quanda.Client.Repositories.Interfaces;
@@ -12,8 +11,7 @@ namespace Quanda.Client.Shared.UserProfile
     {
         private int _actualPage;
 
-        private int _amountOfAllQuestions;
-        private IEnumerable<QuestionInProfileResponseDto> _questions;
+        private GetProfileQuestionsResponseDto _profileQuestions;
 
         [Parameter] public int IdUser { get; set; }
 
@@ -28,14 +26,13 @@ namespace Quanda.Client.Shared.UserProfile
 
         private async Task FetchMoreData(int skip = 0)
         {
-            _questions = await QuestionsReposiotry.GetUserQuestionsAsync(IdUser, skip);
-            _amountOfAllQuestions = await QuestionsReposiotry.GetAmountOfUserQuestionsAsync(IdUser);
+            _profileQuestions = new GetProfileQuestionsResponseDto();
+            _profileQuestions = await QuestionsReposiotry.GetUserQuestionsAsync(IdUser, skip);
         }
 
         private async Task OnPageChange(int pageNumber)
         {
             _actualPage = pageNumber;
-            _questions = null;
             await JsRuntime.InvokeVoidAsync("window.scrollTo", new
             {
                 top = 0,

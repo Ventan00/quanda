@@ -160,25 +160,25 @@ namespace Quanda.Server.Controllers
             return Ok(await _repository.GetAmountOfQuestions(tags));
         }
 
+        /// <summary>
+        ///    API endpoint for getting questions created by given user
+        /// </summary>
+        /// <param name="idUser">Id of user whose questions should be returned</param>
+        /// <param name="skip">Amount of questions that are already loaded and should be skipped</param>
+        /// <returns>
+        ///     NotFound,
+        ///     Ok => GetProfileQuestionsResponseDto
+        /// </returns>
         [Authorize]
         [HttpGet("users/{idUser:int}")]
         public async Task<IActionResult> GetUserQuestions(
             [FromRoute] int idUser, [FromQuery] int skip)
         {
-            var questions = await _repository.GetUserProfileQuestionsAsync(idUser, skip);
-            if (questions is null)
+            var profileQuestions = await _repository.GetUserProfileQuestionsAsync(idUser, skip);
+            if (profileQuestions is null)
                 return NotFound();
 
-            return Ok(questions);
-        }
-
-        [Authorize]
-        [HttpGet("users/{idUser:int}/amount")]
-        public async Task<IActionResult> GetAmountOfUserQuestions(
-            [FromRoute] int idUser)
-        {
-            var amountOfQuestions = await _repository.GetAmountOfUserQuestionsAsync(idUser);
-            return Ok(amountOfQuestions);
+            return Ok(profileQuestions);
         }
     }
 }

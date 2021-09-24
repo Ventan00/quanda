@@ -89,7 +89,12 @@ namespace Quanda.Server.Repositories.Interfaces
         /// <returns>int</returns>
         Task<int> GetAmountOfQuestions(List<int> tags);
 
-        public Task<IEnumerable<QuestionInProfileResponseDto>> GetUserProfileQuestionsAsync(int idUser, int skip);
-        public Task<int> GetAmountOfUserQuestionsAsync(int idUser);
+        /// <summary>
+        ///     Method for getting user profile questions
+        /// </summary>
+        /// <param name="idUser">Id of user whose questions should be returned</param>
+        /// <param name="skip">Amount of questions should be skipped</param>
+        /// <returns>GetProfileQuestionsResponseDto</returns>
+        public Task<GetProfileQuestionsResponseDto> GetUserProfileQuestionsAsync(int idUser, int skip);
     }
 }

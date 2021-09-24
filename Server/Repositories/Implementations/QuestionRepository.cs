@@ -297,35 +297,32 @@ namespace Quanda.Server.Repositories.Implementations
                 .CountAsync();
         }
 
-        public async Task<IEnumerable<QuestionInProfileResponseDto>> GetUserProfileQuestionsAsync(int idUser, int skip)
+        public async Task<GetProfileQuestionsResponseDto> GetUserProfileQuestionsAsync(int idUser, int skip)
         {
-            return await _context.Questions
-                .Where(q => q.IdUser == idUser)
-                .OrderByDescending(q => q.PublishDate)
-                .Skip(skip)
-                .Take(Config.ProfileQuestionsPageSize)
-                .Select(q => new QuestionInProfileResponseDto
+            return await _context.Users
+                .Where(u => u.IdUser == idUser)
+                .Select(u => u.Questions)
+                .Select(uq => new GetProfileQuestionsResponseDto()
                 {
-                    IdQuestion = q.IdQuestion,
-                    Header = q.Header,
-                    Description = q.Description,
-                    Answers = q.Answers.Count,
-                    Views = q.Views,
-                    CreatedAt = q.PublishDate,
-                    Tags = q.QuestionTags.Select(qt => new TagResponseDTO
-                    {
-                        IdTag = qt.IdTag,
-                        Name = qt.IdTagNavigation.Name
-                    })
-                })
-                .ToListAsync();
-        }
-
-        public Task<int> GetAmountOfUserQuestionsAsync(int idUser)
-        {
-            return _context.Questions
-                .Where(q => q.IdUser == idUser)
-                .CountAsync();
+                    Questions = uq.OrderByDescending(q => q.PublishDate)
+                        .Skip(skip)
+                        .Take(Config.ProfileQuestionsPageSize)
+                        .Select(q => new QuestionInProfileResponseDto
+                        {
+                            IdQuestion = q.IdQuestion,
+                            Header = q.Header,
+                            Description = q.Description,
+                            Answers = q.Answers.Count,
+                            Views = q.Views,
+                            CreatedAt = q.PublishDate,
+                            Tags = q.QuestionTags.Select(qt => new TagResponseDTO
+                            {
+                                IdTag = qt.IdTag,
+                                Name = qt.IdTagNavigation.Name
+                            }),
+                        }),
+                    AmountOfAllQuestions = uq.Count
+                }).FirstOrDefaultAsync();
         }
     }
 }

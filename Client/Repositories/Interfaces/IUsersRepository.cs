@@ -44,9 +44,10 @@ namespace Quanda.Client.Repositories.Interfaces
         public Task<HttpStatusCode> ResetPasswordAsync(PasswordResetDTO passwordResetDto);
 
         /// <summary>
+        ///     Sending API Request in order to get user profile detailed data
         /// </summary>
-        /// <param name="idUser"></param>
-        /// <returns></returns>
+        /// <param name="idUser">User id of the profile you want to get data for</param>
+        /// <returns>UserProfileDetailsResponseDto</returns>
         public Task<UserProfileDetailsResponseDto> GetUserProfileDetailsAsync(int idUser);
     }
 }

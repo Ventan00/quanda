@@ -1,10 +1,10 @@
-﻿@if (_questions is null)
+﻿@if (_profileQuestions.Questions is null)
 {
     <LoadingIndicatorComponent />
 }
 else
 {
-    @foreach (var question in _questions)
+    @foreach (var question in _profileQuestions.Questions)
     {
         <div class="question-container">
             <h3 class="header">@question.Header</h3>
@@ -29,7 +29,7 @@ else
     }
     <div class="pagination-container">
         <PaginationComponent PageSize="Config.ProfileQuestionsPageSize"
-                             ElementsSize="_amountOfAllQuestions"
+                             ElementsSize="_profileQuestions.AmountOfAllQuestions"
                              ActualPage="_actualPage"
                              PageSelectedListener="@OnPageChange" />
     </div>
