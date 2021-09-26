@@ -5,11 +5,13 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Quanda.Client.Authentication;
 using Quanda.Client.Helpers;
+using Quanda.Client.Repositories;
 using Quanda.Client.Repositories.Implementations;
 using Quanda.Client.Repositories.Interfaces;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Quanda.Client.Services;
 using Toolbelt.Blazor.Extensions.DependencyInjection;
 
 namespace Quanda.Client
@@ -28,6 +30,8 @@ namespace Quanda.Client
 
             ConfigureServices(builder.Services);
 
+            builder.Services.AddSingleton<RightMenuStateService>();
+
             await builder.Build().RunAsync();
         }
 
@@ -42,7 +46,7 @@ namespace Quanda.Client
             services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();
             services.AddScoped<IRefreshTokenService, RefreshTokenService>();
             services.AddScoped<IQuestionsReposiotry, QuestionsRepository>();
-            services.AddScoped<ITagsReposiotry, TagsRepository>();
+            services.AddScoped<ITagsRepository, TagsRepository>();
 
             services.AddScoped<IUsersRepository, UsersRepository>();
             services.AddScoped<IHttpService, HttpService>();

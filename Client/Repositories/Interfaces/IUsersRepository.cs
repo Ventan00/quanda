@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 using Quanda.Shared.DTOs.Requests;
 using Quanda.Shared.DTOs.Responses;
@@ -49,5 +50,11 @@ namespace Quanda.Client.Repositories.Interfaces
         /// <param name="idUser">User id of the profile you want to get data for</param>
         /// <returns>UserProfileDetailsResponseDto</returns>
         public Task<UserProfileDetailsResponseDto> GetUserProfileDetailsAsync(int idUser);
+      
+        /// <summary>
+        ///     Funkcja która zwraca listę 3 użytkowników z największą ilością punktów
+        /// </summary>
+        /// <returns></returns>
+        public Task<IEnumerable<Top3UserResponseDTO>> GetTop3UsersAsync();
     }
 }

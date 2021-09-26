@@ -1,0 +1,41 @@
+﻿.user-container {
+    display: flex;
+}
+.top3avatar {
+    width: 45px;
+    border-radius: 100%;
+}
+.user-icon {
+    font-size: 27px;
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-right: 10px;
+}
+.user-icon0 {
+    color: #D6C66E !important;
+}
+.user-icon1 {
+    color: #9A9A9A !important;
+}
+.user-icon2 {
+    color: #A05D10 !important;
+}
+.user-separator {
+    margin: 5px;
+    width: 75%;
+    height: 1px;
+}
+.light-mode .user-separator {
+    background: black;
+}
+.dark-mode .user-separator {
+    background: white;
+}
+.usernick {
+    margin: auto 3px;
+}
+.userpoints {
+    margin-top: auto;
+    margin-bottom: auto;
+    font-style: italic;
+}

@@ -141,7 +141,7 @@
             var confirmed = await js.InvokeAsync<bool>("confirm", "Do want to delete answer?");
             if (confirmed)
             {
-                var result = await answerRepository.DeleteAnswer(answer.IdAnswer);
+                var result = await answerRepository.DeleteAnswerAsync(answer.IdAnswer);
                 if (!result.Item1)
                     await js.InvokeVoidAsync("alert", result.Item2);
                 else

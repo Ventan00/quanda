@@ -1,0 +1,12 @@
+﻿@implements IDisposable
+<div class="right-shared @(RightMenuStateService.RightMenuType==RightMenuType.NONE ? "right-hidden" : "")">
+    @switch (RightMenuStateService.RightMenuType)
+    {
+        case RightMenuType.STANDARD:
+            <RightStandard />
+            break;
+        case RightMenuType.ASKQUESTION:
+            <RightAskQuestion />
+            break;
+    }
+</div>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Quanda.Server.Utils;
 using Quanda.Shared.DTOs.Requests;
@@ -21,5 +22,11 @@ namespace Quanda.Server.Repositories.Interfaces
         public Task<User> GetUserByEmailAsync(string email);
         public Task<UserProfileDetailsResponseDto> GetUserProfileDetailsAsync(int idUser);
         public Task AddViewForUserAsync(int idUser);
+      
+        /// <summary>
+        ///     Funkcja zwracająca top 3 użytkowników
+        /// </summary>
+        /// <returns></returns>
+        public Task<IEnumerable<Top3UserResponseDTO>> GetTop3UsersAsync();
     }
 }

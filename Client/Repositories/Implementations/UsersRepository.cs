@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using System;
+using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 using Quanda.Client.Helpers;
 using Quanda.Client.Repositories.Interfaces;
@@ -57,7 +59,12 @@ namespace Quanda.Client.Repositories.Implementations
         {
             var response = await _httpService.Get<UserProfileDetailsResponseDto>
                 ($"{ApiUrl}/{idUser}/profile-details");
-
+            return response.Response;
+        }
+        
+        public async Task<IEnumerable<Top3UserResponseDTO>> GetTop3UsersAsync()
+        {
+            var response = await _httpService.Get<IEnumerable<Top3UserResponseDTO>>($"{ApiUrl}/top3-users");
             return response.Response;
         }
     }

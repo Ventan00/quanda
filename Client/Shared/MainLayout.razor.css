@@ -21,7 +21,9 @@
     width: calc(100% - 90px);
     z-index: 2;
 }
-
+.main-page-reduced {
+    width: calc(100% - 470px) !important;
+}
 .light-mode .topbar {
     background: white;
     box-shadow: -3px -13px 15px 13px #ccc;
@@ -43,8 +45,6 @@
     display: block;
     width: 100%;
 }
-
-.main-page-reduced { width: calc(100% - 300px); }
 
 .page-footer {
     background-color: #3F4D54;

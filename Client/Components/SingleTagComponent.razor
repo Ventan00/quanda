@@ -1,0 +1,35 @@
+﻿<div class="tag-box tag-box-background">
+    <div class="tag-box-part">
+        @if (IsMainTag)
+        {
+            <a href="/tags/@Tag.IdTag" class="tag-name">
+                #@Tag.Name
+            </a>
+        }
+        else
+        {
+            <div class="tag-name">
+                #@Tag.Name
+            </div>
+        }
+        <span class="tag-description">
+            @Tag.Description
+        </span>
+    </div>
+    <div class="tag-box-part">
+        <span class="tag-questions light-grey">
+            Amount of questions: @Tag.AmountOfQuestions
+        </span>
+        <a href="@(IsMainTag==true? $"/tags/{@Tag.IdTag}" : $"/questions?tags={@Tag.IdTag}")" class="tag-subtags tag-subtags-box @(Tag.AmountOfQuestions == 0&&!IsMainTag?"disabled":"")">
+            @(IsMainTag==true? "Go to subtags > >" : "Show all questions >>")
+        </a>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public TagResponseDTO Tag { get; set; }
+
+    [Parameter]
+    public bool IsMainTag { get; set; }
+}

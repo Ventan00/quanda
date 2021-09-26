@@ -7,14 +7,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Quanda.Server.Data;
-using Quanda.Server.Extensions;
 using Quanda.Server.Models.Settings;
+using Quanda.Server.Repositories;
 using Quanda.Server.Repositories.Implementations;
 using Quanda.Server.Repositories.Interfaces;
 using Quanda.Server.Services.Implementations;
 using Quanda.Server.Services.Interfaces;
 using System;
-using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 

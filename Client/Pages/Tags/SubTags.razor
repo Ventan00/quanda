@@ -1,0 +1,60 @@
+﻿@page "/tags/{IdMainTag:int}"
+
+<div class="page-container">
+    @if (_subTagPage != null)
+    {
+        <h1 class="header">#@_subTagPage.NameMainTag</h1>
+        <span class="header-amount-tags light-grey">
+            Amount of subtags: @_subTagPage.TotalAmountOfSubTags
+        </span>
+        <span class="header-info">
+            You choose tag that you interested in! Now you can search for more specific topic for you or watch all question in this tag.
+        </span>
+        <a href="/questions?tags=@_subTagPage.IdMainTag" class="main-tags-questions">
+            Show me all questions in this tag>>
+        </a>
+        @if (_subTagPage.TotalAmountOfSubTags > 0)
+        {
+            <span class="grey">
+                Filter by tag name
+            </span>
+            <div class="search-sort-row">
+                <input type="text" class="tag-searcher tag-searcher-text" placeholder="Enter name of tag that interest you..." />
+                <div class="sort-container">
+                    <span class="light-grey">
+                        Sort:
+                    </span>
+                    <div class="button-container">
+                        <div class="sort-button @(_activeSorting== SortTagsEnum.Popular?"active-sort":"inactive-sort")" @onclick="(() =>ChangeSorting(SortTagsEnum.Popular))">
+                            Popular
+                        </div>
+                        <div class="sort-button @(_activeSorting== SortTagsEnum.Name?"active-sort":"inactive-sort")" @onclick="(() =>ChangeSorting(SortTagsEnum.Name))">
+                            Name
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tags-container">
+                @foreach (var tag in _subTagPage.SubTags)
+                {
+                    <div class="single-tag">
+                        <SingleTagComponent Tag="tag" IsMainTag="false"></SingleTagComponent>
+                    </div>
+                }
+            </div>
+            <div class="pagination-row">
+                <PaginationComponent ElementsSize="@_subTagPage.TotalAmountOfSubTags" PageSelectedListener="SetPage" PageSize="@Config.TagsPageSize" ActualPage="_activePage"></PaginationComponent>
+            </div>
+        }
+        else
+        {
+            <h1>
+                Any subtag not assigned yet.
+            </h1>
+        }
+    }
+    else
+    {
+        <LoadingIndicatorComponent></LoadingIndicatorComponent>
+    }
+</div>

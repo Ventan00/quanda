@@ -2,9 +2,8 @@
     border-radius: 25px;
     margin-left: 50px;
     margin-top: 50px;
+    margin-bottom: 50px;
     padding: 30px;
-    width: 75%;
-    height: 100%;
 }
 
 .light-mode .main-container-background {
@@ -17,8 +16,6 @@
 
 .answers-empty {
     font-size: 25px;
-    font-family: 'Sen', sans-serif;
-    font-weight: bold;
 }
 
 ::deep .header {

@@ -95,14 +95,6 @@ namespace Quanda.Server.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDTO loginDto)
         {
-            //zamockowany losowy użytkownik do momentu faktycznego działania mechanizmu
-            /*return Ok(new LoginResponseDTO()
-            {
-                RefreshToken = _jwtService.GenerateRefreshToken().refreshToken,
-                AccessToken = _jwtService.WriteToken(_jwtService.GenerateAccessToken(new User())),
-                Avatar = "https://is2-ssl.mzstatic.com/image/thumb/Purple128/v4/b1/ea/32/b1ea3207-6343-35de-a2c1-3132ff367eea/source/512x512bb.jpg",
-                LoginStatus = LoginStatusEnum.LOGIN_ACCEPTED
-            });*/
             var isCaptchaCorrect = await _captchaService.VerifyCaptchaAsync(loginDto.CaptchaResponseToken);
             if (!isCaptchaCorrect)
                 return Unauthorized(new LoginResponseDTO
@@ -312,6 +304,7 @@ namespace Quanda.Server.Controllers
             return NoContent();
         }
 
+
         [Authorize]
         [HttpGet("{idUser:int}/profile-details")]
         public async Task<IActionResult> GetUserProfileDetails(
@@ -328,6 +321,17 @@ namespace Quanda.Server.Controllers
                 await _usersRepository.AddViewForUserAsync(idUser);
 
             return Ok(userDetails);
+        }
+
+        /// <summary>
+        ///     Końcówka zwracająca top 3 użytkowników względem punktów
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("top3-users")]
+        public async Task<IActionResult> GetTop3Users()
+        {
+            var list = await _usersRepository.GetTop3UsersAsync();
+            return Ok(list);
         }
     }
 }
