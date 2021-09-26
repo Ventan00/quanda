@@ -55,6 +55,13 @@ namespace Quanda.Client.Repositories.Implementations
             return response.HttpResponseMessage.StatusCode;
         }
 
+        public async Task<UserProfileDetailsResponseDto> GetUserProfileDetailsAsync(int idUser)
+        {
+            var response = await _httpService.Get<UserProfileDetailsResponseDto>
+                ($"{ApiUrl}/{idUser}/profile-details");
+            return response.Response;
+        }
+        
         public async Task<IEnumerable<Top3UserResponseDTO>> GetTop3UsersAsync()
         {
             var response = await _httpService.Get<IEnumerable<Top3UserResponseDTO>>($"{ApiUrl}/top3-users");

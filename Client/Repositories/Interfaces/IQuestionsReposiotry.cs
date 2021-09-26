@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Quanda.Shared.DTOs.Responses;
 using Quanda.Shared.Enums;
@@ -33,5 +34,13 @@ namespace Quanda.Client.Repositories.Interfaces
         /// <param name="idQuestion">Id pytania</param>
         /// <returns>GetQuestionsDTO</returns>
         public Task<QuestionResponseDTO> GetQuestion(int idQuestion);
+
+        /// <summary>
+        ///     Sending API Request in order to get questions created by given user
+        /// </summary>
+        /// <param name="idUser">Id of user whose questions you want to receive</param>
+        /// <param name="skip">Amount of questions that are already loaded and should be skipped</param>
+        /// <returns>GetProfileQuestionsResponseDto</returns>
+        public Task<GetProfileQuestionsResponseDto> GetUserQuestionsAsync(int idUser, int skip);
     }
 }

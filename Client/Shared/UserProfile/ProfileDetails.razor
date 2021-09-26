@@ -1,0 +1,97 @@
+﻿@if (_userProfileDetails is null)
+{
+    <LoadingIndicatorComponent />
+}
+else
+{
+    @if (_userProfileDetails.TopUsersPlacement is not null)
+    {
+        <span class="top-user @($"top-{_userProfileDetails.TopUsersPlacement+1}-user")">
+            <i class="icon-cup"></i>
+            @switch (_userProfileDetails.TopUsersPlacement)
+            {
+                case 0:
+                    @:@("1st")
+                    break;
+                case 1:
+                    @:@("2nd")
+                    break;
+                case 2:
+                    @:@("3rd")
+                    break;
+            }
+            @(" best user")
+        </span>
+    }
+    @if (_userProfileDetails.IsPremium)
+    {
+        <span class="premium-user">
+            <i class="icon-crown"></i>
+            premium user
+        </span>
+    }
+    <h2 class="nickname">@_userProfileDetails.Nickname</h2>
+    <img class="q-user-avatar" src="@_userProfileDetails.Avatar" alt="user avatar" />
+    <div class="statistics-container">
+        <div>
+            <h2>@_userProfileDetails.Points</h2>
+            <h6>points</h6>
+        </div>
+        <div class="v-line"></div>
+        <div>
+            <h2>@_userProfileDetails.Questions</h2>
+            <h6>questions</h6>
+        </div>
+        <div class="v-line"></div>
+        <div>
+            <h2>@_userProfileDetails.Answers</h2>
+            <h6>answers</h6>
+        </div>
+    </div>
+    @if (!OwnProfile)
+    {
+        <a href="messages/new/@IdUser">
+            <span class="send-message"><i class="icon-mail"></i>Send a message to this user</span>
+        </a>
+    }
+    <span class="bio">@_userProfileDetails.Bio</span>
+    <div class="h-line"></div>
+    <h5 class="top-tags-header">Top tags:</h5>
+    @if (_userProfileDetails.TopTags.Any())
+    {
+        @foreach (var userInTag in _userProfileDetails.TopTags)
+        {
+            <div class="top-tag-item">
+                <a href="/tags/@userInTag.IdTag">
+                    <span class="tag-name">#@userInTag.TagName</span>
+                </a>
+                <h5>@userInTag.UserPoints points</h5>
+            </div>
+        }
+        <span class="view-all-points" @onclick="ViewAllPoints">view all points</span>
+    }
+    else
+    {
+        <div class="top-tag-item justify-content-center">
+            <span class="tag-name">This user don't have any points</span>
+        </div>
+    }
+    <div class="h-line"></div>
+    <div class="bottom-container">
+        <span class="extra-info">
+            <i class="icon-time"></i>
+            Member for @_userProfileDetails.RegisteredAt.ToAgoString()
+        </span>
+        <span class="extra-info">
+            <i class="icon-views"></i>
+            @_userProfileDetails.ProfileViews profile views
+        </span>
+        @if (OwnProfile)
+        {
+            <span class="edit-profile" @onclick="EditProfile">
+                <i class="icon-edit"></i>
+                edit profile and settings
+            </span>
+        }
+    </div>
+}
