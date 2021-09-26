@@ -22,11 +22,6 @@ namespace Quanda.Client.Pages.Users
             _ownProfile = int.Parse(authState.User.FindFirst(ClaimTypes.NameIdentifier).Value) == IdUser;
         }
 
-        protected override void OnAfterRender(bool firstRender)
-        {
-            Console.WriteLine("UserProfile page - render");
-        }
-
         private void ShowQuestions()
         {
             _showQuestions = true;
