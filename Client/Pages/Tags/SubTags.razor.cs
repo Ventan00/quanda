@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Components.Routing;
 using Quanda.Client.Extensions;
 using Quanda.Client.Repositories;
+using Quanda.Client.Services;
+using Quanda.Client.Shared.RightMenu;
 using Quanda.Shared.DTOs.Responses;
 using Quanda.Shared.Enums;
 using System;
@@ -14,6 +16,11 @@ namespace Quanda.Client.Pages.Tags
     {
         [Inject] private ITagsRepository TagRepository { get; set; }
         [Inject] private NavigationManager NavManager { get; set; }
+        // <summary>
+        ///     Zmienna która jest odnośnikiem do serwisu prawego menu.
+        /// </summary>
+        [Inject]
+        public RightMenuStateService RightMenuStateService { get; set; }
 
         /// <summary>
         ///     Id nadrzędnego tagu.
@@ -38,6 +45,7 @@ namespace Quanda.Client.Pages.Tags
         /// </summary>
         protected async override Task OnInitializedAsync()
         {
+            RightMenuStateService.RightMenuType = RightMenuType.NONE;
             _subTagPage = null;
             await GetQueryValues();
             NavManager.LocationChanged += HandleLocationChanged;
