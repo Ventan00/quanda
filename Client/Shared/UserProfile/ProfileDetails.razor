@@ -6,20 +6,21 @@ else
 {
     @if (_userProfileDetails.TopUsersPlacement is not null)
     {
-        <span class="top-user @($"top-{_userProfileDetails.TopUsersPlacement}-user")">
+        <span class="top-user @($"top-{_userProfileDetails.TopUsersPlacement+1}-user")">
             <i class="icon-cup"></i>
             @switch (_userProfileDetails.TopUsersPlacement)
             {
+                case 0:
+                    @:@("1st")
+                    break;
                 case 1:
-                    @:@($"{_userProfileDetails.TopUsersPlacement}st best user");
+                    @:@("2nd")
                     break;
                 case 2:
-                    @:@($"{_userProfileDetails.TopUsersPlacement}nd best user");
-                    break;
-                case 3:
-                    @:@($"{_userProfileDetails.TopUsersPlacement}rd best user")
+                    @:@("3rd")
                     break;
             }
+            @(" best user")
         </span>
     }
     @if (_userProfileDetails.IsPremium)
