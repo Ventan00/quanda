@@ -108,12 +108,16 @@ namespace Quanda.Server.Repositories
                 _ => tagsQuery
             };
 
-            var mainTag = await _context.Tags.SingleOrDefaultAsync(t => t.IdTag == idMainTag);
-
             return new SubTagsPageResponseDTO
             {
-                IdMainTag = idMainTag,
-                NameMainTag = mainTag.Name,
+                MainTag = await _context.Tags
+                .Where(t => t.IdTag == idMainTag)
+                .Select(tag => new TagResponseDTO
+                {
+                    IdTag = tag.IdTag,
+                    Name = tag.Name,
+                    AmountOfQuestions = tag.QuestionTags.Count
+                }).SingleOrDefaultAsync(),
                 SubTags = await tagsQuery
                 .Skip(page * Config.TagsPageSize)
                 .Take(Config.TagsPageSize)
