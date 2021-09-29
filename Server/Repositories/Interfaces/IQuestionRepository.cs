@@ -88,5 +88,13 @@ namespace Quanda.Server.Repositories.Interfaces
         /// <param name="tags">Lista kategorii do filtrowania pytań</param>
         /// <returns>int</returns>
         Task<int> GetAmountOfQuestions(List<int> tags);
+
+        /// <summary>
+        ///     Method for getting user profile questions
+        /// </summary>
+        /// <param name="idUser">Id of user whose questions should be returned</param>
+        /// <param name="skip">Amount of questions should be skipped</param>
+        /// <returns>GetProfileQuestionsResponseDto</returns>
+        public Task<GetProfileQuestionsResponseDto> GetUserProfileQuestionsAsync(int idUser, int skip);
     }
 }

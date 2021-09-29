@@ -34,6 +34,7 @@ namespace Quanda.Shared.Models
         public int? IdService { get; set; }
         public string ServiceToken { get; set; }
         public bool IsDarkModeOff { get; set; }
+        public int Views { get; set; }
 
         public virtual ICollection<UserRole> UserRoles { get; set; }
         public virtual ICollection<Question> Questions { get; set; }
