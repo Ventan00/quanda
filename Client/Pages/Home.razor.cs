@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Quanda.Client.Services;
 using Quanda.Client.Shared.RightMenu;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace Quanda.Client.Pages
 {
@@ -26,7 +23,7 @@ namespace Quanda.Client.Pages
 
         public ClaimsPrincipal user;
 
-        protected async override Task OnParametersSetAsync()
+        protected async override Task OnInitializedAsync()
         {
             var authState = await authenticationStateTask;
             user = authState.User;
