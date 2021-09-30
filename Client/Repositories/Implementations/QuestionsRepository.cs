@@ -41,7 +41,6 @@ namespace Quanda.Client.Repositories.Implementations
             var url = $"{ApiUrl}?skip={page * _skipAmount}&sortOption={Enum.GetName(sortingBy)}";
             if (tags.Count != 0) url += $"&tag={string.Join("&tag=", tags)}";
             var response = await _httpService.Get<GetQuestionsDTO>(url);
-
             return response.Response;
         }
 
@@ -51,6 +50,15 @@ namespace Quanda.Client.Repositories.Implementations
             if (tags.Count != 0) url += $"tag={string.Join("&tag=", tags)}";
             var response = await _httpService.Get<int>(url);
             return response.Response;
+        }
+
+        public async Task<GetProfileQuestionsResponseDto> GetUserQuestionsAsync(int idUser, int skip)
+        {
+            var response =
+                await _httpService.Get<GetProfileQuestionsResponseDto>(
+                    $"{ApiUrl}/users/{idUser}?skip={skip}");
+
+            return !response.Success ? default : response.Response;
         }
     }
 }
