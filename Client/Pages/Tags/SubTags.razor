@@ -3,16 +3,19 @@
 <div class="page-container">
     @if (_subTagPage != null)
     {
-        <h1 class="header">#@_subTagPage.NameMainTag</h1>
+        <h1 class="header">#@_subTagPage.MainTag.Name</h1>
         <span class="header-amount-tags light-grey">
             Amount of subtags: @_subTagPage.TotalAmountOfSubTags
         </span>
         <span class="header-info">
             You choose tag that you interested in! Now you can search for more specific topic for you or watch all question in this tag.
         </span>
-        <a href="/questions?tags=@_subTagPage.IdMainTag" class="main-tags-questions">
-            Show me all questions in this tag>>
-        </a>
+        @if (_subTagPage.MainTag.AmountOfQuestions != 0)
+        {
+            <a href="/questions?tags=@_subTagPage.MainTag.IdTag" class="main-tags-questions">
+                Show me all questions in this tag>>
+            </a>
+        }
         @if (_subTagPage.TotalAmountOfSubTags > 0)
         {
             <span class="grey">
